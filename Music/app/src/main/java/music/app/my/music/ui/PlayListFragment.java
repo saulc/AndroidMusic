@@ -120,6 +120,19 @@ public class PlayListFragment extends baseListFragment {
 
 
     @Override
+    public void updateAdapter(){
+        mAdapter = new PlaylistAdapter(items
+                , ( baseListFragment.OnListFragmentInteractionListener) getActivity() );
+    if(recyclerView == null) return;
+        recyclerView.setAdapter(mAdapter);
+        log("Updating adapter");
+        mAdapter.notifyDataSetChanged();
+        log("items:" + items.size());
+
+    }
+
+
+    @Override
     public void helperReady(){
         log("Helper ready, loading playlists");
 

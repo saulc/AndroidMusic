@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.util.List;
@@ -39,11 +40,24 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    public void onBindViewHolder(final ViewHolder holder, final int position) {
 
         holder.mItem = mValues.get(position);
         holder.mIdView.setText(mValues.get(position).getId());
         holder.mContentView.setText(mValues.get(position).getName());
+
+        holder.opbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.onPlaylistOptionClicked(position, mValues.get(position).getId(), mValues.get(position).getName() );
+            }
+        });
+        holder.nextbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.onPlaylistNextUpClicked(position, mValues.get(position).getId());
+            }
+        });
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -66,6 +80,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
         public final View mView;
         public final TextView mIdView;
         public final TextView mContentView;
+        public final ImageButton opbtn, nextbtn;
         public Playlist mItem;
 
         public ViewHolder(View view) {
@@ -73,6 +88,8 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
             mView = view;
             mIdView = (TextView) view.findViewById(R.id.id);
             mContentView = (TextView) view.findViewById(R.id.content);
+            opbtn = (ImageButton) view.findViewById(R.id.optionbtn);
+            nextbtn = (ImageButton) view.findViewById(R.id.nextupbtn);
         }
 
         @Override

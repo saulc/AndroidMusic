@@ -1,9 +1,11 @@
 package music.app.my.music;
 
+import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
@@ -14,9 +16,11 @@ import android.os.IBinder;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -42,6 +46,7 @@ import music.app.my.music.types.Playlist;
 import music.app.my.music.types.Song;
 import music.app.my.music.ui.AlbumFragment;
 import music.app.my.music.ui.ArtistFragment;
+import music.app.my.music.ui.ConfirmDeleteDialogFragment;
 import music.app.my.music.ui.ControlFragment;
 import music.app.my.music.ui.GenreFragment;
 import music.app.my.music.ui.NewPlaylistDialog;
@@ -511,6 +516,26 @@ public class DrawerActivity extends AppCompatActivity
 
     }
 
+
+
+    public void deleted(String pid){
+        deletePlaylist(pid);
+    }
+    @Override
+    public void onPlaylistOptionClicked(int position, String pid, String name) {
+        //confirm first! important! double confirm?
+        DialogFragment c = ConfirmDeleteDialogFragment.newInstance(name);
+        c.show(getSupportFragmentManager(), pid);
+
+       // deletePlaylist(pid);
+    }
+
+    @Override
+    public void onPlaylistNextUpClicked(int position, String pid) {
+        Log.d(TAG, "Playlist next up clicked");
+        //play list?
+    }
+
     @Override
     public void onPlaylistClicked(Playlist item) {
         Log.d(TAG, "Playlist  clicked");
@@ -726,6 +751,19 @@ public class DrawerActivity extends AppCompatActivity
 
 
         }
+
+    }
+
+
+    public void deletePlaylist(String id){
+        Log.i("m6", "Deleting playlist "+ id);
+        Uri uri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
+        ContentResolver resolver = this.getApplicationContext().getContentResolver();
+        String[] arg = { id};
+        resolver.delete(uri, MediaStore.Audio.Playlists._ID+ "=?", arg);
+
+            Log.i("m6", id + " Playlist delete sucessful id: "+ id);
+
 
     }
 
