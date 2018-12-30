@@ -40,7 +40,7 @@ public  class baseListFragment extends Fragment  implements MediaHelperListener 
     private static final String ARG_COLUMN_COUNT = "column-count";
     // TODO: Customize parameters
     private int mColumnCount = 1;
-    private OnListFragmentInteractionListener mListener;
+    protected OnListFragmentInteractionListener mListener;
 
 
     private final String TAG = getClass().getSimpleName();
@@ -233,5 +233,7 @@ public  class baseListFragment extends Fragment  implements MediaHelperListener 
         void onOptionClicked(int position, Song song);
 
         void  onGenreClicked(Genre item);
+
+        void createNewPlaylist();
     }
 }

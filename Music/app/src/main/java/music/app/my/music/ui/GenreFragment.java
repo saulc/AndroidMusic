@@ -56,15 +56,14 @@ public class GenreFragment extends baseListFragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_baselistitem_list, container, false);
 
+        View v = view.findViewById(R.id.list);
         // Set the adapter
-        if (view instanceof RecyclerView) {
+        if (v instanceof RecyclerView) {
             Context context = view.getContext();
-            recyclerView = (RecyclerView) view;
-//            if (mColumnCount <= 1) {
-//                recyclerView.setLayoutManager(new LinearLayoutManager(context));
-//            } else {
+            recyclerView = (RecyclerView) v;
+
             recyclerView.setLayoutManager(new GridLayoutManager(context, 2));
-            //            }
+
             updateAdapter();
         }
         return view;

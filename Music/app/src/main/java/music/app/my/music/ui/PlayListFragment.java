@@ -11,6 +11,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -61,21 +64,55 @@ public class PlayListFragment extends baseListFragment {
     }
 
 
+    private void headerClicked(){
+        mListener.createNewPlaylist();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_baselistitem_list, container, false);
 
+        View v = view.findViewById(R.id.list);
         // Set the adapter
-        if (view instanceof RecyclerView) {
+        if (v instanceof RecyclerView) {
             Context context = view.getContext();
-             recyclerView = (RecyclerView) view;
-//            if (mColumnCount <= 1) {
-                recyclerView.setLayoutManager(new LinearLayoutManager(context));
-//            } else {
-              //  recyclerView.setLayoutManager(new GridLayoutManager(context, 2));
- //            }
+             recyclerView = (RecyclerView) v;
+             recyclerView.setLayoutManager(new LinearLayoutManager(context));
+            View header =  view.findViewById(R.id.header);
+            TextView t = (TextView) header.findViewById(R.id.content);
+            t.setText("Header");
+
+            ImageButton next = (ImageButton) view.findViewById(R.id.nextupbtn);
+            ImageButton op = (ImageButton) view.findViewById(R.id.optionbtn);
+            next.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View a) {
+
+                    log("Playlist next up clicked");
+
+                }
+            });
+
+            op.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View a){
+
+                        log("Playlist op clicked");
+
+                    }
+            });
+
+            header.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View a) {
+
+                    log("Playlist header clicked");
+                   headerClicked();
+
+                }
+            });
+
           updateAdapter();
         }
         return view;

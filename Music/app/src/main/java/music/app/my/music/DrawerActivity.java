@@ -1,12 +1,17 @@
 package music.app.my.music;
 
 import android.content.ComponentName;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -39,6 +44,7 @@ import music.app.my.music.ui.AlbumFragment;
 import music.app.my.music.ui.ArtistFragment;
 import music.app.my.music.ui.ControlFragment;
 import music.app.my.music.ui.GenreFragment;
+import music.app.my.music.ui.NewPlaylistDialog;
 import music.app.my.music.ui.PlaceholderFragment;
 import music.app.my.music.ui.PlayListFragment;
 import music.app.my.music.ui.QueueFragment;
@@ -48,7 +54,8 @@ import music.app.my.music.ui.dummy.DummyContent;
 
 public class DrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        baseListFragment.OnListFragmentInteractionListener, QueueListener, ControlFragment.ControlFragmentListener{
+        baseListFragment.OnListFragmentInteractionListener, QueueListener,
+        ControlFragment.ControlFragmentListener, NewPlaylistDialog.OnDialogInteractionListener {
 
     private  final String TAG = getClass().getSimpleName();
 
@@ -479,6 +486,31 @@ public class DrawerActivity extends AppCompatActivity
         transaction.commit();
     }
 
+
+    @Override
+    public void nameEnted(String name) {
+        Log.d(TAG, "Playlist  name entered: " + name);
+        newPlaylist( name);
+
+
+    }
+
+    @Override
+    public void cancelClicked() {
+        Log.d(TAG, "Playlist  create terminated.");
+
+    }
+
+    @Override
+    public void createNewPlaylist() {
+        NewPlaylistDialog d =   NewPlaylistDialog.newInstance();
+
+        d.show(getSupportFragmentManager(), "playlist_name_dialog");
+
+        //do the actual work above if nameEnterd() is triggered
+
+    }
+
     @Override
     public void onPlaylistClicked(Playlist item) {
         Log.d(TAG, "Playlist  clicked");
@@ -652,4 +684,70 @@ public class DrawerActivity extends AppCompatActivity
         if(showq != 0)
             qf.setQList(mService.getQueue());
     }
+
+
+    /*
+     * Save/load queue when closing.
+     */
+
+    public void addToPlaylist(Long id, plist p){
+        String[] cols = new String[] {
+                "count(*)"
+        };
+        ContentValues values = new ContentValues();
+        ContentResolver resolver = this.getApplicationContext().getContentResolver();
+        Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external", id);
+        Cursor cur = resolver.query(uri, cols, null, null, null);
+        cur.moveToFirst();
+        final int base = cur.getInt(0);
+        cur.close();
+        Log.d("Music service", "base: " + base);
+
+        int i =0;
+        for(Song t : p.getArray()){
+            values = new ContentValues();
+            int songid = Integer.parseInt(t.getId());
+            Log.d("Music service", i +" saving song: " + t.getTitle() + songid);
+            values.put(MediaStore.Audio.Playlists.Members.PLAY_ORDER,  i++ );
+            values.put(MediaStore.Audio.Playlists.Members.AUDIO_ID, songid);
+            resolver.insert(uri, values);
+        }
+    }
+    public void newPlaylist(String name){
+        Log.i("m6", "Saving playlist "+ name);
+        Uri uri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Audio.Playlists.NAME, name);
+        ContentResolver resolver = this.getApplicationContext().getContentResolver();
+        resolver.insert(uri, values);
+        long id = findPlaylistId(name);
+        if( id > 0){
+            Log.i("m6", name + " Playlist saved sucessful id: "+ id);
+
+
+        }
+
+    }
+
+
+    public long findPlaylistId(String name){
+        Log.d("M6", "Looking for playlist: " + name);
+        ContentResolver resolver = this.getApplicationContext().getContentResolver();
+        String[] playlistProjection = { MediaStore.Audio.Playlists.NAME,
+                MediaStore.Audio.Playlists._ID};
+        Uri uri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
+        Cursor cur = resolver.query(uri, playlistProjection, null, null, null);
+
+        long id = 0;
+        while(cur.moveToNext()){
+            if(cur.getString(0).equals(name)){
+                id = Long.parseLong(cur.getString(1));
+                Log.d("m6", "queue playlist id: " + id);
+                return id;
+            }
+        }
+        return id;
+    }
+
+
 }

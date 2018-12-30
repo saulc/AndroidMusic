@@ -521,6 +521,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 		}
 		return false;
 	}
+
 	@Override
 	public void onStateChanged(MusicPlayer.MUSICPLAYER_STATE s) {
 		switch(s){
