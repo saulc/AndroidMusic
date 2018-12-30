@@ -140,6 +140,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 	@Override
 	public void stopUiCallbacks() {
 
+   	mHandler.removeCallbacks(updateUi);
 	}
 
 	/**
@@ -160,9 +161,10 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 
    public interface BoundServiceListener {
 
-   //	public void sendProgress(HashMap<String, String> info);
+   	//public void sendProgress(HashMap<String, String> info);
 
-		public void setPlayPause(String string);
+	    public void sendProgress(MusicPlayer player);
+		public void setPlayPause(Boolean isPlaying);
 
 		public void setAudioId(int aid);
 
@@ -182,13 +184,24 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 //   	return s;
 //   }
 
-   public void seekTo(int secs){
-//   	if(secs < getDuration() )
-//   	player.seekTo(secs * 1000);
-//   	else if(secs >= getDuration() ){
-//   		player.seekTo(player.getDuration() );
-//   		player.pause();
-//   	}
+   public void seekTo(int progress){
+	   double secs = progress;
+	   log("Seek playback to " +secs + "% requested");
+
+	   int d = getDuration();
+	   log("Duration " +d + " seconds");
+	   secs = secs * d;
+	   log("seekto " + secs + " m seconds");
+	   secs = secs / 100;
+	   log("seekto " + secs + " m seconds");
+
+	   if(secs < getDuration() )
+   		player.seekTo((int)(secs ));
+
+   	else if(secs >= getDuration() ){
+   		player.seekTo(player.getDuration() );
+   		pauseRequest();
+   	}
    }
    public void togglePlaybackRequest() {
 	   log("Toggle playback requested");
@@ -355,53 +368,49 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 //		return temp;
 //
 //	}
-
+//
 //	public int getProgress(){
 //
 //		return (player.getCurrentPosition()/1000);
 //	}
-//	public int getDuration(){
-//		return (player.getDuration()/1000);
-//	}
+	public int getDuration(){
+		return (player.getDuration());
+	}
 
-   public Song getCurrentSong(){
+    public Song getCurrentSong(){
    	return player.getCurrentSong();
    }
-
-	public boolean shuffleSongs() {
-		return player.shuffle();
-
-	}
+	public boolean shuffleSongs() {  return player.shuffle(); }
 	public boolean repeatSongs(){
 		return player.repeat();
 	}
-
 	public void setQueue(plist q){
 		player.setQueue(q);
 	}
-   public plist getQueue(){
+    public plist getQueue(){
    	return player.getQueue();
    }
 
-   public HashMap<String, String> getUiInfo(){
-	   HashMap<String, String> info = new HashMap<String, String>();
-
-
-	   return info;
+   public MusicPlayer getUiInfo(){
+	   return player;
    }
 
 	public Runnable updateUi = new Runnable(){
 		@Override
 		public void run()
 		{
-//			 if(mListener != null){
-//		            mListener.sendProgress(getUiInfo());		//send call to begin updating UI
-//			 }
-//
-//			if( (getDuration() - (player.getCurrentPosition()/1000) )
-//					<= ( player.fadeOutDuration/1000 + player.fadeOutGap/1000) )
-//					nextRequest();
-			// mHandler.postDelayed(updateUi, 1000);
+			 if(mListener != null){
+		            mListener.sendProgress(getUiInfo());		//send call to begin updating UI
+			 }
+
+			if( (getDuration() - (player.getCurrentPosition()/1000) )
+					<= ( player.getFadeOutDuration()/1000 + player.getFadeOutGap()/1000) ) {
+
+				Log.i("Music Service", "Playing next song based on progress...");
+				//mHandler.removeCallbacks(updateUi);  //must stop updating or well try to call on a dead player
+				nextRequest();
+			}
+			 mHandler.postDelayed(updateUi, 1000);
 
 		}
 	};
@@ -549,6 +558,9 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 	        } break;
 			default :
 		}
+
+		if(mListener != null)
+		mListener.setPlayPause(player.isPlaying());
 	}
 
 	public Song removeSong(int index) {

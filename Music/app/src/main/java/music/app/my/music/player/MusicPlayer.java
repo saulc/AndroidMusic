@@ -240,9 +240,16 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 			}
 		}
 	}
+	public int getFadeOutDuration(){ return player.get(currentPlayer).fadeOutDuration; }
+	public int getFadeOutGap(){ return player.get(currentPlayer).fadeOutGap; }
+
+	public int getCurrentPosition(){ return player.get(currentPlayer).getCurrentPosition(); }
 	public int getProgress(){
-		
-		return (player.get(currentPlayer).getCurrentPosition()/1000);
+		double a = player.get(currentPlayer).getCurrentPosition();
+		double d = player.get(currentPlayer).getDuration();
+		//log(a + " time: " + d + " aa " + (a/d));
+		//current/total == percent * 100.
+		return (int)(a/d*100);
 	}
 	public int getDuration(){
 		if(player.get(currentPlayer).isPrepared())

@@ -22,6 +22,8 @@ public class Album {
         mart = art;
     }
 
+    public String getArt(){ return  mart; }
+
     public String getAlbum() {
         return album;
     }

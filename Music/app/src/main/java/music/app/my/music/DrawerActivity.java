@@ -24,7 +24,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
 
+import java.util.HashMap;
+
 import music.app.my.music.helpers.QueueListener;
+import music.app.my.music.player.MusicPlayer;
 import music.app.my.music.player.MusicService;
 import music.app.my.music.types.Album;
 import music.app.my.music.types.Artist;
@@ -553,10 +556,32 @@ public class DrawerActivity extends AppCompatActivity
         startService(previousIntent);
     }
 
+    @Override
+    public void readyForInfo() {
+
+    }
+
+    @Override
+    public void seekBarChanged(int progress) {
+        mService.seekTo(progress);
+    }
+
 
     // bound service
 
 
+    public void setpp(Boolean isPlaying){
+        if(controlsVisible) cf.setPlayPause(isPlaying);
+    }
+    public void updateInfo(MusicPlayer player){
+        if(controlsVisible)
+        {
+
+                cf.updateInfo(player);
+
+        }
+
+    }
 
     /** Defines callbacks for service binding, passed to bindService() */
     private ServiceConnection mConnection = new ServiceConnection() {
@@ -577,8 +602,18 @@ public class DrawerActivity extends AppCompatActivity
             binder.setListener(new MusicService.BoundServiceListener() {
 
                 @Override
-                public void setPlayPause(String string) {
+                public void sendProgress(MusicPlayer player) {
+                    //this happens alot, don't leave active
+                  //  log("Activty got progress info. updating ui...");
 
+                    //update seekbar.
+                    updateInfo(player);
+
+                }
+
+                @Override
+                public void setPlayPause(Boolean isPlaying) {
+                   setpp(isPlaying);
                 }
 
                 @Override

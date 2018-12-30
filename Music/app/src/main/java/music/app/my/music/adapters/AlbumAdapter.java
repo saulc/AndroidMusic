@@ -1,9 +1,11 @@
 package music.app.my.music.adapters;
 
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -28,7 +30,7 @@ public class AlbumAdapter   extends  RecyclerView.Adapter<AlbumAdapter.ViewHolde
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_listitem, parent, false);
+                .inflate(R.layout.albumfragment_listitem, parent, false);
         return new ViewHolder(view);
     }
 
@@ -39,10 +41,16 @@ public class AlbumAdapter   extends  RecyclerView.Adapter<AlbumAdapter.ViewHolde
         holder.mContentView.setText(mValues.get(position).getAlbum());
 
         Album temp = mValues.get(position);
-        String t = temp.getSongs() + " song";
+        String t = temp.getArtist() + " : " + temp.getSongs() + " song";
         if(temp.getSongs() > 1) t += "s";
 
         holder.mLine2.setText(t);
+
+        if(mValues.get(position).getArt() != null) {
+            Drawable d = Drawable.createFromPath(mValues.get(position).getArt());
+            holder.mIcon.setImageDrawable(d);
+
+        }
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,9 +72,10 @@ public class AlbumAdapter   extends  RecyclerView.Adapter<AlbumAdapter.ViewHolde
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
         public final TextView mIdView;
-        public final TextView mContentView;
-
         public final TextView mLine2;
+        public final TextView mContentView;
+        public  final ImageView mIcon;
+
 
         public Album mItem;
 
@@ -76,6 +85,7 @@ public class AlbumAdapter   extends  RecyclerView.Adapter<AlbumAdapter.ViewHolde
             mIdView = (TextView) view.findViewById(R.id.id);
             mContentView = (TextView) view.findViewById(R.id.content);
 
+            mIcon = (ImageView) view.findViewById(R.id.albumImageView);
             mLine2 = (TextView) view.findViewById(R.id.line2);
         }
 
