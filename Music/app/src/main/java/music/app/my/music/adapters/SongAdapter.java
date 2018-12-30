@@ -58,8 +58,17 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                 mListener.onOptionClicked(position, mValues.get(position) );
             }
         });
-        //set details on line 2/subtext
-        Song s = mValues.get(position);
+
+        holder.optionbtn.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                    mListener.onOptionLongClicked(mValues.get(position));
+                return false;
+            }
+        });
+
+                //set details on line 2/subtext
+                Song s = mValues.get(position);
         holder.mLine2View.setText( s.getArtist() + " : " + s.getAlbum());
 
 

@@ -240,5 +240,6 @@ public  class baseListFragment extends Fragment  implements MediaHelperListener 
 
         void  onPlaylistNextUpClicked(int position, String pid);
 
+        void onOptionLongClicked(Song song);
     }
 }

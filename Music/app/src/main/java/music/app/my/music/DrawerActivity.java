@@ -46,6 +46,7 @@ import music.app.my.music.types.Playlist;
 import music.app.my.music.types.Song;
 import music.app.my.music.ui.AlbumFragment;
 import music.app.my.music.ui.ArtistFragment;
+import music.app.my.music.ui.ChoosePlaylistDialogFragment;
 import music.app.my.music.ui.ConfirmDeleteDialogFragment;
 import music.app.my.music.ui.ControlFragment;
 import music.app.my.music.ui.GenreFragment;
@@ -536,6 +537,31 @@ public class DrawerActivity extends AppCompatActivity
         //play list?
     }
 
+    public void addToPlaylistCanceled(){
+        Log.d(TAG, "add to Playlist canceled.");
+        //nothign to do.
+    }
+
+    public void addSongToPlaylist(String name, String sid, int pos, String pid){
+        Log.d(TAG, "Playlist picked: " + pos + " pid:" + pid);
+        try {
+            long id = Long.parseLong(pid);
+            long lsid = Long.parseLong(sid);
+
+            addToPlaylist(id, lsid);
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //calls above method when a playlist is seltected
+    @Override
+    public void onOptionLongClicked(Song song) {
+        Log.d(TAG, "Option long clicked, add to playlist");
+        DialogFragment c = ChoosePlaylistDialogFragment.newInstance(song.getTitle());
+        c.show(getSupportFragmentManager(), song.getId());
+    }
+
     @Override
     public void onPlaylistClicked(Playlist item) {
         Log.d(TAG, "Playlist  clicked");
@@ -715,28 +741,25 @@ public class DrawerActivity extends AppCompatActivity
      * Save/load queue when closing.
      */
 
-    public void addToPlaylist(Long id, plist p){
+    public void addToPlaylist(Long pid, Long sid){
         String[] cols = new String[] {
                 "count(*)"
         };
         ContentValues values = new ContentValues();
         ContentResolver resolver = this.getApplicationContext().getContentResolver();
-        Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external", id);
+        Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external", pid);
         Cursor cur = resolver.query(uri, cols, null, null, null);
         cur.moveToFirst();
         final int base = cur.getInt(0);
         cur.close();
         Log.d("Music service", "base: " + base);
 
-        int i =0;
-        for(Song t : p.getArray()){
             values = new ContentValues();
-            int songid = Integer.parseInt(t.getId());
-            Log.d("Music service", i +" saving song: " + t.getTitle() + songid);
-            values.put(MediaStore.Audio.Playlists.Members.PLAY_ORDER,  i++ );
-            values.put(MediaStore.Audio.Playlists.Members.AUDIO_ID, songid);
+           // Log.d("Music service", i +" saving song: " + t.getTitle() + songid);
+            values.put(MediaStore.Audio.Playlists.Members.PLAY_ORDER,  base );
+            values.put(MediaStore.Audio.Playlists.Members.AUDIO_ID, sid);
             resolver.insert(uri, values);
-        }
+
     }
     public void newPlaylist(String name){
         Log.i("m6", "Saving playlist "+ name);
