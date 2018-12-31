@@ -11,6 +11,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -97,6 +99,11 @@ public class SongFragment extends baseListFragment implements MediaHelperListene
 
     }
 
+    private void headerClicked(){
+        mListener.addSongsToQueue(items);
+    }
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -107,8 +114,44 @@ public class SongFragment extends baseListFragment implements MediaHelperListene
         if (v instanceof RecyclerView) {
             Context context = view.getContext();
             recyclerView = (RecyclerView) v;
-
             recyclerView.setLayoutManager(new GridLayoutManager(context, 1));
+
+            View header =  view.findViewById(R.id.header);
+            TextView t = (TextView) header.findViewById(R.id.content);
+            t.setText(pname);
+            t = (TextView) header.findViewById(R.id.line2);
+            t.setText("type?");
+
+            ImageButton next = (ImageButton) view.findViewById(R.id.nextupbtn);
+            ImageButton op = (ImageButton) view.findViewById(R.id.optionbtn);
+            next.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View a) {
+
+                    log("Playlist next up clicked");
+
+                }
+            });
+
+            op.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View a){
+
+                    log("Playlist op clicked");
+
+                }
+            });
+
+            header.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View a) {
+
+                    log("Playlist header clicked");
+                    headerClicked();
+
+                }
+            });
+
 
             updateAdapter();
         }
@@ -119,6 +162,8 @@ public class SongFragment extends baseListFragment implements MediaHelperListene
     public void updateAdapter(){
         mAdapter = new SongAdapter(items
                 , ( baseListFragment.OnListFragmentInteractionListener) getActivity() );
+
+        if(recyclerView == null) return;
         recyclerView.setAdapter(mAdapter);
         log("Updating song list adapter");
         mAdapter.notifyDataSetChanged();

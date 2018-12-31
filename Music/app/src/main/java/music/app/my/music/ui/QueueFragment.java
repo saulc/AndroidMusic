@@ -2,6 +2,7 @@ package music.app.my.music.ui;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -9,9 +10,19 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ListView;
+
+import com.nhaarman.listviewanimations.appearance.simple.AlphaInAnimationAdapter;
+import com.nhaarman.listviewanimations.appearance.simple.SwingBottomInAnimationAdapter;
+import com.nhaarman.listviewanimations.itemmanipulation.DynamicListView;
+import com.nhaarman.listviewanimations.itemmanipulation.dragdrop.TouchViewDraggableManager;
+import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.OnDismissCallback;
+import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.undo.SimpleSwipeUndoAdapter;
 
 import java.util.ArrayList;
 
+import music.app.my.music.DrawerActivity;
 import music.app.my.music.R;
 import music.app.my.music.adapters.QueueAdapter;
 import music.app.my.music.helpers.QueueListener;
@@ -31,8 +42,10 @@ public class QueueFragment extends baseListFragment {
     // TODO: Customize parameters
     private int mColumnCount = 1;
     private QueueListener qListener;
+    private QueueAdapter mAdapter;
 
     private ArrayList<Song> items;
+    private DynamicListView mListView;
     //private MediaStoreHelper msHelper;
     //private RecyclerView.Adapter mAdapter;
 
@@ -75,20 +88,71 @@ public class QueueFragment extends baseListFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_queueitem_list, container, false);
+        View view = inflater.inflate(R.layout.qlist, container, false);
 
-        // Set the adapter
-        if (view instanceof RecyclerView) {
-            Context context = view.getContext();
-             recyclerView = (RecyclerView) view;
-            if (mColumnCount <= 1) {
-                recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            }
-           // recyclerView.setAdapter(new QueueAdapter(items, mListener));
-            qListener.qFragCreated();
+        mListView = (DynamicListView) view.findViewById(R.id.qlistview);
 
-        }
+//        mListView.setOnItemLongClickListener(
+//                new AdapterView.OnItemLongClickListener() {
+//                    @Override
+//                    public boolean onItemLongClick(final AdapterView<?> parent, final View view,
+//                                                   final int position, final long id) {
+//                        log("Queue item long click ");
+//                        mListView.startDragging(position);
+//                        return true;
+//                    }
+//                }
+//        );
+
+        qListener.qFragCreated();
+
+
         return view;
+    }
+
+    @Override
+    public void updateAdapter(){
+        if(items == null) {
+            items = new ArrayList<>();
+        }
+
+        mAdapter = new QueueAdapter(items, (QueueListener) getActivity());
+
+        SwingBottomInAnimationAdapter animationAdapter = new SwingBottomInAnimationAdapter(mAdapter);
+
+       // mListView.insert(0, myItem); // myItem is of the type the adapter represents.
+
+    //    animationAdapter.setAbsListView(mListView);
+  //      mListView.setAdapter(animationAdapter);
+        mListView.enableDragAndDrop();
+        mListView.setDraggableManager(new TouchViewDraggableManager(R.id.i));
+
+        SimpleSwipeUndoAdapter swipeUndoAdapter = new SimpleSwipeUndoAdapter(animationAdapter, getContext(),
+                new OnDismissCallback() {
+                    @Override
+                    public void onDismiss(@NonNull final ViewGroup listView, @NonNull final int[] reverseSortedPositions) {
+                        for (int position : reverseSortedPositions) {
+                            mListener.onItemSwiped(items.get(position), position);
+                            mAdapter.notifyDataSetChanged();
+                        }
+                    }
+                }
+        );
+
+
+        swipeUndoAdapter.setAbsListView(mListView);
+        mListView.setAdapter(swipeUndoAdapter);
+        mListView.enableSimpleSwipeUndo();
+
+
+        ((QueueAdapter)  mAdapter).setCurrent(current);
+        mListView.setSelection(current) ;
+        // mListView.setAdapter(mAdapter);
+
+        log("Updating adapter");
+        mAdapter.notifyDataSetChanged();
+
+        log("items:" + items.size());
     }
 
 
@@ -129,21 +193,6 @@ public class QueueFragment extends baseListFragment {
         Log.d(getClass().getSimpleName(), s);
     }
 
-
-    @Override
-    public void updateAdapter(){
-        if(items == null) {
-            items = new ArrayList<>();
-        }
-            mAdapter = new QueueAdapter(items, (QueueListener) getActivity());
-        ((QueueAdapter)  mAdapter).setCurrent(current);
-        recyclerView.setAdapter(mAdapter);
-
-        log("Updating adapter");
-        mAdapter.notifyDataSetChanged();
-
-        log("items:" + items.size());
-    }
 
     private  int current = 0;
 

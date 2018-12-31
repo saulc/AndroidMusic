@@ -152,6 +152,7 @@ public class myPlayer extends MediaPlayer {
 	    public void removeCallbacks(){
 	    	mHandler.removeCallbacks(fadeInVolume);
 	    	mHandler.removeCallbacks(fadeOutVolume);
+	    	mHandler.removeCallbacks(pause);
 	    	
 	    }
 		public void setDuckVolume() {

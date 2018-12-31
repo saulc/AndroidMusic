@@ -54,7 +54,7 @@ public class GenreFragment extends baseListFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_baselistitem_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_baselist, container, false);
 
         View v = view.findViewById(R.id.list);
         // Set the adapter
@@ -72,6 +72,7 @@ public class GenreFragment extends baseListFragment {
     public void updateAdapter(){
         mAdapter = new GenreAdapter(items
                 , ( baseListFragment.OnListFragmentInteractionListener) getActivity() );
+        if(recyclerView== null) return;
         recyclerView.setAdapter(mAdapter);
         log("Updating adapter");
         mAdapter.notifyDataSetChanged();

@@ -34,29 +34,40 @@ public class AudioFocusHelper implements AudioManager.OnAudioFocusChangeListener
 
 	@Override
 	public void onAudioFocusChange(int focusChange) {
-		if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT){
-			mContext.startService(new Intent(MusicService.ACTION_PAUSE));
+		if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
+			Intent i = new Intent(MusicService.ACTION_DUCK);
+			//i.putExtra("ToDuckOrNotToDuck", "DUCK");
+			i.setPackage("music.app.my.music.player");
+			mContext.startService(i);
+			Log.i("M6", "ducking audio");
+		}
+		else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT){
+			Intent bi = new Intent(MusicService.ACTION_DUCK);
+			bi.setPackage("music.app.my.music.player");
+			mContext.startService(bi);
+			Log.i("M6", "lost focus!");
 
 			// Pause playback
 		} 
 		else if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
-			mContext.startService(new Intent(MusicService.ACTION_BLANK).putExtra("ToDuckOrNotToDuck", "NO_DUCK"));
+			Intent i = new Intent(MusicService.ACTION_GOOSE);
+//			i.putExtra("ToDuckOrNotToDuck", "NO_DUCK");
+			i.setPackage("music.app.my.music.player");
+			mContext.startService(i);
 
 			Log.i("M6", "Got focus!");
 			//am.registerMediaButtonEventReceiver(myEventReceiver);
 			// Resume playback 
 		} 
 		else if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
-			mContext.startService(new Intent(MusicService.ACTION_PAUSE));
-			//  am.unregisterMediaButtonEventReceiver(myEventReceiver);
+			Intent bi = new Intent(MusicService.ACTION_PAUSE);
+			bi.setPackage("music.app.my.music.player");
+
 			mAudioManager.abandonAudioFocus(this);
-			Log.i("M6", "lost focus!");
+			Log.i("M6", "lost focus for good!");
 			// Stop playback
 		} 
-		else  if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
-			mContext.startService(new Intent(MusicService.ACTION_BLANK).putExtra("ToDuckOrNotToDuck", "DUCK"));
-			Log.i("M6", "ducking audio");
-		} 
+
 
 
 	}

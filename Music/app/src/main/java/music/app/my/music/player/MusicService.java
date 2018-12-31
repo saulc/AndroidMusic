@@ -29,6 +29,12 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.media.MediaDescriptionCompat;
+import android.support.v4.media.MediaMetadataCompat;
+import android.support.v4.media.session.MediaButtonReceiver;
+import android.support.v4.media.session.MediaControllerCompat;
+import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 import android.widget.RemoteViews;
 
@@ -58,6 +64,8 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
    public static final String ACTION_NEXT = "com.app.m6.action.NEXT";
    public static final String ACTION_PREVIOUS = "com.app.m6.action.PREVIOUS";
    public static final String ACTION_BLANK = "com.app.m6.action.ACTION_BLANK";
+	public static final String ACTION_DUCK = "com.app.m6.action.ACTION_DUCK";
+	public static final String ACTION_GOOSE = "com.app.m6.action.ACTION_GOOSE";
 
    private RemoteControlClientCompat mRemoteControlClientCompat;
    private MediaControlReceiver mediaReceiver;
@@ -121,21 +129,31 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
        else if (action.equals(ACTION_NEXT)) nextRequest();
        else if (action.equals(ACTION_STOP)) stopRequest();
        else if (action.equals(ACTION_PREVIOUS)) previousRequest();
-       else if(action.equals(ACTION_BLANK)) {
-       	if(intent.hasExtra("ToDuckOrNotToDuck")){
-       	if( intent.getExtras().getString("ToDuckOrNotToDuck").equals("DUCK"))
-       		player.setDucking(true);
-       	else if( intent.getExtras().getString("ToDuckOrNotToDuck").equals("NO_DUCK"))
-       		player.setDucking(false);
-       	}
+       else if(action.equals(ACTION_BLANK)) ;
+	   else if(action.equals(ACTION_DUCK)) {
+		  		 player.setDucking(true);
+	   }
+		else if(action.equals(ACTION_GOOSE)){
+				player.setDucking(false);
+				player.duck();
+		   log("Music service Audio ducking: " + player.isDucking() );
 
-       }
+	   }
+
+
 
        return START_NOT_STICKY; // Means we started the service, but don't want it to
                                 // restart in case it's killed.
    }
 
 
+   public void duck(){
+   log("Music service Audio ducking: " + player.isDucking() );
+	   player.setDucking(!player.isDucking());
+	   player.duck();
+
+	   log("Music service Audio ducking: " + player.isDucking() );
+   }
 
 	@Override
 	public void stopUiCallbacks() {
@@ -177,12 +195,8 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 	   log("on bind called");
 		return mBinder;
 	}
-//   public Song removeSong(int i){
-//   	Song s = player.removeSong(i);
-////   	if(queue.getIndex() == i)
-////   		playSongFromQueue(i);
-//   	return s;
-//   }
+
+
 
    public void seekTo(int progress){
 	   double secs = progress;
@@ -310,33 +324,55 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 
    		        mBuilder.setSmallIcon(R.drawable.android_robot_icon_128)
    		        .setContentTitle(s.getTitle())
-   		        .setContentText(text);
-   	 PendingIntent pauseIntent = PendingIntent.getService(getApplicationContext(), 0,
-   			 	new Intent(MusicService.ACTION_TOGGLE_PLAYBACK), PendingIntent.FLAG_UPDATE_CURRENT);
-   	 PendingIntent nextIntent = PendingIntent.getService(getApplicationContext(), 0,
-   			 	new Intent(MusicService.ACTION_NEXT), PendingIntent.FLAG_UPDATE_CURRENT);
-   	 PendingIntent resultPendingIntent = PendingIntent.getActivity(getApplicationContext(),
-   			 					0,  new Intent(), PendingIntent.FLAG_CANCEL_CURRENT);
-   		 RemoteViews rv = new RemoteViews(this.getPackageName(), R.layout.notification);
-       	 mBuilder.setContent(rv);
-       	 mBuilder.setContentIntent(resultPendingIntent);
-       	 mBuilder.setOngoing(true);
-
-      // 	 mBuilder.addAction(R.drawable.pausebutton, "Pause", pauseIntent);
-       	 rv.setTextViewText(R.id.title, s.getTitle());
+   		        .setContentText(text + s.getArtist());
+//   	 PendingIntent pauseIntent = PendingIntent.getService(getApplicationContext(), 0,
+//   			 	new Intent(MusicService.ACTION_TOGGLE_PLAYBACK), PendingIntent.FLAG_UPDATE_CURRENT);
+//   	 PendingIntent nextIntent = PendingIntent.getService(getApplicationContext(), 0,
+//   			 	new Intent(MusicService.ACTION_NEXT), PendingIntent.FLAG_UPDATE_CURRENT);
+//	   PendingIntent preIntent = PendingIntent.getService(getApplicationContext(), 0,
+//			   new Intent(MusicService.ACTION_PREVIOUS), PendingIntent.FLAG_UPDATE_CURRENT);
 //
-       	 rv.setTextViewText(R.id.nowplaying, "("+text+ ") " + s.getArtist() );
-//      	 rv.setImageViewResource(R.id.icon, R.drawable.android_robot_icon_128);
-       	 rv.setOnClickPendingIntent(R.id.next, nextIntent);
-       	 rv.setOnClickPendingIntent(R.id.playpause, pauseIntent);
+	   PendingIntent resultPendingIntent = PendingIntent.getActivity(getApplicationContext(),
+               0,  new Intent(MusicService.ACTION_BLANK), PendingIntent.FLAG_CANCEL_CURRENT);
 
-       	if(text.contains("Paused"))
-       	 rv.setImageViewResource(R.id.playpause, R.drawable.playbutton);
-       	else rv.setImageViewResource(R.id.playpause, R.drawable.pausebutton);
+	   MediaSessionCompat mediaSession = new MediaSessionCompat(getApplicationContext(), "Notification");
+	   MediaControllerCompat controller = mediaSession.getController();
+	   MediaMetadataCompat mediaMetadata = controller.getMetadata();
+//	   MediaDescriptionCompat description = mediaMetadata.getDescription();
+
+	    //mBuilder.setContentIntent(controller.getSessionActivity());
+
+	   mBuilder.setContentIntent(resultPendingIntent);
+
+       	 mBuilder.setOngoing(true);
+       	 int pr = android.R.drawable.ic_media_play;
+	   if(text.contains("Paused"))
+		  pr = android.R.drawable.ic_media_pause;
+	   // Add media control buttons that invoke intents in your media service
+
+
+//        mBuilder.addAction(android.R.drawable.ic_media_previous, "Previous", preIntent) // #0
+//			   .addAction(pr, "Pause", pauseIntent)  // #1
+//			   .addAction(android.R.drawable.ic_media_next, "Next", nextIntent);
+
+//	   RemoteViews rv = new RemoteViews(this.getPackageName(), R.layout.notification);
+//	   mBuilder.setContent(rv);
+//			rv.setOnClickPendingIntent(R.id.noti, resultPendingIntent);
+//      // 	 mBuilder.addAction(R.drawable.pausebutton, "Pause", pauseIntent);
+//       	 rv.setTextViewText(R.id.title, s.getTitle());
+////
+//       	 rv.setTextViewText(R.id.nowplaying, "("+text+ ") " + s.getArtist() );
+////      	 rv.setImageViewResource(R.id.icon, R.drawable.android_robot_icon_128);
+//       	 rv.setOnClickPendingIntent(R.id.next, nextIntent);
+//       	 rv.setOnClickPendingIntent(R.id.playpause, pauseIntent);
+
+//       	if(text.contains("Paused"))
+//       	 rv.setImageViewResource(R.id.playpause, R.drawable.playbutton);
+//       	else rv.setImageViewResource(R.id.playpause, R.drawable.pausebutton);
 
    		 mNotificationManager =  (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
    		 mNotification = mBuilder.build();
-   		 mNotification.contentView = rv;
+   		// mNotification.contentView = rv;
    		mNotificationManager.notify(NOTIFICATION_ID, mNotification);
    		startForeground(NOTIFICATION_ID, mNotification);
 
@@ -409,6 +445,15 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 				Log.i("Music Service", "Playing next song based on progress...");
 				//mHandler.removeCallbacks(updateUi);  //must stop updating or well try to call on a dead player
 				nextRequest();
+
+				//if its the last song, wait till the end.
+				if (!getQueue().hasNext() && (getDuration() - (player.getCurrentPosition() / 1000) < 1)){
+
+					mHandler.removeCallbacks(updateUi);
+					player.removeCallbacks();
+					pauseRequest();
+					return;
+					}
 			}
 			 mHandler.postDelayed(updateUi, 1000);
 
@@ -525,6 +570,10 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 	@Override
 	public void onStateChanged(MusicPlayer.MUSICPLAYER_STATE s) {
 		switch(s){
+
+			case PLAYING_DUCKING:
+				player.duck();
+
 		case PLAYING :
 			mHandler.post(updateUi);
 			setUpAsForeground("Playing");;
@@ -564,12 +613,24 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 		mListener.setPlayPause(player.isPlaying());
 	}
 
-	public Song removeSong(int index) {
 
-		return player.removeSong(index);
+	public Song removeSong(int i){
+		log("Music Player removing song: " + i + " curr: " + player.getQueue().getIndex()+ " n: " + player.getQueue().getSize());
+
+		Song s = player.removeSong(i);
+		//if the current song was removed, play whats current now(next).
+		int in = player.getQueue().getIndex();
+		log("Music Player removed song: " + i + " curr: " + in + " n: " + player.getQueue().getSize());
+		//if removing a song before the current
+		if(i <= in) player.getQueue().setIndex(in-1);
+		in = player.getQueue().getIndex();
+
+		if(i >= in) {
+			playSongFromQueue(i);
+			log("Music Player playing current song");
+		}
+		return s;
 	}
-
-
 
 }
 

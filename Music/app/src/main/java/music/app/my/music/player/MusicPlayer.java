@@ -68,7 +68,10 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 		mState = s;
 		sListener.onStateChanged(mState); //update gui, remotes, ...
 	}
-	
+
+	public void removeCallbacks(){
+		player.get(currentPlayer).removeCallbacks();
+	}
 	
     public void togglePlaybackRequest() {
 		  if (player.get(currentPlayer).isPaused()) {
@@ -243,8 +246,14 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 	public int getFadeOutDuration(){ return player.get(currentPlayer).fadeOutDuration; }
 	public int getFadeOutGap(){ return player.get(currentPlayer).fadeOutGap; }
 
-	public int getCurrentPosition(){ return player.get(currentPlayer).getCurrentPosition(); }
+	public int getCurrentPosition(){
+		if(!isPlaying()) return 0;
+		return player.get(currentPlayer).getCurrentPosition();
+	}
+
 	public int getProgress(){
+		if(!isPlaying()) return 0;
+
 		double a = player.get(currentPlayer).getCurrentPosition();
 		double d = player.get(currentPlayer).getDuration();
 		//log(a + " time: " + d + " aa " + (a/d));
@@ -252,7 +261,7 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 		return (int)(a/d*100);
 	}
 	public int getDuration(){
-		if(player.get(currentPlayer).isPrepared())
+		if(player.get(currentPlayer).isPrepared() && !player.get(currentPlayer).isPaused())
 		return (player.get(currentPlayer).getDuration()/1000);
 		return 110;
 	}
@@ -268,13 +277,20 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
     		player.get(currentPlayer).pause();
     	}
     }
-	
+
+    public void duck(){
+    	if(isDucking())
+    		player.get(currentPlayer).setDuckVolume();
+    	else player.get(currentPlayer).setNormalVolume();
+	}
+
+    public boolean isDucking(){ return mState == MUSICPLAYER_STATE.PLAYING_DUCKING; }
 	public void setDucking(boolean b){
 	
 			
 			if(b && mState == MUSICPLAYER_STATE.PLAYING)
 				mState = MUSICPLAYER_STATE.PLAYING_DUCKING;
-			else if(!b && mState == MUSICPLAYER_STATE.PLAYING)
+			else if(!b && mState == MUSICPLAYER_STATE.PLAYING_DUCKING)
 				mState = MUSICPLAYER_STATE.PLAYING;
 			else if(!b && mState == MUSICPLAYER_STATE.PAUSED)
 			mState = MUSICPLAYER_STATE.PAUSED;

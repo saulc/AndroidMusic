@@ -32,7 +32,7 @@ public  class ChoosePlaylistDialogFragment extends DialogFragment {
     private   CharSequence[] getItems(){
         ArrayList<String> items = new  ArrayList<String>();
         ids = new  ArrayList<String>();
- 
+
             Log.d("M6", "Looking for playlist: " );
             ContentResolver resolver = getContext().getContentResolver();
             String[] playlistProjection = { MediaStore.Audio.Playlists.NAME,  MediaStore.Audio.Playlists._ID};

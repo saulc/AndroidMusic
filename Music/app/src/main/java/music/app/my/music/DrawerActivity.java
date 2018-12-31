@@ -32,7 +32,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import music.app.my.music.helpers.QueueListener;
@@ -85,7 +87,16 @@ public class DrawerActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+
+                mService.duck();
+                return true;
+            }
+        });
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -125,7 +136,8 @@ public class DrawerActivity extends AppCompatActivity
 
         //log("Starting service");
         //startService(startIntent);
-
+        if(controlsVisible)
+            showControls();
 
     }
 
@@ -199,7 +211,11 @@ public class DrawerActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.shuffle) {
+            return true;
+        } else if (id == R.id.repeat) {
+            return true;
+        } else if (id == R.id.mix) {
             return true;
         }
 
@@ -510,8 +526,11 @@ public class DrawerActivity extends AppCompatActivity
     @Override
     public void createNewPlaylist() {
         NewPlaylistDialog d =   NewPlaylistDialog.newInstance();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
-        d.show(getSupportFragmentManager(), "playlist_name_dialog");
+        transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
+
+        d.show(transaction, "playlist_name_dialog");
 
         //do the actual work above if nameEnterd() is triggered
 
@@ -560,6 +579,24 @@ public class DrawerActivity extends AppCompatActivity
         Log.d(TAG, "Option long clicked, add to playlist");
         DialogFragment c = ChoosePlaylistDialogFragment.newInstance(song.getTitle());
         c.show(getSupportFragmentManager(), song.getId());
+    }
+
+    @Override
+    public void addSongsToQueue(ArrayList<Song> items) {
+        log("Group header clicked. adding group to queue and playing...");
+
+        plist p = mService.getQueue(); //new plist();
+        if(p.getSize() > 0) {
+            p.addToTop(items);
+            mService.nextRequest();
+        }
+        else{
+            p.addTo(items);
+            startService(playIntent);
+        }
+        if(showq != 0)
+            qf.setQList(p);
+
     }
 
     @Override
@@ -737,6 +774,52 @@ public class DrawerActivity extends AppCompatActivity
     }
 
 
+    @Override
+    public void onQueueItemLongClicked(Song mItem, int position) {
+
+        log(position + " Q item Long clicked " + mItem.getTitle());
+    }
+
+    @Override
+    public void swapItems(int i, int i1) {
+        log("Swapping queue items: " + i + " : " + i1);
+
+        plist p = mService.getQueue();
+
+        int a = i > i1 ? i : i1;    //return the larger
+        int b = a == i ? i1: i;    // return the other
+
+        Song s = p.getSong(b);
+        Song f = p.removeSong(a);
+        p.getArray().add(a, s);  //remove the larger, cope smaller to it
+        p.getArray().remove(b);
+        p.getArray().add(b, f);
+
+        //todo "deal with moving the current song. adjust index or play new current?
+
+      //  mService.setQueue(p);
+
+    }
+
+    @Override
+    public void addToQ(int i, Object o) {
+        log("Add to Q called: " + i);
+    }
+
+    @Override
+    public void onItemSwiped(Song mItem, int position) {
+
+        log(position + " Q item swiped " + mItem.getTitle());
+      //  Toast.makeText(mService, "removed: " + mItem.getTitle() + " from queue.", Toast.LENGTH_SHORT).show();
+
+        log(position + " Removing " + mItem.getTitle() + " from queue.");
+        mService.removeSong(position);
+
+        if(showq != 0)
+            qf.setQList(mService.getQueue());
+    }
+
+
     /*
      * Save/load queue when closing.
      */
@@ -761,6 +844,31 @@ public class DrawerActivity extends AppCompatActivity
             resolver.insert(uri, values);
 
     }
+
+    public void addListToPlaylist(Long pid, ArrayList<Long> ids){
+        String[] cols = new String[] {
+                "count(*)"
+        };
+        ContentValues values = new ContentValues();
+        ContentResolver resolver = this.getApplicationContext().getContentResolver();
+        Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external", pid);
+        Cursor cur = resolver.query(uri, cols, null, null, null);
+        cur.moveToFirst();
+        final int base = cur.getInt(0);
+        cur.close();
+        Log.d("Music service", "base: " + base);
+
+        for(int i=0; i<ids.size(); i++) {
+            values = new ContentValues();
+            // Log.d("Music service", i +" saving song: " + t.getTitle() + songid);
+            values.put(MediaStore.Audio.Playlists.Members.PLAY_ORDER, base + i);
+            values.put(MediaStore.Audio.Playlists.Members.AUDIO_ID, ids.get(i));
+            resolver.insert(uri, values);
+        }
+
+    }
+
+
     public void newPlaylist(String name){
         Log.i("m6", "Saving playlist "+ name);
         Uri uri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;

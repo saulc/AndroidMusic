@@ -58,7 +58,7 @@ public class ArtistFragment extends baseListFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_baselistitem_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_baselist, container, false);
 
         View v = view.findViewById(R.id.list);
         // Set the adapter

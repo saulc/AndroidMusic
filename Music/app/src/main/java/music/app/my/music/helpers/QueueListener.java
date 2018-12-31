@@ -9,4 +9,10 @@ public interface QueueListener  {
     void qFragCreated();
 
     void onQueueItemClicked(Song mItem, int position);
+
+    void onQueueItemLongClicked(Song mItem, int position);
+
+    void swapItems(int i, int i1);
+
+    void addToQ(int i, Object o);
 }
