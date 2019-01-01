@@ -25,11 +25,9 @@ public class NewPlaylistDialog extends DialogFragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
     // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private boolean mParam1;
 
     private  EditText name;
     private OnDialogInteractionListener mListener;
@@ -43,16 +41,14 @@ public class NewPlaylistDialog extends DialogFragment {
      * this fragment using the provided parameters.
      *
      * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
      * @return A new instance of fragment NewPlaylistDialog.
      */
     // TODO: Rename and change types and number of parameters
-    public static NewPlaylistDialog newInstance() {
+    public static NewPlaylistDialog newInstance(boolean isQ) {
         NewPlaylistDialog fragment = new NewPlaylistDialog();
-        //Bundle args = new Bundle();
-//        args.putString(ARG_PARAM1, param1);
-//        args.putString(ARG_PARAM2, param2);
-      //  fragment.setArguments(args);
+        Bundle args = new Bundle();
+        args.putBoolean(ARG_PARAM1, isQ);
+        fragment.setArguments(args);
         return fragment;
     }
 
@@ -60,8 +56,7 @@ public class NewPlaylistDialog extends DialogFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            mParam1 = getArguments().getBoolean(ARG_PARAM1);
         }
     }
 
@@ -78,7 +73,7 @@ public class NewPlaylistDialog extends DialogFragment {
         go.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onButtonPressed(name.getText().toString());
+                onButtonPressed(name.getText().toString(), mParam1);
             }
         });
 
@@ -93,9 +88,9 @@ public class NewPlaylistDialog extends DialogFragment {
     }
 
     // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(String name) {
+    public void onButtonPressed(String name, Boolean isQ) {
         if (mListener != null) {
-            mListener.nameEnted(name);
+            mListener.nameEnted(name, isQ);
             this.dismiss();
         }
     }
@@ -135,7 +130,7 @@ public class NewPlaylistDialog extends DialogFragment {
      */
     public interface OnDialogInteractionListener {
         // TODO: Update argument type and name
-        void nameEnted(String name);
+        void nameEnted(String name, boolean b);
         void cancelClicked();
     }
 }

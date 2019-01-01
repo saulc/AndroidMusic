@@ -65,7 +65,7 @@ public class PlayListFragment extends baseListFragment {
 
 
     private void headerClicked(){
-        mListener.createNewPlaylist();
+        mListener.createNewPlaylist(false);
     }
 
     @Override

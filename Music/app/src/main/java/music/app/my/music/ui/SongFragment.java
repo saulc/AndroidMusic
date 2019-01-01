@@ -98,9 +98,22 @@ public class SongFragment extends baseListFragment implements MediaHelperListene
 
 
     }
+    private void nextLongClicked() {
+        mListener.addSongsToPlaylist(items, true);
+    }
+
+    private void opLongClicked() {
+        mListener.addSongsToPlaylist(items, false);
+    }
 
     private void headerClicked(){
-        mListener.addSongsToQueue(items);
+        mListener.addSongsToQueue(items, true);
+    }
+    private void nextClicked(){
+        mListener.addSongsNextToQueue(items);
+    }
+    private void opClicked(){
+        mListener.addSongsToQueue(items, false);
     }
 
 
@@ -128,8 +141,8 @@ public class SongFragment extends baseListFragment implements MediaHelperListene
                 @Override
                 public void onClick(View a) {
 
-                    log("Playlist next up clicked");
-
+                    log("Song Group next up clicked");
+                        nextClicked();
                 }
             });
 
@@ -137,8 +150,8 @@ public class SongFragment extends baseListFragment implements MediaHelperListene
                 @Override
                 public void onClick(View a){
 
-                    log("Playlist op clicked");
-
+                    log("Song Group op clicked");
+                    opClicked();
                 }
             });
 
@@ -146,17 +159,39 @@ public class SongFragment extends baseListFragment implements MediaHelperListene
                 @Override
                 public void onClick(View a) {
 
-                    log("Playlist header clicked");
+                    log("Song Group header clicked");
                     headerClicked();
 
                 }
             });
 
+            next.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
 
-            updateAdapter();
+                    log("Song Group next long clicked");
+                    nextLongClicked();
+
+                    return false;
+                }
+            });
+
+            op.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+
+                    log("Song Group op long clicked");
+                    opLongClicked();
+
+                    return false;
+                }
+            });
+
+                    updateAdapter();
         }
         return view;
     }
+
 
     @Override
     public void updateAdapter(){

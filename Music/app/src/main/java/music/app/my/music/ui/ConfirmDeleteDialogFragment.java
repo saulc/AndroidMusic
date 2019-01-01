@@ -24,11 +24,15 @@ public  class ConfirmDeleteDialogFragment extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // Use the Builder class for convenient dialog construction
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        String n = getArguments().getString("Name");
-        builder.setMessage(n + " Delete this playlist?")
+        final String n = getArguments().getString("Name");
+
+        builder.setIcon(android.R.drawable.ic_dialog_alert);
+        builder.setTitle( " Delete this playlist?");
+       // builder.setIconAttribute(android.R.drawable.ic_dialog_alert);
+        builder.setMessage("Playlist : " + n)
                 .setPositiveButton("Delete!", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        ((DrawerActivity)  getActivity()).deleted(getTag().toString());
+                        ((DrawerActivity)  getActivity()).deleted(getTag().toString(), n);
                         dismiss();
                     }
                 })

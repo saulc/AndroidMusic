@@ -234,7 +234,7 @@ public  class baseListFragment extends Fragment  implements MediaHelperListener 
 
         void  onGenreClicked(Genre item);
 
-        void createNewPlaylist();
+        void createNewPlaylist(boolean isQ);
 
         void onPlaylistOptionClicked(int position, String pid, String name);
 
@@ -242,8 +242,14 @@ public  class baseListFragment extends Fragment  implements MediaHelperListener 
 
         void onOptionLongClicked(Song song);
 
-        void addSongsToQueue(ArrayList<Song> items);
+        void addSongsToQueue(ArrayList<Song> items, boolean play);
 
         void onItemSwiped(Song m, int position);
+
+        void addSongsNextToQueue(ArrayList<Song> items);
+
+        void addSongsToPlaylist(ArrayList<Song> items, boolean top);
+
+        void onNextLongClicked(Song song);
     }
 }

@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
 import android.database.Cursor;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -22,6 +23,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -32,8 +34,10 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
+import android.widget.TextSwitcher;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ViewSwitcher;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,6 +58,7 @@ import music.app.my.music.ui.ConfirmDeleteDialogFragment;
 import music.app.my.music.ui.ControlFragment;
 import music.app.my.music.ui.GenreFragment;
 import music.app.my.music.ui.NewPlaylistDialog;
+import music.app.my.music.ui.NowFragment;
 import music.app.my.music.ui.PlaceholderFragment;
 import music.app.my.music.ui.PlayListFragment;
 import music.app.my.music.ui.QueueFragment;
@@ -68,6 +73,7 @@ public class DrawerActivity extends AppCompatActivity
 
     private  final String TAG = getClass().getSimpleName();
 
+    private NowFragment nf = null;
     private QueueFragment qf = null;
     private ControlFragment cf = null;
     private PlaceholderFragment pf = null;
@@ -77,7 +83,8 @@ public class DrawerActivity extends AppCompatActivity
     }
     private MusicService mService;
     private boolean mBound = false;
-    private TextView nextText, currentText;
+    private TextView  currentText;
+    private TextSwitcher nextText;
     private Intent startIntent, toggleIntent, pauseIntent, playIntent,
     nextIntent, previousIntent;
 
@@ -90,8 +97,19 @@ public class DrawerActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        nextText = (TextView) findViewById(R.id.nextText);
+        nextText = (TextSwitcher) findViewById(R.id.nextText);
+        nextText.setFactory(new ViewSwitcher.ViewFactory() {
+
+            public View makeView() {
+                TextView t = new TextView(getApplicationContext());
+                t.setTypeface(Typeface.MONOSPACE);
+                return t;
+            }
+        });
+        nextText.setInAnimation(getApplicationContext(), android.R.anim.slide_in_left);
+        nextText.setOutAnimation(getApplicationContext(), android.R.anim.slide_out_right);
         nextText.setText("Nothing to play...");
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -105,7 +123,7 @@ public class DrawerActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 if(controlsVisible)
-                    hideControls();
+                    hideControls(true);
 
                 else showControls();
 
@@ -338,6 +356,8 @@ public class DrawerActivity extends AppCompatActivity
                 b = s.getTitle() + " by " + s.getArtist();
                 if(pf != null)
                 pf.setText(" Now Playing : " + b);
+
+
             }
         }
     }
@@ -354,7 +374,7 @@ public class DrawerActivity extends AppCompatActivity
         }
     }
 
-    public void hideControls(){
+    public void hideControls(boolean showPlaceholder){
 
         if(showq == 1){
             Log.d(TAG, "Hiding Q fragement");
@@ -377,6 +397,9 @@ public class DrawerActivity extends AppCompatActivity
         pf = PlaceholderFragment.newInstance(a);
         transaction.replace(R.id.controlFrame, pf);
         transaction.commit();
+
+        if(!showPlaceholder)
+        getSupportFragmentManager().beginTransaction().remove(pf).commit();
 
     }
     public void showControls(){
@@ -411,13 +434,29 @@ public class DrawerActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_now) {
-           if(showq == 1){
 
-               //update queue for now.. now playing screen?
-                 qf.setQList(mService.getQueue());
-            }
+                Log.d(TAG, "Showing NOW fragment");
+                hideControls(false);
+                //todo
+                //hideStatusLines(); //doesn't exist yet
+                nf =  NowFragment.newInstance();
 
-        } else if (id == R.id.nav_playlists) {
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
+
+                transaction.replace(R.id.frame, nf);
+                transaction.addToBackStack(null);
+                transaction.commit();
+
+        } else if( id == R.id.save_queue) {
+            createNewPlaylist(true);
+
+
+        } else if( id == R.id.new_playlist){
+            createNewPlaylist(false);
+
+            //show playlist after we added a new one. no else
+        }  if (id == R.id.nav_playlists || id == R.id.new_playlist) {
             Fragment f = PlayListFragment.newInstance();
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
@@ -548,13 +587,6 @@ public class DrawerActivity extends AppCompatActivity
     }
 
 
-    @Override
-    public void nameEnted(String name) {
-        Log.d(TAG, "Playlist  name entered: " + name);
-        newPlaylist( name);
-
-
-    }
 
     @Override
     public void cancelClicked() {
@@ -562,9 +594,43 @@ public class DrawerActivity extends AppCompatActivity
 
     }
 
+
+
     @Override
-    public void createNewPlaylist() {
-        NewPlaylistDialog d =   NewPlaylistDialog.newInstance();
+    public void nameEnted(String name, boolean isQ) {
+        Log.d(TAG, "Playlist  name entered: " + name);
+        newPlaylist( name);
+
+        Toast.makeText(mService, "Created Playlist: " + name, Toast.LENGTH_SHORT).show();
+        if(isQ)
+            saveQueueAsPlaylist(name);
+    }
+
+    //called back fro nameEnted when playlist has been created.
+    //add items and we're done.
+    public void saveQueueAsPlaylist(String name){
+        try {
+            Long ii =  findPlaylistId(name);
+            ArrayList<Long> ss = new ArrayList<>();
+
+            if(mService != null) {
+                ArrayList<Song> songs =  mService.getQueue().getArray();
+                for(Song a: songs) ss.add( Long.parseLong( a.getId() ) );
+                Toast.makeText(mService, "adding items Playlist" + name, Toast.LENGTH_SHORT).show();
+
+            }
+            addListToPlaylist(ii, ss, true);
+            onPlaylistClicked(new Playlist(name, ii.toString()));   //show the new playlist.
+
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    @Override
+    public void createNewPlaylist(boolean isQ) {
+        NewPlaylistDialog d =   NewPlaylistDialog.newInstance(isQ);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
         transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
@@ -577,10 +643,15 @@ public class DrawerActivity extends AppCompatActivity
 
 
 
-    public void deleted(String pid){
+    public void deleted(String pid, String name){
         deletePlaylist(pid);
+        Toast.makeText(mService, "Deleted Playlist: " + name + " : " + pid, Toast.LENGTH_SHORT).show();
+
     }
 
+    /*
+    add song to playlist
+     */
     @Override
     public void onPlaylistOptionClicked(int position, String pid, String name) {
         //confirm first! important! double confirm?
@@ -600,37 +671,115 @@ public class DrawerActivity extends AppCompatActivity
         //nothign to do.
     }
 
-    public void addSongToPlaylist(String name, String sid, int pos, String pid){
+    public void addSongToPlaylist(String name, String sid, int pos, String pid, boolean top){
         Log.d(TAG, "Playlist picked: " + pos + " pid:" + pid);
         try {
             long id = Long.parseLong(pid);
             long lsid = Long.parseLong(sid);
 
-            addToPlaylist(id, lsid);
+            addToPlaylist(id, lsid, top);
         } catch (NumberFormatException e) {
             e.printStackTrace();
         }
     }
 
+    /*
+    end of add song to playlist
+    */
+
+    /*
+   add group to playlist
+    */
+
+    //called for song option/next long click top is true for next
+    @Override
+    public void addSongsToPlaylist(ArrayList<Song> items, boolean top) {
+        Log.d(TAG, "Group Option long clicked, add to playlist");
+        DialogFragment c = ChoosePlaylistDialogFragment.newInstance( items.get(0).getTitle(), true, top);
+        c.show(getSupportFragmentManager(), items.get(0).getId());
+
+        //happens after dialog name entered.
+        try {
+            ArrayList<Long> i = new ArrayList<>();
+            for(Song s: items) i.add(Long.parseLong( s.getId() ));
+
+            if(temptag != 0) {
+                Log.d(TAG, "adding Group to playlist: " + temptag);
+                addListToPlaylist(temptag, i, top);
+                temptag = 0;
+            }
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+        }
+
+    }
+    private long temptag = 0;
+
+    public void addSongsToPlaylist(String name, String sid, int pos, String pid){
+        Log.d(TAG, "Playlist picked: " + pos + " pid:" + pid);
+        try {
+            long id = Long.parseLong(pid);
+            temptag = id;
+            //then let the above method resume.
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+    /*
+      end of add group to playlist
+    */
+
     //calls above method when a playlist is seltected
     @Override
     public void onOptionLongClicked(Song song) {
         Log.d(TAG, "Option long clicked, add to playlist");
-        DialogFragment c = ChoosePlaylistDialogFragment.newInstance(song.getTitle());
+        DialogFragment c = ChoosePlaylistDialogFragment.newInstance(song.getTitle(), false, false);
         c.show(getSupportFragmentManager(), song.getId());
     }
 
     @Override
-    public void addSongsToQueue(ArrayList<Song> items) {
+    public void onNextLongClicked(Song song) {
+        Log.d(TAG, "Option long clicked, add to top of playlist");
+        DialogFragment c = ChoosePlaylistDialogFragment.newInstance(song.getTitle(), false, true);
+        c.show(getSupportFragmentManager(), song.getId());
+    }
+
+    @Override
+    public void addSongsNextToQueue(ArrayList<Song> items) {
         log("Group header clicked. adding group to queue and playing...");
 
         plist p = mService.getQueue(); //new plist();
         if(p.getSize() > 0) {
             p.addToTop(items);
+        }
+        else{
+            p.addTo(items);
+        }
+        if(showq != 0)
+            qf.setQList(p);
+
+        updateNextSongInfo();
+        updateCurrentSongInfo();
+    }
+
+
+
+    @Override
+    public void addSongsToQueue(ArrayList<Song> items, boolean play) {
+    log("Group header clicked. adding group to queue and playing...");
+
+        plist p = mService.getQueue(); //new plist();
+        if(p.getSize() > 0) {
+            p.addToTop(items);
+            if(play)
             mService.nextRequest();
         }
         else{
             p.addTo(items);
+            if(play)
             startService(playIntent);
         }
         if(showq != 0)
@@ -659,6 +808,10 @@ public class DrawerActivity extends AppCompatActivity
         // Commit the transaction
         transaction.commit();
     }
+
+
+
+
 
     @Override
     public void onSongNextupClicked(int position, Song item) {
@@ -737,14 +890,22 @@ public class DrawerActivity extends AppCompatActivity
 
 
     public void setpp(Boolean isPlaying){
+        if(nf != null) nf.setPlayPause(isPlaying);
         if(controlsVisible) cf.setPlayPause(isPlaying);
     }
     public void updateInfo(MusicPlayer player){
+        if(nf != null) nf.updateInfo(player);
         if(controlsVisible)
         {
-
                 cf.updateInfo(player);
+        }
 
+    }
+    public void updateCurrentInfo(Song s){
+        if(nf != null) nf.updateInfo(s);
+        if(controlsVisible)
+        {
+            cf.updateInfo(s);
         }
 
     }
@@ -780,6 +941,11 @@ public class DrawerActivity extends AppCompatActivity
                 @Override
                 public void setPlayPause(Boolean isPlaying) {
                    setpp(isPlaying);
+                }
+
+                @Override
+                public void setCurrentInfo(Song s) {
+                    updateCurrentInfo(s);
                 }
 
                 @Override
@@ -873,7 +1039,7 @@ public class DrawerActivity extends AppCompatActivity
      * Save/load queue when closing.
      */
 
-    public void addToPlaylist(Long pid, Long sid){
+    public void addToPlaylist(Long pid, Long sid, boolean top){
         String[] cols = new String[] {
                 "count(*)"
         };
@@ -881,31 +1047,39 @@ public class DrawerActivity extends AppCompatActivity
         ContentResolver resolver = this.getApplicationContext().getContentResolver();
         Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external", pid);
         Cursor cur = resolver.query(uri, cols, null, null, null);
-        cur.moveToFirst();
-        final int base = cur.getInt(0);
+        cur.moveToLast();
+        if(top) cur.moveToFirst();
+
+        int base = cur.getInt(0);
         cur.close();
+        if(top) base -= 1;
+
         Log.d("Music service", "base: " + base);
 
             values = new ContentValues();
            // Log.d("Music service", i +" saving song: " + t.getTitle() + songid);
-            values.put(MediaStore.Audio.Playlists.Members.PLAY_ORDER,  base );
+            values.put(MediaStore.Audio.Playlists.Members.PLAY_ORDER,  base +1);
             values.put(MediaStore.Audio.Playlists.Members.AUDIO_ID, sid);
             resolver.insert(uri, values);
 
     }
 
-    public void addListToPlaylist(Long pid, ArrayList<Long> ids){
-        String[] cols = new String[] {
+    public void addListToPlaylist(Long pid, ArrayList<Long> ids, boolean top) {
+        String[] cols = new String[]{
                 "count(*)"
         };
         ContentValues values = new ContentValues();
         ContentResolver resolver = this.getApplicationContext().getContentResolver();
         Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external", pid);
+        int base = 0;
+        if(!top){
         Cursor cur = resolver.query(uri, cols, null, null, null);
         cur.moveToFirst();
-        final int base = cur.getInt(0);
-        cur.close();
-        Log.d("Music service", "base: " + base);
+            base = cur.getInt(0);
+            cur.close();
+            Log.d("Music service", "base: " + base);
+
+        }
 
         for(int i=0; i<ids.size(); i++) {
             values = new ContentValues();

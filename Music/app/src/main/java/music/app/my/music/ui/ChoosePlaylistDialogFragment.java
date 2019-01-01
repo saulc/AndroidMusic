@@ -20,10 +20,12 @@ import music.app.my.music.types.Playlist;
 
 public  class ChoosePlaylistDialogFragment extends DialogFragment {
 
-    public static ChoosePlaylistDialogFragment newInstance(String name) {
+    public static ChoosePlaylistDialogFragment newInstance(String name, boolean isGroup, boolean isTop) {
         ChoosePlaylistDialogFragment fragment = new ChoosePlaylistDialogFragment();
         Bundle b = new Bundle();
         b.putString("Name", name);
+        b.putBoolean("isGroup", isGroup);
+        b.putBoolean("isTop", isTop);
         fragment.setArguments(b);
         return fragment;
     }
@@ -61,7 +63,8 @@ public  class ChoosePlaylistDialogFragment extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         final String n = getArguments().getString("Name");
-
+        final boolean g = getArguments().getBoolean("isGroup");
+        final boolean t = getArguments().getBoolean("isTop");
         builder.setTitle(n + " : Add to Playlist: ");
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
@@ -72,7 +75,9 @@ public  class ChoosePlaylistDialogFragment extends DialogFragment {
         });
         builder.setItems(getItems() , new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        ((DrawerActivity) getActivity()).addSongToPlaylist(n, getTag(), which, ids.get(which));
+                        if(g) ((DrawerActivity) getActivity()).addSongsToPlaylist(n, getTag(), which, ids.get(which));
+                      else    ((DrawerActivity) getActivity()).addSongToPlaylist(n, getTag(), which, ids.get(which), t);
+
                     }
                 });
         return builder.create();

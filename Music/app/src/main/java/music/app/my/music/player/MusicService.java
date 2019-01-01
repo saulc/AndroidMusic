@@ -184,6 +184,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 	    public void sendProgress(MusicPlayer player);
 		public void setPlayPause(Boolean isPlaying);
 
+		public void setCurrentInfo(Song s);
 		public void setAudioId(int aid);
 
 		public void setAlbumArt();
@@ -578,6 +579,9 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 				player.duck();
 
 		case PLAYING :
+			mListener.setPlayPause(true);
+			mListener.setCurrentInfo(player.getCurrentSong());
+			mListener.setAlbumArt();
 			mHandler.post(updateUi);
 			setUpAsForeground("Playing");;
 			// Tell any remote controls that our playback state is 'paused'.
@@ -588,6 +592,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 		case PAUSED : log("Music Player Pause");
 		case PAUSED_USER :
 			log("Music Player state Paused by User");
+			mListener.setPlayPause(false);
 			mHandler.removeCallbacks(updateUi);
 			 // Tell any remote controls that our playback state is 'paused'.
 	        if (mRemoteControlClientCompat != null) {

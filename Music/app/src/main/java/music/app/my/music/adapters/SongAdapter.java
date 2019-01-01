@@ -66,6 +66,14 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                 return false;
             }
         });
+        holder.nextupbtn.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                mListener.onNextLongClicked(mValues.get(position));
+                return false;
+            }
+        });
+
 
                 //set details on line 2/subtext
                 Song s = mValues.get(position);

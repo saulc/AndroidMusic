@@ -51,7 +51,15 @@
                 android:id="@+id/nav_settings"
                 android:icon="@android:drawable/ic_menu_preferences"
                 android:title="Settings" />
-            </menu>
+            <item
+                android:id="@+id/new_playlist"
+                android:icon="@android:drawable/ic_input_add"
+                android:title="New Playlist" />
+            <item
+                android:id="@+id/save_queue"
+                android:icon="@android:drawable/ic_menu_save"
+                android:title="Save Queue" />
+        </menu>
     </item>
 
 </menu>

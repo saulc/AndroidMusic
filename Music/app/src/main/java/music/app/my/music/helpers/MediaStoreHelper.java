@@ -475,11 +475,11 @@ public class MediaStoreHelper extends Fragment implements LoaderManager.LoaderCa
 	private String playlistMemberSort =  MediaStore.Audio.Playlists.Members.PLAY_ORDER + " COLLATE LOCALIZED ASC";
 
 
-	 private  String[] playlistProjection = { MediaStore.Audio.Playlists.NAME,
-												MediaStore.Audio.Playlists._ID,
-	 			};
-	 private Uri playlistUri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
-	 private String playlistSortOrder = MediaStore.Audio.Playlists.NAME   + " COLLATE LOCALIZED ASC";
+	private  String[] playlistProjection = { MediaStore.Audio.Playlists.NAME,
+			MediaStore.Audio.Playlists._ID,
+	};
+	private Uri playlistUri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
+	private String playlistSortOrder = MediaStore.Audio.Playlists.NAME   + " COLLATE LOCALIZED ASC";
 
 	private Uri genreUri = MediaStore.Audio.Genres.EXTERNAL_CONTENT_URI;
 	private String genreSortOrder = MediaStore.Audio.Genres.NAME   + " COLLATE LOCALIZED ASC";
@@ -487,8 +487,7 @@ public class MediaStoreHelper extends Fragment implements LoaderManager.LoaderCa
 			MediaStore.Audio.Genres.NAME,
 			MediaStore.Audio.Genres._ID
 
-			};
-
+	};
 
 
 	private String genreMembersSortOrder = MediaStore.Audio.Genres.Members.TITLE   + " COLLATE LOCALIZED ASC";
