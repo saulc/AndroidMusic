@@ -424,6 +424,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 		player.setQueue(q);
 	}
     public plist getQueue(){
+		if(player== null) return null;
    	return player.getQueue();
    }
 
@@ -448,9 +449,11 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 
 				//if its the last song, wait till the end.
 				if (!getQueue().hasNext() && (getDuration() - (player.getCurrentPosition() / 1000) < 1)){
+					Log.i("Music Service", "No song up next, pausing player.");
 
 					mHandler.removeCallbacks(updateUi);
 					player.removeCallbacks();
+					//stopRequest();
 					pauseRequest();
 					return;
 					}

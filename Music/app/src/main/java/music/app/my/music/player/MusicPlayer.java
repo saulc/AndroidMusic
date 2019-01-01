@@ -81,8 +81,10 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 	        }
 	}
 	public void stopRequest() {
-		
+
+			setState(MUSICPLAYER_STATE.STOPPED);
 		try {
+		 //   player.get(currentPlayer).removeCallbacks();
 			player.get(currentPlayer).stop();
 			//player.get(currentPlayer).reset();
 			player.get(currentPlayer).release();
@@ -90,8 +92,7 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 		} catch (IllegalStateException e) {
 			throw e;
 		}
-		
-		setState(MUSICPLAYER_STATE.STOPPED);
+
        
 
 	}

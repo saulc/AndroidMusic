@@ -32,6 +32,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -69,12 +70,14 @@ public class DrawerActivity extends AppCompatActivity
 
     private QueueFragment qf = null;
     private ControlFragment cf = null;
+    private PlaceholderFragment pf = null;
     private int showq = 0; //0 == hidden, 1 = mini q, 2 = half, 3 = full screen, 4 edit plist
     private void log(String s){
         Log.d(TAG, s);
     }
     private MusicService mService;
     private boolean mBound = false;
+    private TextView nextText, currentText;
     private Intent startIntent, toggleIntent, pauseIntent, playIntent,
     nextIntent, previousIntent;
 
@@ -87,7 +90,8 @@ public class DrawerActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-
+        nextText = (TextView) findViewById(R.id.nextText);
+        nextText.setText("Nothing to play...");
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -255,6 +259,8 @@ public class DrawerActivity extends AppCompatActivity
             );
             findViewById(R.id.frame).setLayoutParams(param);
         }
+
+
     }
     public void expandQframe(){
         int orientation = getResources().getConfiguration().orientation;
@@ -296,7 +302,7 @@ public class DrawerActivity extends AppCompatActivity
         if(qf != null) {
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
-            transaction.replace(R.id.qframe, PlaceholderFragment.newInstance());
+            transaction.replace(R.id.qframe, PlaceholderFragment.newInstance("something"));
             //  transaction.addToBackStack(null);
             // Commit the transaction
             transaction.commit();
@@ -323,6 +329,31 @@ public class DrawerActivity extends AppCompatActivity
     }
 
 
+
+    public void updateCurrentSongInfo(){
+        if(mService != null ) {
+            Song s = mService.getQueue().getCurrentSong();
+            String b = "";
+            if (s != null) {
+                b = s.getTitle() + " by " + s.getArtist();
+                if(pf != null)
+                pf.setText(" Now Playing : " + b);
+            }
+        }
+    }
+
+    public void updateNextSongInfo(){
+        if((mService.getQueue().getIndex()+1) < mService.getQueue().getSize() ) {
+            Song s = mService.getQueue().getSong(mService.getQueue().getIndex() + 1);
+            String b = "";
+            if (s != null) {
+                b = s.getTitle() + " by " + s.getArtist();
+                                //" Now Playing: "
+                nextText.setText( " Up Next: " + b);
+            }
+        }
+    }
+
     public void hideControls(){
 
         if(showq == 1){
@@ -336,7 +367,15 @@ public class DrawerActivity extends AppCompatActivity
        // getSupportFragmentManager().popBackStack("cf", FragmentManager.POP_BACK_STACK_INCLUSIVE);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
-        transaction.replace(R.id.controlFrame, PlaceholderFragment.newInstance());
+
+        Song s = mService.getQueue().getCurrentSong();
+        String a = "";
+        if(s != null) a =  s.getTitle() + " by " + s.getArtist();
+
+        updateNextSongInfo();
+
+        pf = PlaceholderFragment.newInstance(a);
+        transaction.replace(R.id.controlFrame, pf);
         transaction.commit();
 
     }
@@ -541,13 +580,13 @@ public class DrawerActivity extends AppCompatActivity
     public void deleted(String pid){
         deletePlaylist(pid);
     }
+
     @Override
     public void onPlaylistOptionClicked(int position, String pid, String name) {
         //confirm first! important! double confirm?
         DialogFragment c = ConfirmDeleteDialogFragment.newInstance(name);
         c.show(getSupportFragmentManager(), pid);
 
-       // deletePlaylist(pid);
     }
 
     @Override
@@ -597,6 +636,8 @@ public class DrawerActivity extends AppCompatActivity
         if(showq != 0)
             qf.setQList(p);
 
+        updateNextSongInfo();
+        updateCurrentSongInfo();
     }
 
     @Override
@@ -628,6 +669,7 @@ public class DrawerActivity extends AppCompatActivity
         p.addNextSong(item);
         if(showq >0)
         qf.setQList(p);
+        updateNextSongInfo();
     }
 
     @Override
@@ -649,7 +691,9 @@ public class DrawerActivity extends AppCompatActivity
         plist p = mService.getQueue(); //new plist();
         if(p.getSize() > 0) {
             p.addNextSong(item);
-            mService.nextRequest();
+            //let this action take care of the rest ;)
+            onQueueItemClicked(item, p.getIndex()+1);
+           // mService.nextRequest();
         }
         else{
             p.addSong(item);
@@ -657,6 +701,8 @@ public class DrawerActivity extends AppCompatActivity
         }
         if(showq != 0)
         qf.setQList(p);
+        updateNextSongInfo();
+        updateCurrentSongInfo();
     }
 
 
@@ -760,7 +806,7 @@ public class DrawerActivity extends AppCompatActivity
     @Override
     public void qFragCreated() {
         log("Q frag created");
-        if(mService != null)
+        if(mService != null  )
         qf.setQList(mService.getQueue());
     }
 
@@ -769,8 +815,11 @@ public class DrawerActivity extends AppCompatActivity
         log(position + " Q item clicked " + mItem.getTitle());
        if( mService.getQueue().getIndex() != position)
             mService.playSongFromQueue(position);
+
+       if(showq == 0)        updateCurrentSongInfo();
         if(showq != 0)
             qf.setQList(mService.getQueue());
+        updateNextSongInfo();
     }
 
 

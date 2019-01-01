@@ -37,10 +37,13 @@
         android:paddingTop="3dp" />
 
     <TextView
+        android:id="@+id/nextText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="0"
-        android:text="Up Next:" />
+        android:fontFamily="monospace"
+        android:text="Up Next:"
+        android:typeface="monospace" />
 
 
     <View
