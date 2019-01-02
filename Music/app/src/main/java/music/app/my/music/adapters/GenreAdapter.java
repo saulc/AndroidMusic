@@ -10,9 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import music.app.my.music.R;
-import music.app.my.music.types.Artist;
 import music.app.my.music.types.Genre;
-import music.app.my.music.ui.baseListFragment;
+import music.app.my.music.ui.browser.baseListFragment;
 
 
 public class GenreAdapter extends  RecyclerView.Adapter<GenreAdapter.ViewHolder> {

@@ -1,4 +1,4 @@
-package music.app.my.music.ui;
+package music.app.my.music.ui.popup;
 
 
 
@@ -16,7 +16,6 @@ import android.util.Log;
 import java.util.ArrayList;
 
 import music.app.my.music.DrawerActivity;
-import music.app.my.music.types.Playlist;
 
 public  class ChoosePlaylistDialogFragment extends DialogFragment {
 

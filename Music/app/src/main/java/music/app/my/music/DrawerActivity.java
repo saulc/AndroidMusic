@@ -1,12 +1,10 @@
 package music.app.my.music;
 
-import android.app.Dialog;
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
@@ -18,14 +16,10 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AlertDialog;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.MenuInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -37,14 +31,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
-import android.widget.SearchView;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import music.app.my.music.helpers.QueueListener;
 import music.app.my.music.player.MusicPlayer;
@@ -55,19 +47,19 @@ import music.app.my.music.types.Genre;
 import music.app.my.music.types.plist;
 import music.app.my.music.types.Playlist;
 import music.app.my.music.types.Song;
-import music.app.my.music.ui.AlbumFragment;
-import music.app.my.music.ui.ArtistFragment;
-import music.app.my.music.ui.ChoosePlaylistDialogFragment;
-import music.app.my.music.ui.ConfirmDeleteDialogFragment;
+import music.app.my.music.ui.browser.AlbumFragment;
+import music.app.my.music.ui.browser.ArtistFragment;
+import music.app.my.music.ui.popup.ChoosePlaylistDialogFragment;
+import music.app.my.music.ui.popup.ConfirmDeleteDialogFragment;
 import music.app.my.music.ui.ControlFragment;
-import music.app.my.music.ui.GenreFragment;
-import music.app.my.music.ui.NewPlaylistDialog;
+import music.app.my.music.ui.browser.GenreFragment;
+import music.app.my.music.ui.popup.NewPlaylistDialog;
 import music.app.my.music.ui.NowFragment;
 import music.app.my.music.ui.PlaceholderFragment;
-import music.app.my.music.ui.PlayListFragment;
+import music.app.my.music.ui.browser.PlayListFragment;
 import music.app.my.music.ui.QueueFragment;
-import music.app.my.music.ui.SongFragment;
-import music.app.my.music.ui.baseListFragment;
+import music.app.my.music.ui.browser.SongFragment;
+import music.app.my.music.ui.browser.baseListFragment;
 import music.app.my.music.ui.dummy.DummyContent;
 
 public class DrawerActivity extends AppCompatActivity
@@ -91,6 +83,7 @@ public class DrawerActivity extends AppCompatActivity
     private TextSwitcher nextText;
     private Intent startIntent, toggleIntent, pauseIntent, playIntent,
     nextIntent, previousIntent;
+
 
     private boolean controlsVisible = false;
     @Override
@@ -302,7 +295,18 @@ public class DrawerActivity extends AppCompatActivity
 
 
     //adjust layout weights to hide/show queue and player
-    public void placeholderCreated(){
+    public void placeholderCreated() {
+
+        log("Placeholder created, q frame");
+        closeQframe();
+    }
+
+
+
+
+    public void closeQframe(){
+        log("Closing q frame: ");
+      //  mHandler.removeCallbacks(hideQframe);
         int orientation = getResources().getConfiguration().orientation;
         if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
             // In landscape
@@ -326,6 +330,7 @@ public class DrawerActivity extends AppCompatActivity
                     0,
                     0.0f
             );
+            //queue frame ends at q == 0, f == 2
             findViewById(R.id.qframe).setLayoutParams(param);
             param = new LinearLayout.LayoutParams(
                     DrawerLayout.LayoutParams.MATCH_PARENT,
@@ -333,11 +338,13 @@ public class DrawerActivity extends AppCompatActivity
                     2.0f
             );
             findViewById(R.id.frame).setLayoutParams(param);
+            //main frame
         }
 
 
     }
     public void expandQframe(){
+        log("Expanding q frame");
         int orientation = getResources().getConfiguration().orientation;
         if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
             // In landscape
@@ -441,22 +448,22 @@ public class DrawerActivity extends AppCompatActivity
         Log.d(TAG, "Hiding control fragement");
         controlsVisible = false;
 
-       // getSupportFragmentManager().popBackStack("cf", FragmentManager.POP_BACK_STACK_INCLUSIVE);
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
-
-        Song s = mService.getQueue().getCurrentSong();
-        String a = "";
-        if(s != null) a =  s.getTitle() + " by " + s.getArtist();
-
-        updateNextSongInfo();
-
-        pf = PlaceholderFragment.newInstance(a);
-        transaction.replace(R.id.controlFrame, pf);
-        transaction.commit();
-
-        if(!showPlaceholder)
-        getSupportFragmentManager().beginTransaction().remove(pf).commit();
+//       // getSupportFragmentManager().popBackStack("cf", FragmentManager.POP_BACK_STACK_INCLUSIVE);
+//        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+//        transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
+//
+//        Song s = mService.getQueue().getCurrentSong();
+//        String a = "";
+//        if(s != null) a =  s.getTitle() + " by " + s.getArtist();
+//
+//        updateNextSongInfo();
+//
+//        pf = PlaceholderFragment.newInstance(a);
+//        transaction.replace(R.id.controlFrame, pf);
+//        transaction.commit();
+//
+//        if(!showPlaceholder)
+//        getSupportFragmentManager().beginTransaction().remove(pf).commit();
 
     }
     public void showControls(){
@@ -467,19 +474,19 @@ public class DrawerActivity extends AppCompatActivity
            // qf.setQList(mService.getQueue());
         }
 
-        Log.d(TAG, "Showing control fragement");
-        cf =  (ControlFragment) ControlFragment.newInstance();
-
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
-
-        // Replace whatever is in the fragment_container view with this fragment,
-        // and add the transaction to the back stack
-        transaction.replace(R.id.controlFrame, cf);
-      //  transaction.addToBackStack("cf");
-
-        // Commit the transaction
-        transaction.commit();
+//        Log.d(TAG, "Showing control fragement");
+//        cf =  (ControlFragment) ControlFragment.newInstance();
+//
+//        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+//        transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
+//
+//        // Replace whatever is in the fragment_container view with this fragment,
+//        // and add the transaction to the back stack
+//        transaction.replace(R.id.controlFrame, cf);
+//      //  transaction.addToBackStack("cf");
+//
+//        // Commit the transaction
+//        transaction.commit();
         controlsVisible = true;
     }
 
@@ -992,13 +999,13 @@ public class DrawerActivity extends AppCompatActivity
 
     public void setpp(Boolean isPlaying){
         if(nf != null) nf.setPlayPause(isPlaying);
-        if(controlsVisible) cf.setPlayPause(isPlaying);
+      //  if(controlsVisible) cf.setPlayPause(isPlaying);
     }
     public void updateInfo(MusicPlayer player){
         if(nf != null) nf.updateInfo(player);
         if(controlsVisible)
         {
-                cf.updateInfo(player);
+              //  cf.updateInfo(player);
         }
 
     }
@@ -1006,7 +1013,7 @@ public class DrawerActivity extends AppCompatActivity
         if(nf != null) nf.updateInfo(s);
         if(controlsVisible)
         {
-            cf.updateInfo(s);
+           // cf.updateInfo(s);
         }
 
     }

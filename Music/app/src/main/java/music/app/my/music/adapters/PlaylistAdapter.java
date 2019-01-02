@@ -11,8 +11,7 @@ import java.util.List;
 
 import music.app.my.music.R;
 import music.app.my.music.types.Playlist;
-import music.app.my.music.ui.baseListFragment;
-import music.app.my.music.ui.dummy.DummyContent;
+import music.app.my.music.ui.browser.baseListFragment;
 
 /**
  * Created by saul on 7/27/16.

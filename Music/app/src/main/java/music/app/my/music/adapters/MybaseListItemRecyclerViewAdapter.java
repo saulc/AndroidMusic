@@ -10,7 +10,7 @@ import java.util.List;
 
 import music.app.my.music.R;
 
-import music.app.my.music.ui.baseListFragment;
+import music.app.my.music.ui.browser.baseListFragment;
 import music.app.my.music.ui.dummy.DummyContent.DummyItem;
 
 

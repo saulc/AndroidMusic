@@ -11,8 +11,7 @@ import java.util.List;
 
 import music.app.my.music.R;
 import music.app.my.music.types.Artist;
-import music.app.my.music.types.Playlist;
-import music.app.my.music.ui.baseListFragment;
+import music.app.my.music.ui.browser.baseListFragment;
 
 public class ArtistAdapter extends  RecyclerView.Adapter<ArtistAdapter.ViewHolder> {
 

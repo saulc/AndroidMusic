@@ -1,4 +1,4 @@
-package music.app.my.music.ui;
+package music.app.my.music.ui.browser;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -6,7 +6,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,7 +15,6 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 
 import music.app.my.music.R;
-import music.app.my.music.adapters.MybaseListItemRecyclerViewAdapter;
 import music.app.my.music.adapters.PlaylistAdapter;
 import music.app.my.music.helpers.MediaHelperListener;
 import music.app.my.music.helpers.MediaStoreHelper;
@@ -25,7 +23,6 @@ import music.app.my.music.types.Artist;
 import music.app.my.music.types.Genre;
 import music.app.my.music.types.Playlist;
 import music.app.my.music.types.Song;
-import music.app.my.music.ui.dummy.DummyContent;
 import music.app.my.music.ui.dummy.DummyContent.DummyItem;
 
 /**

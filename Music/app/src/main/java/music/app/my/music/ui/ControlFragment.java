@@ -163,6 +163,7 @@ public class ControlFragment extends Fragment {
                 MediaStore.Audio.Albums.ALBUM_ART
         };
         ContentValues values = new ContentValues();
+        if(getContext()==null) return null;
         ContentResolver resolver = getContext().getContentResolver();
         Uri uri = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI;
         String selection =  MediaStore.Audio.Albums._ID + "=?";

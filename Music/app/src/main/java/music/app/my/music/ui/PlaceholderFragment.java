@@ -11,8 +11,9 @@ import android.widget.TextView;
 
 import music.app.my.music.DrawerActivity;
 import music.app.my.music.R;
+import music.app.my.music.ui.browser.baseListFragment;
 
-public class PlaceholderFragment extends baseListFragment{
+public class PlaceholderFragment extends baseListFragment {
 
 
     /**

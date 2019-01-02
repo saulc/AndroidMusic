@@ -13,8 +13,7 @@ import java.util.List;
 
 import music.app.my.music.R;
 import music.app.my.music.types.Album;
-import music.app.my.music.types.Artist;
-import music.app.my.music.ui.baseListFragment;
+import music.app.my.music.ui.browser.baseListFragment;
 
 public class AlbumAdapter   extends  RecyclerView.Adapter<AlbumAdapter.ViewHolder> {
 

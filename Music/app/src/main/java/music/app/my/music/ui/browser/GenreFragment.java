@@ -1,4 +1,4 @@
-package music.app.my.music.ui;
+package music.app.my.music.ui.browser;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -12,28 +12,27 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 
 import music.app.my.music.R;
-import music.app.my.music.adapters.AlbumAdapter;
-import music.app.my.music.types.Album;
+import music.app.my.music.adapters.GenreAdapter;
+import music.app.my.music.types.Genre;
 
-public class AlbumFragment  extends baseListFragment {
+/*
+ * Created by saul on 7/26/16.
+ */
+public class GenreFragment extends baseListFragment {
 
-    protected ArrayList<Album> items;
+    protected ArrayList<Genre> items;
 
     private final String TAG = getClass().getSimpleName();
     private void log(String s){
         Log.d(TAG, s);
     }
 
-    //private MediaStoreHelper msHelper;
-    //private RecyclerView.Adapter mAdapter;
-    // private ArrayList<Playlist> items;
-    // private RecyclerView recyclerView;
 
     private String pid = null;
     private String pname = null;
 
-    public static AlbumFragment newInstance() {
-        AlbumFragment fragment = new AlbumFragment();
+    public static GenreFragment newInstance() {
+        GenreFragment fragment = new GenreFragment();
 
         return fragment;
     }
@@ -42,9 +41,9 @@ public class AlbumFragment  extends baseListFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        log("Album fragment qFragCreated");
+        log("Genre fragment Created");
         //   iniMsHelper();
-        items = new ArrayList<Album>();
+        items = new ArrayList<Genre>();
 
     }
 
@@ -59,18 +58,18 @@ public class AlbumFragment  extends baseListFragment {
         // Set the adapter
         if (v instanceof RecyclerView) {
             Context context = view.getContext();
-            recyclerView = (RecyclerView)  v;
-            recyclerView.setLayoutManager(new GridLayoutManager(context, 3));
-            //
+            recyclerView = (RecyclerView) v;
+
+            recyclerView.setLayoutManager(new GridLayoutManager(context, 2));
+
             updateAdapter();
         }
         return view;
     }
 
     public void updateAdapter(){
-        mAdapter = new AlbumAdapter(items
+        mAdapter = new GenreAdapter(items
                 , ( baseListFragment.OnListFragmentInteractionListener) getActivity() );
-
         if(recyclerView== null) return;
         recyclerView.setAdapter(mAdapter);
         log("Updating adapter");
@@ -81,15 +80,16 @@ public class AlbumFragment  extends baseListFragment {
 
     @Override
     public void helperReady(){
-        log("Helper ready, loading Albums");
+        log("Helper ready, loading Genres");
 
-        msHelper.loadAlbums();
+
+        msHelper.loadGenres();
     }
 
     @Override
-    public void albumLoaderFinished(ArrayList<Album> p) {
-        log("Albums Loaded");
-        log("found " + p.size() + " album(s)");
+    public void genreLoaderFinished(ArrayList<Genre> p) {
+        log("Genre Loaded");
+        log("found " + p.size() + " Genre(s)");
         items = p;
         updateAdapter();
 

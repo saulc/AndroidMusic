@@ -3,17 +3,11 @@ package music.app.my.music.ui;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ListView;
 
-import com.nhaarman.listviewanimations.appearance.simple.AlphaInAnimationAdapter;
 import com.nhaarman.listviewanimations.appearance.simple.SwingBottomInAnimationAdapter;
 import com.nhaarman.listviewanimations.itemmanipulation.DynamicListView;
 import com.nhaarman.listviewanimations.itemmanipulation.dragdrop.TouchViewDraggableManager;
@@ -22,12 +16,12 @@ import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.undo.Simple
 
 import java.util.ArrayList;
 
-import music.app.my.music.DrawerActivity;
 import music.app.my.music.R;
 import music.app.my.music.adapters.QueueAdapter;
 import music.app.my.music.helpers.QueueListener;
 import music.app.my.music.types.Song;
 import music.app.my.music.types.plist;
+import music.app.my.music.ui.browser.baseListFragment;
 
 /**
  * A fragment representing a list of Items.
