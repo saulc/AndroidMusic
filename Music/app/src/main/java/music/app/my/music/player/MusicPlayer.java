@@ -70,6 +70,8 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 	}
 
 	public void removeCallbacks(){
+
+
 		player.get(currentPlayer).removeCallbacks();
 	}
 	

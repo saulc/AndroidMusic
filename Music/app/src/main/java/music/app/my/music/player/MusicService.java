@@ -456,6 +456,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 					player.removeCallbacks();
 					//stopRequest();
 					pauseRequest();
+					seekTo(0);
 					return;
 					}
 			}
@@ -534,7 +535,9 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 					MediaStore.Audio.Playlists.Members.ALBUM,
 					MediaStore.Audio.Playlists.Members.DURATION,
 					MediaStore.Audio.Playlists.Members._ID,
-					MediaStore.Audio.Playlists.Members.PLAY_ORDER
+					MediaStore.Audio.Playlists.Members.PLAY_ORDER,
+					MediaStore.Audio.Playlists.Members.ARTIST_ID
+
 
 			};
 			Uri memebersUri =  MediaStore.Audio.Playlists.Members.getContentUri("external", queuePlaylistId);
@@ -544,7 +547,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 			while(cur.moveToNext()){
 				Log.d("Music service", "Adding song: " + cur.getString(0) + cur.getString(5));
 				player.addSong(new Song(cur.getString(0), cur.getString(1), cur.getString(2),
-						cur.getString(3), cur.getString(4), cur.getString(5) ));
+						cur.getString(3), cur.getString(4), cur.getString(5), cur.getString(6) ));
 			}
 
 			Uri uri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
@@ -582,7 +585,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 			mListener.setPlayPause(true);
 			mListener.setCurrentInfo(player.getCurrentSong());
 			mListener.setAlbumArt();
-			mHandler.post(updateUi);
+			mHandler.postDelayed(updateUi, 1000);
 			setUpAsForeground("Playing");;
 			// Tell any remote controls that our playback state is 'paused'.
 	        if (mRemoteControlClientCompat != null) {
@@ -601,7 +604,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 	            setUpAsForeground("Paused");
 	        } break;
 		case STOPPED :
-			mHandler.post(updateUi);
+			//mHandler.post(updateUi);
 			 // Tell any remote controls that our playback state is 'paused'.
 	        if (mRemoteControlClientCompat != null) {
 	            mRemoteControlClientCompat

@@ -7,11 +7,11 @@
     android:gravity="center_vertical|center_horizontal"
     android:orientation="vertical">
 
-    <ImageView
+    <ImageSwitcher
         android:id="@+id/currentIcon"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="2"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
         app:srcCompat="@drawable/android_robot_icon_2" />
 
     <SeekBar
@@ -25,7 +25,7 @@
         android:gravity="center_horizontal"
         android:orientation="vertical">
 
-        <TextView
+        <TextSwitcher
             android:id="@+id/currentText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -37,7 +37,7 @@
             android:textSize="24sp"
             android:textStyle="bold" />
 
-        <TextView
+        <TextSwitcher
             android:id="@+id/currentSubText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -48,7 +48,7 @@
             android:textAlignment="center"
             android:textSize="18sp" />
 
-        <TextView
+        <TextSwitcher
             android:id="@+id/currentSubText2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

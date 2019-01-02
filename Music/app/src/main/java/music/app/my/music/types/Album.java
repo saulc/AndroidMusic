@@ -6,7 +6,7 @@ import static java.lang.Integer.parseInt;
  * Created by saul on 8/17/16.
  */
 public class Album {
-    private String album, artist, id, mart;
+    private String album, artist, id, mart, artistId;
     private int songs;
 
     public Album(String mid, String albumName){
@@ -20,8 +20,10 @@ public class Album {
         id = mid;
         songs = parseInt(song);
         mart = art;
+        //artistId = artistid;
     }
 
+    public String artistId(){ return artistId; }
     public String getArt(){ return  mart; }
 
     public String getAlbum() {

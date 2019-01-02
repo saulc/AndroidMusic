@@ -1,8 +1,15 @@
 package music.app.my.music.ui;
 
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -39,6 +46,12 @@ public class ControlFragment extends Fragment {
         void prevPressed();
         void readyForInfo();
         void seekBarChanged(int progress);
+
+        void controlIconClicked();
+
+        void nowIconClicked();
+
+        void lineClicked(int i);
     }
     private ControlFragmentListener mListener;
     private SeekBar sbar;
@@ -79,7 +92,15 @@ public class ControlFragment extends Fragment {
         log("Control fragment view created");
             Context context = view.getContext();
 
+            
             icon = (ImageView) view.findViewById(R.id.currentIcon);
+            
+            icon.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mListener.controlIconClicked();
+                }
+            });
             line1 = (TextView) view.findViewById(R.id.currentText);
             line2 = (TextView) view.findViewById(R.id.currentSubText);
             sbar = (SeekBar) view.findViewById(R.id.seekBar);
@@ -136,6 +157,24 @@ public class ControlFragment extends Fragment {
 
         return view;
     }
+    public String findAlbumArt(String albumid){
+        String[] cols = new String[] {
+                MediaStore.Audio.Albums._ID,
+                MediaStore.Audio.Albums.ALBUM_ART
+        };
+        ContentValues values = new ContentValues();
+        ContentResolver resolver = getContext().getContentResolver();
+        Uri uri = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI;
+        String selection =  MediaStore.Audio.Albums._ID + "=?";
+        String[] arg = { albumid };
+        Cursor cur = resolver.query(uri, cols, selection, arg, null);
+        cur.moveToFirst();
+        int base = cur.getInt(0);
+        String id = cur.getString(1);
+        Log.d("Music service", "--->>>>>base: " + base + " " + id);
+
+        return id;
+    }
 
 
     private boolean infoset = false;
@@ -153,9 +192,19 @@ public class ControlFragment extends Fragment {
 
                 line1.setText(s.getTitle());
                 line2.setText(s.getArtist() + " : " + s.getAlbum());
-                if (s.getAlbumArt() != null) {
-                    Drawable d = Drawable.createFromPath(s.getAlbumArt());
-                    icon.setImageDrawable(d);
+                if (s.getAlbumId() != null) {
+                    String p = findAlbumArt(s.getAlbumId());
+
+                    log("Now fragment updating albumart: " + p);
+                    Drawable d = Drawable.createFromPath(p);
+                    if (d != null) {
+//                        Bitmap bitmap = ((BitmapDrawable) d).getBitmap();
+//                        // Scale it to 50 x 50
+//
+//                        d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, 512, 512, true));
+
+                        icon.setImageDrawable(d);
+                    } else icon.setImageResource(R.drawable.android_robot_icon_2);
                 }
             }
 

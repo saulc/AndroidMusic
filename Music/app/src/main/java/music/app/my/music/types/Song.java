@@ -13,6 +13,7 @@ public class Song extends Qbase{
 	private String duration;
 	private String albumArt;
 	private String albumId;
+	private String artistId;
 //	
 //	public Song(String title, String filePath, String artist, String album){
 //		this.title = title;
@@ -27,7 +28,7 @@ public class Song extends Qbase{
 		this.genre = gid;
 	}
 
-	public Song(String title, String gid, String artist, String album, String id, String filePath ){
+	public Song(String title, String gid, String artist, String album, String id, String filePath,  String artistId ){
 		super();
 		this.title = title;
 		this.filePath = filePath;
@@ -36,10 +37,11 @@ public class Song extends Qbase{
 		this.id = id;
 		this.genre = gid;
 
+		this.artistId = artistId;
 		//this.duration = duration;
 	}
 
-	public Song(String title, String filePath, String artist, String album, String duration, String id, String albumId){
+	public Song(String title, String filePath, String artist, String album, String duration, String id, String albumId, String artistId ){
 		super();
 		this.title = title;
 		this.filePath = filePath;
@@ -48,8 +50,10 @@ public class Song extends Qbase{
 		this.id = id;
 		this.duration = duration;
 		this.albumId = albumId;
+
+		this.artistId = artistId;
 	}
-	public Song(String title, String filePath, String artist, String album, String albumArt, String id, String genre, String duration){
+	public Song(String title, String filePath, String artist, String album, String albumArt, String id, String genre, String duration, String artistId){
 		super();
 		this.title = title;
 		this.filePath = filePath;
@@ -59,6 +63,7 @@ public class Song extends Qbase{
 		this.id = id;
 		this.genre = genre;
 		this.duration = duration;
+		this.artistId = artistId;
 	}
 	
 	public int getKey(){
@@ -95,9 +100,16 @@ public class Song extends Qbase{
 	public String getArtist() {
 		return artist;
 	}
+	public void setArtistId(String artistId) {
+		this.artistId = artistId;
+	}
+	public String getArtistId() {
+		return artistId;
+	}
 	public void setArtist(String artist) {
 		this.artist = artist;
 	}
+
 	public String getAlbum() {
 		return album;
 	}

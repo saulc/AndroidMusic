@@ -31,15 +31,19 @@ public  class ChoosePlaylistDialogFragment extends DialogFragment {
     }
 
     private   ArrayList<String> ids;
+    private ArrayList<String> items;
+
     private   CharSequence[] getItems(){
-        ArrayList<String> items = new  ArrayList<String>();
+        items = new  ArrayList<String>();
         ids = new  ArrayList<String>();
 
             Log.d("M6", "Looking for playlist: " );
             ContentResolver resolver = getContext().getContentResolver();
             String[] playlistProjection = { MediaStore.Audio.Playlists.NAME,  MediaStore.Audio.Playlists._ID};
             Uri uri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
-            Cursor cur = resolver.query(uri, playlistProjection, null, null, null);
+
+            String playlistSortOrder = MediaStore.Audio.Playlists.NAME   + " COLLATE LOCALIZED ASC";
+            Cursor cur = resolver.query(uri, playlistProjection, null, null, playlistSortOrder);
 
             String id = "";
             String pname = "";
@@ -75,8 +79,8 @@ public  class ChoosePlaylistDialogFragment extends DialogFragment {
         });
         builder.setItems(getItems() , new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        if(g) ((DrawerActivity) getActivity()).addSongsToPlaylist(n, getTag(), which, ids.get(which));
-                      else    ((DrawerActivity) getActivity()).addSongToPlaylist(n, getTag(), which, ids.get(which), t);
+                        if(g) ((DrawerActivity) getActivity()).addSongsToPlaylist(items.get(which), getTag(), which, ids.get(which));
+                      else    ((DrawerActivity) getActivity()).addSongToPlaylist(items.get(which), getTag(), which, ids.get(which), t);
 
                     }
                 });

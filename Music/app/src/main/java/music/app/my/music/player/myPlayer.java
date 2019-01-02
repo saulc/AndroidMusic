@@ -79,7 +79,8 @@ public class myPlayer extends MediaPlayer {
 			}
 		} catch (IllegalStateException e) {
 			e.printStackTrace();
-			removeCallbacks();
+			//removeCallbacks();
+			mHandler.removeCallbacks(fadeOutVolume);
 		}
     	
     }

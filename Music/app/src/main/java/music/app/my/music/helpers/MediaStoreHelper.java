@@ -278,7 +278,7 @@ public class MediaStoreHelper extends Fragment implements LoaderManager.LoaderCa
 			while(cursor.moveToNext()) {
 				songs.add(new Song(cursor.getString(0), cursor.getString(1),
 						cursor.getString(2), cursor.getString(3), cursor.getString(4)
-						, cursor.getString(5), cursor.getString(6)));
+						, cursor.getString(5), cursor.getString(6), cursor.getString(7)));
 			}
 			log("Returning Playlist with "+ songs.size() + " Items to activity");
 			if(pid.compareTo(qid) == 0) mListener.queueitemLoaderFinished(songs);
@@ -305,7 +305,7 @@ public class MediaStoreHelper extends Fragment implements LoaderManager.LoaderCa
 			while(cursor.moveToNext()) {
 				songs.add(new Song(cursor.getString(0), cursor.getString(1)
 						,cursor.getString(2), cursor.getString(3), cursor.getString(4)
-						, cursor.getString(5) ) );
+						, cursor.getString(5), cursor.getString(6) ) );
 			}
 			log("Returning Genre with "+ songs.size() + " Items to activity");
 			 mListener.genreItemLoaderFinished(songs);
@@ -320,7 +320,7 @@ public class MediaStoreHelper extends Fragment implements LoaderManager.LoaderCa
 			while(cursor.moveToNext()) {
 				songs.add(new Song(cursor.getString(0), cursor.getString(1),
 						cursor.getString(2), cursor.getString(3), cursor.getString(4)
-						, cursor.getString(5), cursor.getString(6)));
+						, cursor.getString(5), cursor.getString(6) , cursor.getString(7) ));
 			}
 			log("Returning Album with "+ songs.size() + " Items to activity");
 			 mListener.albumItemLoaderFinished(songs);
@@ -335,7 +335,7 @@ public class MediaStoreHelper extends Fragment implements LoaderManager.LoaderCa
 			while(cursor.moveToNext()) {
 				songs.add(new Song(cursor.getString(0), cursor.getString(1),
 						cursor.getString(2), cursor.getString(3), cursor.getString(4)
-						, cursor.getString(5), cursor.getString(6)));
+						, cursor.getString(5), cursor.getString(6), cursor.getString(7) ));
 			}
 			log("Returning Artist with "+ songs.size() + " Items to activity");
 			mListener.artistItemLoaderFinished(songs);
@@ -350,7 +350,7 @@ public class MediaStoreHelper extends Fragment implements LoaderManager.LoaderCa
 			while(cursor.moveToNext()) {
 				songs.add(new Song(cursor.getString(0), cursor.getString(1),
 						cursor.getString(2), cursor.getString(3), cursor.getString(4)
-						, cursor.getString(5), cursor.getString(6)));
+						, cursor.getString(5), cursor.getString(6), cursor.getString(7 )));
 			}
 			log("Returning SONGs  to activity");
 			mListener.songLoadedFinished(songs);
@@ -375,7 +375,7 @@ public class MediaStoreHelper extends Fragment implements LoaderManager.LoaderCa
 			ArrayList<Album> ar = new ArrayList<>();
 			while(cursor.moveToNext()){
 				//ar.add( new Album( cursor.getString(4), cursor.getString(1) ) );
-				ar.add( new Album( cursor.getString(0), cursor.getString(1) , cursor.getString(2), cursor.getString(3 ), cursor.getString(4)  ));
+				ar.add( new Album( cursor.getString(0), cursor.getString(1) , cursor.getString(2), cursor.getString(3 ), cursor.getString(4)    ));
 				// adapter.add(cursor.getString(0) + "||" + cursor.getString(1) + "||" +   cursor.getString(2) + "||" +   cursor.getString(3) + "||" +  cursor.getString(4) + "||" +  cursor.getString(5));
 			}
 			log("found " + ar.size() + " Album(s)");
@@ -420,7 +420,8 @@ public class MediaStoreHelper extends Fragment implements LoaderManager.LoaderCa
             MediaStore.Audio.Media.ALBUM,
             MediaStore.Audio.Media.DURATION,
             MediaStore.Audio.Media._ID,
-            MediaStore.Audio.Media.ALBUM_ID
+            MediaStore.Audio.Media.ALBUM_ID,
+			MediaStore.Audio.Media.ARTIST_ID
             
     };
 
@@ -429,7 +430,7 @@ public class MediaStoreHelper extends Fragment implements LoaderManager.LoaderCa
 	            MediaStore.Audio.Albums.ARTIST,
 	            MediaStore.Audio.Albums.ALBUM_ART,
 	            MediaStore.Audio.Albums.NUMBER_OF_SONGS,
-	            MediaStore.Audio.Albums._ID,
+	            MediaStore.Audio.Albums._ID
 	    };
 	   private Uri albumUri = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI;
 	   private String albumSort = MediaStore.Audio.Albums.ALBUM + " COLLATE LOCALIZED ASC";
@@ -443,6 +444,7 @@ public class MediaStoreHelper extends Fragment implements LoaderManager.LoaderCa
 				MediaStore.Audio.Media._ID,
 				MediaStore.Audio.Media.ALBUM_ID,
 				MediaStore.Audio.Media.TRACK,
+			    MediaStore.Audio.Media.ARTIST_ID
 
 	   };
 	   private String albumMemeberSort =  MediaStore.Audio.Media.TRACK + " COLLATE LOCALIZED ASC";
@@ -468,7 +470,8 @@ public class MediaStoreHelper extends Fragment implements LoaderManager.LoaderCa
 			MediaStore.Audio.Playlists.Members.DURATION,
 			MediaStore.Audio.Playlists.Members.AUDIO_ID,
 			MediaStore.Audio.Playlists.Members.ALBUM_ID,
-			MediaStore.Audio.Playlists.Members.PLAY_ORDER
+			MediaStore.Audio.Playlists.Members.PLAY_ORDER,
+			MediaStore.Audio.Playlists.Members.ARTIST_ID
 
 	};
 
@@ -497,7 +500,8 @@ public class MediaStoreHelper extends Fragment implements LoaderManager.LoaderCa
 			MediaStore.Audio.Genres.Members.ARTIST,
 			MediaStore.Audio.Genres.Members.ALBUM,
 			MediaStore.Audio.Genres.Members.AUDIO_ID,
-			MediaStore.Audio.Genres.Members.DATA
+			MediaStore.Audio.Genres.Members.DATA,
+			MediaStore.Audio.Genres.Members.ARTIST_ID
 
 	};
 

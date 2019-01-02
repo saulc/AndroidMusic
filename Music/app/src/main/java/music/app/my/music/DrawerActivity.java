@@ -13,6 +13,7 @@ import android.database.Cursor;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
@@ -69,7 +70,7 @@ import music.app.my.music.ui.dummy.DummyContent;
 public class DrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         baseListFragment.OnListFragmentInteractionListener, QueueListener,
-        ControlFragment.ControlFragmentListener, NewPlaylistDialog.OnDialogInteractionListener {
+        ControlFragment.ControlFragmentListener, NewPlaylistDialog.OnDialogInteractionListener , Toolbar.OnMenuItemClickListener{
 
     private  final String TAG = getClass().getSimpleName();
 
@@ -97,6 +98,7 @@ public class DrawerActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        toolbar.setOnMenuItemClickListener((Toolbar.OnMenuItemClickListener) this);
         nextText = (TextSwitcher) findViewById(R.id.nextText);
         nextText.setFactory(new ViewSwitcher.ViewFactory() {
 
@@ -426,6 +428,60 @@ public class DrawerActivity extends AppCompatActivity
         controlsVisible = true;
     }
 
+    @Override
+    public void controlIconClicked(){
+
+        Log.d(TAG, "Control icon clicked");
+        showNow();
+    }
+
+    @Override
+    public void nowIconClicked() {
+
+        Log.d(TAG, "Now icon clicked");
+
+        if(showq == 0){
+            showQ();
+        } else hideQ();
+    }
+
+    @Override
+    public void lineClicked(int i) {
+
+        Log.d(TAG, "Now line clicked: " + i);
+
+        if(i== 1) {
+            Log.d(TAG, "Current song clicked, doing nothing... ");
+        } else if(i==2){
+            Log.d(TAG, "Current Artist clicked");
+            Song s = mService.getCurrentSong();
+            Artist a = new Artist( s.getArtistId(), s.getArtist());
+            onArtistClicked(a);
+        }else if(i==3){
+            Log.d(TAG, "Control Album clicked");
+            Song s = mService.getCurrentSong();
+            Album a = new Album(s.getAlbumId(), s.getAlbum());
+            onAlbumClicked(a);
+        }
+
+    }
+
+    public void showNow(){
+        Log.d(TAG, "Showing NOW fragment");
+        hideControls(false);
+        //todo
+        //hideStatusLines(); //doesn't exist yet
+        nf =  NowFragment.newInstance();
+
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
+
+        transaction.replace(R.id.frame, nf);
+        transaction.addToBackStack(null);
+        transaction.commit();
+
+//        updateCurrentInfo(new Song("", ""));
+    }
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -435,18 +491,7 @@ public class DrawerActivity extends AppCompatActivity
 
         if (id == R.id.nav_now) {
 
-                Log.d(TAG, "Showing NOW fragment");
-                hideControls(false);
-                //todo
-                //hideStatusLines(); //doesn't exist yet
-                nf =  NowFragment.newInstance();
-
-                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
-
-                transaction.replace(R.id.frame, nf);
-                transaction.addToBackStack(null);
-                transaction.commit();
+            showNow();
 
         } else if( id == R.id.save_queue) {
             createNewPlaylist(true);
@@ -677,7 +722,7 @@ public class DrawerActivity extends AppCompatActivity
             long id = Long.parseLong(pid);
             long lsid = Long.parseLong(sid);
 
-            addToPlaylist(id, lsid, top);
+            addToPlaylist(name, id, lsid, top);
         } catch (NumberFormatException e) {
             e.printStackTrace();
         }
@@ -1039,34 +1084,63 @@ public class DrawerActivity extends AppCompatActivity
      * Save/load queue when closing.
      */
 
-    public void addToPlaylist(Long pid, Long sid, boolean top){
+    public void addToPlaylist(String pname, Long pid, Long sid, boolean top){
         String[] cols = new String[] {
-                "count(*)"
+                 MediaStore.Audio.Playlists.Members.PLAY_ORDER,
+                MediaStore.Audio.Playlists.Members.AUDIO_ID
         };
         ContentValues values = new ContentValues();
         ContentResolver resolver = this.getApplicationContext().getContentResolver();
         Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external", pid);
         Cursor cur = resolver.query(uri, cols, null, null, null);
-        cur.moveToLast();
-        if(top) cur.moveToFirst();
-
+         cur.moveToFirst();
         int base = cur.getInt(0);
-        cur.close();
-        if(top) base -= 1;
+        String id = cur.getString(1);
+        Log.d("Music service", "--->>>>>base: " + base + " " + id);
+        ArrayList<String> temp = new ArrayList<>();
 
-        Log.d("Music service", "base: " + base);
+    while(cur.moveToNext()) {
 
-            values = new ContentValues();
-           // Log.d("Music service", i +" saving song: " + t.getTitle() + songid);
-            values.put(MediaStore.Audio.Playlists.Members.PLAY_ORDER,  base +1);
-            values.put(MediaStore.Audio.Playlists.Members.AUDIO_ID, sid);
-            resolver.insert(uri, values);
+        base = cur.getInt(0);
+        id = cur.getString(1);
+        temp.add(id);
+        Log.d("Music service", "--->>>>>base: " + base + " " + id);
+    }
+    cur.close();
+
+//    if( top ) temp.add(0, sid.toString());
+//    else temp.add(sid.toString());
+//
+//    deletePlaylist(pid.toString());
+//    newPlaylist(pname);
+//    pid = findPlaylistId(pname);
+//        uri = MediaStore.Audio.Playlists.Members.getContentUri("external", pid);
+//        cur = resolver.query(uri, cols, null, null, null);
+//        Log.d("Music service", "--->>>>>base: " + base + " " + id);
+//        while(cur.moveToNext()) {
+//
+//            base = cur.getInt(0);
+//            id = cur.getString(1);
+//            //temp.add(id);
+//            Log.d("Music service", "--->>>>>base: " + base + " " + id);
+//        }
+//        cur.close();
+//        resolver.query(uri, cols, null, null, null);
+//
+//        for(int i=0; i<temp.size(); i++) {
+//            Log.d("Music service", "--->>>>>base: " + i + " " + temp.get(i));
+//        values = new ContentValues();
+//        // Log.d("Music service", i +" saving song: " + t.getTitle() + songid);
+//        values.put(MediaStore.Audio.Playlists.Members.PLAY_ORDER, i);
+//        values.put(MediaStore.Audio.Playlists.Members.AUDIO_ID, temp.get(i));
+//        resolver.insert(uri, values);
+//    }
 
     }
 
     public void addListToPlaylist(Long pid, ArrayList<Long> ids, boolean top) {
         String[] cols = new String[]{
-                "count(*)"
+                MediaStore.Audio.Playlists.Members.PLAY_ORDER, MediaStore.Audio.Playlists.Members.AUDIO_ID
         };
         ContentValues values = new ContentValues();
         ContentResolver resolver = this.getApplicationContext().getContentResolver();
@@ -1142,4 +1216,90 @@ public class DrawerActivity extends AppCompatActivity
     }
 
 
+    public Song getRandomSong(){
+        Log.d("M6", "Looking for 'random' song..." );
+        ContentResolver resolver = this.getApplicationContext().getContentResolver();
+
+        Uri songUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+         String defaultSort =  MediaStore.Audio.Media.TITLE + " COLLATE LOCALIZED ASC";
+         String defaultSelection = MediaStore.Audio.Media.IS_MUSIC + " != 0";
+         String[] defaultProjection = {
+                MediaStore.Audio.Media.TITLE,
+                MediaStore.Audio.Media.DATA,
+                MediaStore.Audio.Media.ARTIST,
+                MediaStore.Audio.Media.ALBUM,
+                MediaStore.Audio.Media.DURATION,
+                MediaStore.Audio.Media._ID,
+                MediaStore.Audio.Media.ALBUM_ID,
+                 MediaStore.Audio.Media.ARTIST_ID
+
+        };
+        Cursor cursor = resolver.query(songUri, defaultProjection, defaultSelection, null, defaultSort);
+        cursor.moveToFirst();
+        ArrayList<Song> songs = new ArrayList<Song>();
+        while(cursor.moveToNext()) {
+            songs.add(new Song(cursor.getString(0), cursor.getString(1),
+                    cursor.getString(2), cursor.getString(3), cursor.getString(4)
+                    , cursor.getString(5), cursor.getString(6), cursor.getString(7)));
+        }
+        cursor.close();
+        int i = ((int) (Math.random()*100) );
+        i = i % songs.size();
+
+        Log.d("M6", " 'random' song: " + i );
+
+        return songs.get(i);
+
+    }
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.shuffle) {
+             log("Suffle clicked");
+            boolean b = mService.shuffleSongs();
+            Toast.makeText(mService, "Shuffle: " + b, Toast.LENGTH_SHORT).show();
+             if(showq != 0) qf.setQList(mService.getQueue());
+            return true;
+        } else if (id == R.id.repeat) {
+            log("Repeat clicked");
+            boolean b = mService.repeatSongs();
+            Toast.makeText(mService, "Repeat: " + b, Toast.LENGTH_SHORT).show();
+
+            return true;
+        } else if (id == R.id.mix) {
+            log("Mix clicked");
+            Song s = getRandomSong();
+            String b = "Mix: " + s.getTitle() + " by " + s.getArtist() + " added to Queue.";
+            Toast.makeText(mService,  b, Toast.LENGTH_SHORT).show();
+
+            onSongClicked(s);
+           // showNow();
+            return true;
+        } else if(id == R.id.now){
+            Log.d(TAG, "Now clicked");
+
+            if(nf == null || !nf.isVisible() ) {
+                showNow();
+
+                final Handler h = new Handler();
+                h.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(nf.isVisible())
+                            if(mService.getQueue().getSize() > 0)
+                                updateCurrentInfo(mService.getCurrentSong());
+                        Log.d(TAG, "Now updating..");
+                            h.removeCallbacks(this);
+                    }
+                }, 1000);
+            }
+
+            if(nf.isVisible())
+            if(mService.getQueue().getSize() > 0)
+            updateCurrentInfo(mService.getCurrentSong());
+
+        }
+            return false;
+    }
 }
