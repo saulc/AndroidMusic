@@ -134,6 +134,12 @@ public  class baseListFragment extends Fragment  implements MediaHelperListener 
 
     }
 
+
+    @Override
+    public void queryLoaderFinished(ArrayList<Song> songs) {
+
+    }
+
     @Override
     public void songLoadedFinished(ArrayList<Song> songs) {
 

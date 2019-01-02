@@ -29,4 +29,6 @@ public interface MediaHelperListener {
     void queueitemLoaderFinished(ArrayList<Song> songs);
 
     void albumLoaderFinished(ArrayList<Album> ar);
+
+    void queryLoaderFinished(ArrayList<Song> songs);
 }

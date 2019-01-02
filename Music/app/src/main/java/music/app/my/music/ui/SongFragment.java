@@ -2,6 +2,7 @@ package music.app.my.music.ui;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.GridLayoutManager;
@@ -29,7 +30,7 @@ import music.app.my.music.types.Song;
  */
 public class SongFragment extends baseListFragment implements MediaHelperListener {
 
-    public enum SF_TYPE {QUEUE, PLAYLISTITEMS, SONGS, ALBUMS, ARTISTS, GENRE };
+    public enum SF_TYPE {QUEUE, PLAYLISTITEMS, SONGS, ALBUMS, ARTISTS, GENRE, QUERY };
     private SF_TYPE myType = SF_TYPE.SONGS;
 
     private final String TAG = getClass().getSimpleName();
@@ -42,6 +43,7 @@ public class SongFragment extends baseListFragment implements MediaHelperListene
     private ArrayList<Song> items;
   //  private RecyclerView recyclerView;
 
+    private  TextView infoText;
     private String pid = null;
     private String pname = null;
 
@@ -93,6 +95,13 @@ public class SongFragment extends baseListFragment implements MediaHelperListene
                 pname = b.getString("GenreName");
 
             }
+            else if(s.compareTo(SF_TYPE.QUERY.toString())==0) {
+                myType = SF_TYPE.QUERY;
+
+                pid = b.getString("QueryID");
+                pname = b.getString("Query");
+
+            }
         }
 
 
@@ -131,9 +140,15 @@ public class SongFragment extends baseListFragment implements MediaHelperListene
 
             View header =  view.findViewById(R.id.header);
             TextView t = (TextView) header.findViewById(R.id.content);
-            t.setText(pname);
-            t = (TextView) header.findViewById(R.id.line2);
-            t.setText("type?");
+            infoText = (TextView) header.findViewById(R.id.line2);
+            infoText.setText("type?");
+
+            String a = "";
+            if(myType == SF_TYPE.QUERY)
+                a += "Search results: ";
+
+            a += pname;
+            t.setText(a);
 
             ImageButton next = (ImageButton) view.findViewById(R.id.nextupbtn);
             ImageButton op = (ImageButton) view.findViewById(R.id.optionbtn);
@@ -205,7 +220,11 @@ public class SongFragment extends baseListFragment implements MediaHelperListene
         if(items == null)
             items = new ArrayList<>();
 
-        log("items:" + items.size());
+        String s = items.size() + " song";
+        if(items.size() > 1) s += "s";
+        if(infoText != null) infoText.setText(s);
+
+        log("items:" + s );
     }
 
 
@@ -214,6 +233,9 @@ public class SongFragment extends baseListFragment implements MediaHelperListene
         log("Helper ready, loading songs");
 
             switch(myType) {
+
+                case QUERY: msHelper.search(pname);
+                break;
 
                 case SONGS:
                     msHelper.loadSongs();
@@ -231,6 +253,35 @@ public class SongFragment extends baseListFragment implements MediaHelperListene
                     msHelper.loadPlaylistItems(pid, pname);
                     break;
             }
+
+    }
+
+
+    @Override
+    public void queryLoaderFinished(ArrayList<Song> songs) {
+        log("Query items Loaded " + songs.size() + " song(s)");
+
+        //do matching here. so i dont' need to do multiple where queries
+
+        updateAdapter();
+        infoText.setText("Searching songs...");
+
+        CharSequence q = new StringBuilder(pname.toLowerCase());
+        int i = 0;
+        for(Song s: songs) {
+            if (s.getAlbum().toLowerCase().contains(q)) items.add(s);
+            else if (s.getTitle().toLowerCase().contains(q)) items.add(s);
+            else if (s.getArtist().toLowerCase().contains(q)) items.add(s);
+            //else if(s.getGenre().contains(pname)) results.add(s);
+
+//            if( (i++ % 100) == 0){
+//                log("Returning ----------->>>>>>");
+//             infoText.setText(i + " songs found");
+//            }
+        }
+
+        infoText.setText(items.size() + " songs found");
+        log("Returning Query results (" + items.size() + ") to activity");
 
     }
 

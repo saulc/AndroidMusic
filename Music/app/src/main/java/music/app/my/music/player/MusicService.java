@@ -8,6 +8,7 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.app.TaskStackBuilder;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -38,6 +39,7 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 import android.widget.RemoteViews;
 
+import music.app.my.music.DrawerActivity;
 import music.app.my.music.R;
 import music.app.my.music.types.Song;
 import music.app.my.music.types.plist;
@@ -326,34 +328,34 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
    		        mBuilder.setSmallIcon(R.drawable.android_robot_icon_128)
    		        .setContentTitle(s.getTitle())
    		        .setContentText(text + s.getArtist());
-//   	 PendingIntent pauseIntent = PendingIntent.getService(getApplicationContext(), 0,
-//   			 	new Intent(MusicService.ACTION_TOGGLE_PLAYBACK), PendingIntent.FLAG_UPDATE_CURRENT);
+
 //   	 PendingIntent nextIntent = PendingIntent.getService(getApplicationContext(), 0,
 //   			 	new Intent(MusicService.ACTION_NEXT), PendingIntent.FLAG_UPDATE_CURRENT);
 //	   PendingIntent preIntent = PendingIntent.getService(getApplicationContext(), 0,
 //			   new Intent(MusicService.ACTION_PREVIOUS), PendingIntent.FLAG_UPDATE_CURRENT);
 //
-	   PendingIntent resultPendingIntent = PendingIntent.getActivity(getApplicationContext(),
-               0,  new Intent(MusicService.ACTION_BLANK), PendingIntent.FLAG_CANCEL_CURRENT);
+//	    PendingIntent resultPendingIntent = PendingIntent.getActivity(getApplicationContext(),
+//               0,  new Intent(DrawerActivity.class), PendingIntent.FLAG_CANCEL_CURRENT);
 
-	   MediaSessionCompat mediaSession = new MediaSessionCompat(getApplicationContext(), "Notification");
-	   MediaControllerCompat controller = mediaSession.getController();
-	   MediaMetadataCompat mediaMetadata = controller.getMetadata();
-//	   MediaDescriptionCompat description = mediaMetadata.getDescription();
-
-	    //mBuilder.setContentIntent(controller.getSessionActivity());
+	   Intent resultIntent = new Intent(this, DrawerActivity.class);
+ 	   TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+	   stackBuilder.addNextIntentWithParentStack(resultIntent);
+ 	   PendingIntent resultPendingIntent =
+			   stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 
 	   mBuilder.setContentIntent(resultPendingIntent);
-
-       	 mBuilder.setOngoing(true);
+	   mBuilder.setOngoing(true);
        	 int pr = android.R.drawable.ic_media_play;
 	   if(text.contains("Paused"))
 		  pr = android.R.drawable.ic_media_pause;
 	   // Add media control buttons that invoke intents in your media service
+	   resultIntent = new Intent(MusicService.ACTION_PREVIOUS);
+	   stackBuilder.addNextIntentWithParentStack(resultIntent);
+	   PendingIntent pauseIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 
 
-//        mBuilder.addAction(android.R.drawable.ic_media_previous, "Previous", preIntent) // #0
-//			   .addAction(pr, "Pause", pauseIntent)  // #1
+        mBuilder.addAction(pr, "Pause", pauseIntent) ; // #1
+	   //.addAction(android.R.drawable.ic_media_previous, "Previous", preIntent) // #0
 //			   .addAction(android.R.drawable.ic_media_next, "Next", nextIntent);
 
 //	   RemoteViews rv = new RemoteViews(this.getPackageName(), R.layout.notification);

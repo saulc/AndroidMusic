@@ -38,7 +38,7 @@ public class MediaStoreHelper extends Fragment implements LoaderManager.LoaderCa
 	public  enum Media { songs, artists, playlists};
 
 	private MediaHelperListener mListener;
-	private enum LOADER_TYPE {QUEUE,  PLAYLIST, PLAYLISTITEMS, SONGS, ALBUMS,ALBUMITEMS, ARTISTS,ARTISTITEMS, GENRE, GENREITEMS };
+	private enum LOADER_TYPE {QUEUE,  PLAYLIST, PLAYLISTITEMS, SONGS, ALBUMS,ALBUMITEMS, ARTISTS,ARTISTITEMS, GENRE, GENREITEMS, QUERY };
 	private LOADER_TYPE myType = LOADER_TYPE.SONGS;
 	private Context mContext;
 	private String pid = null;
@@ -72,6 +72,13 @@ public class MediaStoreHelper extends Fragment implements LoaderManager.LoaderCa
 	public void setListener(MediaHelperListener l){
 
 		mListener = l;
+	}
+
+	public void search(String q){
+		myType = LOADER_TYPE.QUERY;
+		pname = q;
+
+		getLoaderManager().initLoader(mLOADER, null, this);
 	}
 
 	public void loadSongs(){
@@ -126,6 +133,7 @@ public class MediaStoreHelper extends Fragment implements LoaderManager.LoaderCa
 		getLoaderManager().initLoader(mLOADER, null, this);
 
 	}
+
 
 	public void loadArtistItems(String id, String pname) {
 		myType = LOADER_TYPE.ARTISTITEMS;
@@ -205,6 +213,13 @@ public class MediaStoreHelper extends Fragment implements LoaderManager.LoaderCa
 			log("Song Item loader Created");
 
 				return new CursorLoader(mContext, songUri, defaultProjection , defaultSelection, null, defaultSort);
+
+		}
+		else  if(myType == LOADER_TYPE.QUERY) {
+
+			log("Query loader Created");
+
+			return new CursorLoader(mContext, songUri, defaultProjection , defaultSelection, null, defaultSort);
 
 		}
             return new CursorLoader(mContext, playlistUri, playlistProjection, null, null, playlistSortOrder);
@@ -343,19 +358,6 @@ public class MediaStoreHelper extends Fragment implements LoaderManager.LoaderCa
 			return;
 		}
 
-
-		else  if(myType == LOADER_TYPE.SONGS) {
-			log("SONG Items loaded");
-			ArrayList<Song> songs = new ArrayList<Song>();
-			while(cursor.moveToNext()) {
-				songs.add(new Song(cursor.getString(0), cursor.getString(1),
-						cursor.getString(2), cursor.getString(3), cursor.getString(4)
-						, cursor.getString(5), cursor.getString(6), cursor.getString(7 )));
-			}
-			log("Returning SONGs  to activity");
-			mListener.songLoadedFinished(songs);
-			return;
-		}
         else if(myType == LOADER_TYPE.ARTISTS)
         {
 			log("Artists  loaded");
@@ -382,13 +384,35 @@ public class MediaStoreHelper extends Fragment implements LoaderManager.LoaderCa
 			mListener.albumLoaderFinished(ar);
 			return;
 		}
-//		ArrayList<Song> songs = new ArrayList<Song>();
-//		  while(cursor.moveToNext()){
-//	    	  songs.add( new Song( cursor.getString(0), cursor.getString(1),
-//					  cursor.getString(2), cursor.getString(3), cursor.getString(4)
-//					  ,cursor.getString(5), cursor.getString(6)) );
-//		       // adapter.add(cursor.getString(0) + "||" + cursor.getString(1) + "||" +   cursor.getString(2) + "||" +   cursor.getString(3) + "||" +  cursor.getString(4) + "||" +  cursor.getString(5));
-//			}
+
+
+		else  if(myType == LOADER_TYPE.SONGS) {
+			log("SONG Items loaded");
+			ArrayList<Song> songs = new ArrayList<Song>();
+			while(cursor.moveToNext()) {
+				songs.add(new Song(cursor.getString(0), cursor.getString(1),
+						cursor.getString(2), cursor.getString(3), cursor.getString(4)
+						, cursor.getString(5), cursor.getString(6), cursor.getString(7 )));
+			}
+			log("Returning SONGs  to activity");
+			mListener.songLoadedFinished(songs);
+			return;
+		}
+
+
+		else  if(myType == LOADER_TYPE.QUERY) {
+			log("SONG Items loaded");
+			ArrayList<Song> songs = new ArrayList<Song>();
+			while(cursor.moveToNext()) {
+				songs.add(new Song(cursor.getString(0), cursor.getString(1),
+						cursor.getString(2), cursor.getString(3), cursor.getString(4)
+						, cursor.getString(5), cursor.getString(6), cursor.getString(7 )));
+			}
+			log("Querying " + songs.size() + " songs for: " + pname);
+
+			mListener.queryLoaderFinished(songs);
+			return;
+		}
 
 		
 	}

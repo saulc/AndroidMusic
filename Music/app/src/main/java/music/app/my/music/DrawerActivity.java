@@ -1,6 +1,7 @@
 package music.app.my.music;
 
 import android.app.Dialog;
+import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -25,6 +26,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.MenuInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -35,6 +37,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
+import android.widget.SearchView;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -98,6 +101,14 @@ public class DrawerActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        //search if we need to...
+        // Get the intent, verify the action and get the query
+        Intent intent = getIntent();
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            doMySearch(query);
+        }
+
         toolbar.setOnMenuItemClickListener((Toolbar.OnMenuItemClickListener) this);
         nextText = (TextSwitcher) findViewById(R.id.nextText);
         nextText.setFactory(new ViewSwitcher.ViewFactory() {
@@ -142,6 +153,17 @@ public class DrawerActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+
+        // Get the SearchView and set the searchable configuration
+//        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+//        SearchView searchView = (SearchView)  findViewById(R.id.search);
+//        // Assumes current activity is the searchable activity
+//        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+//        searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
+//        searchView.setSubmitButtonEnabled(true);
+//        searchView.setQueryRefinementEnabled(true);
+
 
 
 
@@ -220,10 +242,16 @@ public class DrawerActivity extends AppCompatActivity
         }
     }
 
+
+
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.drawer, menu);
+        // Inflate the options menu from XML
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.drawer, menu);
+
+
         return true;
     }
 
@@ -242,9 +270,36 @@ public class DrawerActivity extends AppCompatActivity
         } else if (id == R.id.mix) {
             return true;
         }
+//        else if(id == R.id.app_bar_search){
+//            onSearchRequested();
+//
+//        }
 
         return super.onOptionsItemSelected(item);
     }
+
+
+    private void doMySearch(String q){
+        log("Searching for: " + q);
+
+        Fragment f =  (Fragment) SongFragment.newInstance();
+        Bundle b = new Bundle();
+        b.putString("SFTYPE", SongFragment.SF_TYPE.QUERY.toString());
+        b.putString("QueryID", "0" );
+        b.putString("Query", q);
+        f.setArguments(b);
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
+        // Replace whatever is in the fragment_container view with this fragment,
+        // and add the transaction to the back stack
+        transaction.replace(R.id.frame, f);
+        transaction.addToBackStack(null);
+
+        // Commit the transaction
+        transaction.commit();
+
+    }
+
 
     //adjust layout weights to hide/show queue and player
     public void placeholderCreated(){
@@ -493,6 +548,11 @@ public class DrawerActivity extends AppCompatActivity
 
             showNow();
 
+        } else if( id == R.id.search) {
+            log("Nav search clicked!");
+            onSearchRequested();
+
+
         } else if( id == R.id.save_queue) {
             createNewPlaylist(true);
 
@@ -547,12 +607,8 @@ public class DrawerActivity extends AppCompatActivity
             transaction.commit();
 
 
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        } else if (id == R.id.nav_settings) {
-
+        }  else if (id == R.id.nav_settings) {
+            log("Settings clicked.");
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
