@@ -100,6 +100,15 @@ public class DrawerActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        //dim the systems  status and control bars
+        // 0 == show
+        View decorView =  toolbar;
+//        int uiOptions = View.SYSTEM_UI_FLAG_LOW_PROFILE;
+        int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_FULLSCREEN;
+        decorView.setSystemUiVisibility(uiOptions);
+//        decorView.setSystemUiVisibility(0);
+
         toolbar.setOnMenuItemClickListener((Toolbar.OnMenuItemClickListener) this);
         nextText = (TextSwitcher) findViewById(R.id.nextText);
         if(nextText!=null) {
