@@ -1,7 +1,15 @@
 package music.app.my.music.ui.browser;
 
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -9,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -19,6 +28,7 @@ import music.app.my.music.helpers.MediaHelperListener;
 import music.app.my.music.types.Playlist;
 
 import music.app.my.music.types.Song;
+import music.app.my.music.ui.ControlFragment;
 
 /**
  * Created by saul on 7/26/16.
@@ -37,6 +47,8 @@ public class SongFragment extends baseListFragment implements MediaHelperListene
    // private RecyclerView.Adapter mAdapter;
     private ArrayList<Song> items;
   //  private RecyclerView recyclerView;
+
+    private   ImageView bigIcon;
 
     private  TextView infoText;
     private String pid = null;
@@ -119,12 +131,33 @@ public class SongFragment extends baseListFragment implements MediaHelperListene
     private void opClicked(){
         mListener.addSongsToQueue(items, false);
     }
+    private  String findAlbumArt(String albumid){
+        String[] cols = new String[] {
+                MediaStore.Audio.Albums._ID,
+                MediaStore.Audio.Albums.ALBUM_ART
+        };
+        ContentValues values = new ContentValues();
+        if(getContext()==null) return null;
+        ContentResolver resolver = getContext().getContentResolver();
+        Uri uri = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI;
+        String selection =  MediaStore.Audio.Albums._ID + "=?";
+        String[] arg = { albumid };
+        Cursor cur = resolver.query(uri, cols, selection, arg, null);
+        cur.moveToFirst();
+        int base = cur.getInt(0);
+        String id = cur.getString(1);
+        Log.d("Music service", "--->>>>>base: " + base + " " + id);
 
+        return id;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_baselistitem_list, container, false);
+        View view;
+        if(myType == SF_TYPE.ALBUMS)
+            view = inflater.inflate(R.layout.fragment_album, container, false);
+        else  view = inflater.inflate(R.layout.fragment_baselistitem_list, container, false);
 
         View v = view.findViewById(R.id.list);
         // Set the adapter
@@ -132,6 +165,24 @@ public class SongFragment extends baseListFragment implements MediaHelperListene
             Context context = view.getContext();
             recyclerView = (RecyclerView) v;
             recyclerView.setLayoutManager(new GridLayoutManager(context, 1));
+
+
+            if(myType == SF_TYPE.ALBUMS) {
+                if (pid != null) {
+
+                    ImageView bigIcon = (ImageView) view.findViewById(R.id.bigIcon);
+                    String p =  getArguments().getString("AlbumArt"); //findAlbumArt(pid);
+
+                    log(" fragment updating albumart: " + p);
+                    Drawable d = Drawable.createFromPath(p);
+                    if (d != null) {
+                        Bitmap bitmap = ((BitmapDrawable) d).getBitmap();
+                        d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, 600, 600, true));
+
+                        bigIcon.setImageDrawable(d);
+                    }//else icon.setImageResource(R.drawable.android_robot_icon_2);
+                }
+            }
 
             View header =  view.findViewById(R.id.header);
             TextView t = (TextView) header.findViewById(R.id.content);

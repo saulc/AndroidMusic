@@ -3,7 +3,7 @@ package music.app.my.music.ui.browser;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -71,7 +71,7 @@ public class HeaderFragment extends Fragment {
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
+            mListener.onHeaderFragmentInteraction(uri);
         }
     }
 
@@ -104,6 +104,6 @@ public class HeaderFragment extends Fragment {
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+        void onHeaderFragmentInteraction(Uri uri);
     }
 }

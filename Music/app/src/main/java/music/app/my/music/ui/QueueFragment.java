@@ -119,7 +119,7 @@ public class QueueFragment extends baseListFragment {
     //    animationAdapter.setAbsListView(mListView);
   //      mListView.setAdapter(animationAdapter);
         mListView.enableDragAndDrop();
-        mListView.setDraggableManager(new TouchViewDraggableManager(R.id.i));
+        mListView.setDraggableManager(new TouchViewDraggableManager(R.id.content));
 
         SimpleSwipeUndoAdapter swipeUndoAdapter = new SimpleSwipeUndoAdapter(animationAdapter, getContext(),
                 new OnDismissCallback() {

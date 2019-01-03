@@ -50,6 +50,7 @@ import music.app.my.music.types.Playlist;
 import music.app.my.music.types.Song;
 import music.app.my.music.ui.browser.AlbumFragment;
 import music.app.my.music.ui.browser.ArtistFragment;
+import music.app.my.music.ui.browser.HeaderFragment;
 import music.app.my.music.ui.popup.ChoosePlaylistDialogFragment;
 import music.app.my.music.ui.popup.ConfirmDeleteDialogFragment;
 import music.app.my.music.ui.ControlFragment;
@@ -65,8 +66,12 @@ import music.app.my.music.ui.dummy.DummyContent;
 
 public class DrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        baseListFragment.OnListFragmentInteractionListener, QueueListener,
-        ControlFragment.ControlFragmentListener, NewPlaylistDialog.OnDialogInteractionListener , Toolbar.OnMenuItemClickListener{
+        baseListFragment.OnListFragmentInteractionListener,
+        HeaderFragment.OnFragmentInteractionListener,
+        QueueListener,
+        ControlFragment.ControlFragmentListener,
+        NewPlaylistDialog.OnDialogInteractionListener ,
+        Toolbar.OnMenuItemClickListener{
 
     private  final String TAG = getClass().getSimpleName();
 
@@ -759,6 +764,13 @@ public class DrawerActivity extends AppCompatActivity
 
         }  else if (id == R.id.nav_settings) {
             log("Settings clicked.");
+            Fragment f = (Fragment) HeaderFragment.newInstance("", "");
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
+            transaction.replace(R.id.frame, f);
+            transaction.addToBackStack(null);
+            // Commit the transaction
+            transaction.commit();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -803,6 +815,7 @@ public class DrawerActivity extends AppCompatActivity
         b.putString("SFTYPE", SongFragment.SF_TYPE.ALBUMS.toString());
         b.putString("AlbumID", mItem.getId());
         b.putString("AlbumName", mItem.getAlbum());
+        b.putString("AlbumArt", mItem.getArt());
         f.setArguments(b);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
@@ -1262,6 +1275,21 @@ public class DrawerActivity extends AppCompatActivity
     public void onQueueItemLongClicked(Song mItem, int position) {
 
         log(position + " Q item Long clicked " + mItem.getTitle());
+
+        if( mService.getQueue().getIndex() != position) {
+            plist q =  mService.getQueue();
+           int index = q.getIndex();
+           Song clicked = q.removeSong(position);
+           if(position < index) q.setIndex(index - 1);
+           q.addNextSong(clicked);
+
+        }
+
+        if(showq == 0)        updateCurrentSongInfo();
+        if(showq != 0)
+            qf.setQList(mService.getQueue());
+        updateNextSongInfo();
+
     }
 
     @Override
@@ -1512,5 +1540,10 @@ public class DrawerActivity extends AppCompatActivity
             return true;
         }
             return false;
+    }
+
+    @Override
+    public void onHeaderFragmentInteraction(Uri uri) {
+        log("Header fragment interaction");
     }
 }

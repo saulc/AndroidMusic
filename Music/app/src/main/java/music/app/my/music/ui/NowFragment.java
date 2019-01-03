@@ -256,7 +256,7 @@ public class NowFragment extends ControlFragment {
                 Bitmap bitmap = ((BitmapDrawable) d).getBitmap();
                 // Scale it to 50 x 50
 
-                d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, 512, 512, true));
+                d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, 600, 600, true));
 
                 icon.setImageDrawable(d);
             }else icon.setImageResource(R.drawable.android_robot_icon_2);

@@ -159,7 +159,7 @@ public class ControlFragment extends Fragment {
 
         return view;
     }
-    public String findAlbumArt(String albumid){
+    public  String findAlbumArt(String albumid){
         String[] cols = new String[] {
                 MediaStore.Audio.Albums._ID,
                 MediaStore.Audio.Albums.ALBUM_ART
