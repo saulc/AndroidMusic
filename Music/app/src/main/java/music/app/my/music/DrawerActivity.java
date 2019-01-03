@@ -1,5 +1,6 @@
 package music.app.my.music;
 
+import android.app.Notification;
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.ContentResolver;
@@ -94,27 +95,21 @@ public class DrawerActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        //search if we need to...
-        // Get the intent, verify the action and get the query
-        Intent intent = getIntent();
-        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            String query = intent.getStringExtra(SearchManager.QUERY);
-            doMySearch(query);
-        }
-
         toolbar.setOnMenuItemClickListener((Toolbar.OnMenuItemClickListener) this);
         nextText = (TextSwitcher) findViewById(R.id.nextText);
-        nextText.setFactory(new ViewSwitcher.ViewFactory() {
+        if(nextText!=null) {
+            nextText.setFactory(new ViewSwitcher.ViewFactory() {
 
-            public View makeView() {
-                TextView t = new TextView(getApplicationContext());
-                t.setTypeface(Typeface.MONOSPACE);
-                return t;
-            }
-        });
-        nextText.setInAnimation(getApplicationContext(), android.R.anim.slide_in_left);
-        nextText.setOutAnimation(getApplicationContext(), android.R.anim.slide_out_right);
-        nextText.setText("Nothing to play...");
+                public View makeView() {
+                    TextView t = new TextView(getApplicationContext());
+                    t.setTypeface(Typeface.MONOSPACE);
+                    return t;
+                }
+            });
+            nextText.setInAnimation(getApplicationContext(), android.R.anim.slide_in_left);
+            nextText.setOutAnimation(getApplicationContext(), android.R.anim.slide_out_right);
+            nextText.setText("Nothing to play...");
+        }
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnLongClickListener(new View.OnLongClickListener() {
@@ -128,10 +123,14 @@ public class DrawerActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(controlsVisible)
-                    hideControls(true);
-
-                else showControls();
+                Log.d(TAG, "Hiding Q fragement");
+                if(controlsVisible){
+                    hideControls( false);
+                   // hideQ();
+                } else {
+                    showControls();
+                   // showQ();
+                }
 
 //                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
 //                        .setAction("Action", null).show();
@@ -178,8 +177,47 @@ public class DrawerActivity extends AppCompatActivity
         if(controlsVisible)
             showControls();
 
+
+        handleStartIntents(); //search media share....
+
     }
 
+    private Song shared = null;
+
+    private void handleStartIntents(){
+
+        //search if we need to...
+        // Get the intent, verify the action and get the query
+        Intent intent = getIntent();
+        String action = intent.getAction();
+        String type = intent.getType();
+        log("Got intent! action: " + action);
+
+        log("Got intent! action: " + action);
+        if (Intent.ACTION_SEARCH.equals(action)) {
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            doMySearch(query);
+        }
+        else if(Intent.ACTION_SEND.equals(action) && type != null) {
+
+            log("GOt Action Send!!");
+            log("Looking for data in extras!!");
+            Uri uri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
+
+            log("Type: ===>> "+ type);
+            log("Oh its audio!!"  + uri.toString());
+
+            String id = uri.toString().substring(uri.toString().lastIndexOf('/'), uri.toString().length());
+             shared = new Song("Shared Song", id );
+
+            //todo play the shared song.
+//            onSongClicked(shared);
+
+        }  else if (Intent.ACTION_SEND_MULTIPLE.equals(action)) {
+
+        }
+
+    }
     @Override
     public void finish(){
         //startService(new Intent(MusicService.ACTION_STOP));
@@ -205,6 +243,8 @@ public class DrawerActivity extends AppCompatActivity
 
         if(r) log("Service should be bound");
         else log("Service binding failed.");
+
+
 
         //am.registerMediaButtonEventReceiver(myEventReceiver);
 
@@ -339,6 +379,14 @@ public class DrawerActivity extends AppCompatActivity
             );
             findViewById(R.id.frame).setLayoutParams(param);
             //main frame
+
+//            param = new LinearLayout.LayoutParams(
+//                    DrawerLayout.LayoutParams.MATCH_PARENT,
+//                    0,
+//                    0.0f
+//            );
+//            findViewById(R.id.controlFrame).setLayoutParams(param);
+            //control frame
         }
 
 
@@ -378,6 +426,8 @@ public class DrawerActivity extends AppCompatActivity
                     2.0f
             );
             findViewById(R.id.frame).setLayoutParams(param);
+
+
         }
     }
     public int hideQ(){
@@ -397,6 +447,8 @@ public class DrawerActivity extends AppCompatActivity
     }
 
     public int showQ(){
+        if(showq >1 && qf != null && qf.isVisible()) return showq;
+
         qf = QueueFragment.newInstance();
         expandQframe();
         showq = 1;
@@ -427,8 +479,36 @@ public class DrawerActivity extends AppCompatActivity
     }
 
     public void updateNextSongInfo(){
-        if((mService.getQueue().getIndex()+1) < mService.getQueue().getSize() ) {
-            Song s = mService.getQueue().getSong(mService.getQueue().getIndex() + 1);
+        if(nextText == null) return;
+        plist q = mService.getQueue();
+
+
+        int m = mService.repeatMode();
+        if(m == 1) {    //repeat same song forever!
+            Song s = q.getCurrentSong();
+            String b = "";
+            if (s != null) {
+                b = s.getTitle() + " by " + s.getArtist();
+                //" Now Playing: "
+                nextText.setText( " Up Next: " + b);
+            }
+        } else if( m == 2){
+            //repeat all songs
+            if( q.getIndex() == (q.getSize() -1 ) ){
+                //last song, next is first
+                Song s = q.getSong(0);
+                String b = "";
+                if (s != null) {
+                    b = s.getTitle() + " by " + s.getArtist();
+                    //" Now Playing: "
+                    nextText.setText( " Up Next: " + b);
+                }
+            }
+
+        }else
+
+        if(q.hasNext()) {
+            Song s = q.getSong(q.getIndex() + 1);
             String b = "";
             if (s != null) {
                 b = s.getTitle() + " by " + s.getArtist();
@@ -436,57 +516,74 @@ public class DrawerActivity extends AppCompatActivity
                 nextText.setText( " Up Next: " + b);
             }
         }
+
+
     }
 
+    public  void expandControlFrame(){
+        LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
+                DrawerLayout.LayoutParams.MATCH_PARENT,
+                0,
+                2.0f
+        );
+            findViewById(R.id.controlFrame).setLayoutParams(param);
+        //control frame
+
+    }
+    public  void closeControlFrame(){
+        LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
+                DrawerLayout.LayoutParams.MATCH_PARENT,
+                0,
+                0.0f
+        );
+
+        findViewById(R.id.controlFrame).setLayoutParams(param);
+        //control frame
+
+    }
     public void hideControls(boolean showPlaceholder){
 
-        if(showq == 1){
-            Log.d(TAG, "Hiding Q fragement");
-            hideQ();
-
-        }
+    closeControlFrame();
         Log.d(TAG, "Hiding control fragement");
         controlsVisible = false;
 
-//       // getSupportFragmentManager().popBackStack("cf", FragmentManager.POP_BACK_STACK_INCLUSIVE);
-//        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-//        transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
-//
-//        Song s = mService.getQueue().getCurrentSong();
-//        String a = "";
-//        if(s != null) a =  s.getTitle() + " by " + s.getArtist();
-//
-//        updateNextSongInfo();
-//
-//        pf = PlaceholderFragment.newInstance(a);
-//        transaction.replace(R.id.controlFrame, pf);
-//        transaction.commit();
-//
-//        if(!showPlaceholder)
-//        getSupportFragmentManager().beginTransaction().remove(pf).commit();
+       // getSupportFragmentManager().popBackStack("cf", FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
+
+        Song s = mService.getQueue().getCurrentSong();
+        String a = "";
+        if(s != null) a =  s.getTitle() + " by " + s.getArtist();
+
+        updateNextSongInfo();
+
+        pf = PlaceholderFragment.newInstance(a);
+        transaction.replace(R.id.controlFrame, pf);
+        transaction.commit();
+
+        if(!showPlaceholder)
+        getSupportFragmentManager().beginTransaction().remove(pf).commit();
 
     }
     public void showControls(){
-        if(showq == 0) {
+        if(controlsVisible && cf != null && cf.isVisible()) return;
 
-            Log.d(TAG, "Showing Q fragement");
-            showQ();
-           // qf.setQList(mService.getQueue());
-        }
+        Log.d(TAG, "Showing control fragement");
+        //cf =  (ControlFragment) ControlFragment.newInstance();
+        expandControlFrame();
 
-//        Log.d(TAG, "Showing control fragement");
-//        cf =  (ControlFragment) ControlFragment.newInstance();
-//
-//        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-//        transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
-//
-//        // Replace whatever is in the fragment_container view with this fragment,
-//        // and add the transaction to the back stack
-//        transaction.replace(R.id.controlFrame, cf);
-//      //  transaction.addToBackStack("cf");
-//
-//        // Commit the transaction
-//        transaction.commit();
+        cf =   NowFragment.newInstance();
+
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
+
+        // Replace whatever is in the fragment_container view with this fragment,
+        // and add the transaction to the back stack
+        transaction.replace(R.id.controlFrame, cf);
+      //  transaction.addToBackStack("cf");
+
+        // Commit the transaction
+        transaction.commit();
         controlsVisible = true;
     }
 
@@ -528,9 +625,38 @@ public class DrawerActivity extends AppCompatActivity
 
     }
 
+    @Override
+    public void onNowViewCreated() {
+        log("Now Fragment created");
+
+        if( nf == null)  showNow();
+
+
+        // if(controlsVisible && cf != null && cf.isVisible()) {
+             log("Now Fragment setting updater");
+
+             final Handler h = new Handler();
+             h.postDelayed(new Runnable() {
+                 @Override
+                 public void run() {
+                     if (nf.isVisible() || cf.isVisible())
+                         if (mService.getQueue().getSize() > 0)
+                             updateCurrentInfo(mService.getCurrentSong());
+                     Log.d(TAG, "Now updating..");
+                     h.removeCallbacks(this);
+                 }
+             }, 1000);
+
+
+
+    }
+
     public void showNow(){
         Log.d(TAG, "Showing NOW fragment");
-        hideControls(false);
+
+        if(nf != null && nf.isVisible() ) return;
+
+        //hideControls(false);
         //todo
         //hideStatusLines(); //doesn't exist yet
         nf =  NowFragment.newInstance();
@@ -542,9 +668,17 @@ public class DrawerActivity extends AppCompatActivity
         transaction.addToBackStack(null);
         transaction.commit();
 
+
 //        updateCurrentInfo(new Song("", ""));
     }
 
+    public void showBluetoothSettings(){
+         //shortcut direct to bluetooth setting page
+        Intent intentBluetooth = new Intent();
+        intentBluetooth.setAction(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS);
+        startActivity(intentBluetooth);
+
+    }
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -558,6 +692,15 @@ public class DrawerActivity extends AppCompatActivity
         } else if( id == R.id.search) {
             log("Nav search clicked!");
             onSearchRequested();
+
+
+        } else if( id == R.id.bluetooth) {
+            log("Nav bluetooth clicked!");
+            showBluetoothSettings();
+
+
+        } else if( id == R.id.clear_queue) {
+           clearQueueClicked();
 
 
         } else if( id == R.id.save_queue) {
@@ -749,12 +892,28 @@ public class DrawerActivity extends AppCompatActivity
 
     }
 
+    //called from clear queue nav menu item
+    public void clearQueueClicked(){
+        String name = "NOWPLAYING";
+        DialogFragment c = ConfirmDeleteDialogFragment.newInstance(name);
+        c.show(getSupportFragmentManager(), "QUEUE");
 
+    }
 
     public void deleted(String pid, String name){
-        deletePlaylist(pid);
-        Toast.makeText(mService, "Deleted Playlist: " + name + " : " + pid, Toast.LENGTH_SHORT).show();
+        if(pid.compareTo("QUEUE") == 0 ){
 
+            if(mService!=null) {
+                mService.pauseRequest();
+                mService.getQueue().clearQueue();
+
+                Toast.makeText(mService, "Cleared Now playing: " + name + " : " + pid, Toast.LENGTH_SHORT).show();
+            }
+        }else {
+
+            deletePlaylist(pid);
+            Toast.makeText(mService, "Deleted Playlist: " + name + " : " + pid, Toast.LENGTH_SHORT).show();
+        }
     }
 
     /*
@@ -994,27 +1153,28 @@ public class DrawerActivity extends AppCompatActivity
     }
 
 
-    // bound service
-
-
     public void setpp(Boolean isPlaying){
         if(nf != null) nf.setPlayPause(isPlaying);
-      //  if(controlsVisible) cf.setPlayPause(isPlaying);
+        if(controlsVisible) cf.setPlayPause(isPlaying);
     }
-    public void updateInfo(MusicPlayer player){
+
+    public void updateProgress(MusicPlayer player){
         if(nf != null) nf.updateInfo(player);
         if(controlsVisible)
         {
-              //  cf.updateInfo(player);
+                cf.updateInfo(player);
         }
 
     }
+
     public void updateCurrentInfo(Song s){
         if(nf != null) nf.updateInfo(s);
-        if(controlsVisible)
-        {
-           // cf.updateInfo(s);
-        }
+        if(cf != null) cf.updateInfo(s);
+
+        updateNextSongInfo();
+
+        if(showq > 0) qf.setQList(mService.getQueue());
+
 
     }
 
@@ -1042,7 +1202,8 @@ public class DrawerActivity extends AppCompatActivity
                   //  log("Activty got progress info. updating ui...");
 
                     //update seekbar.
-                    updateInfo(player);
+                    if(player != null)
+                    updateProgress(player);
 
                 }
 
@@ -1342,26 +1503,13 @@ public class DrawerActivity extends AppCompatActivity
         } else if(id == R.id.now){
             Log.d(TAG, "Now clicked");
 
-            if(nf == null || !nf.isVisible() ) {
                 showNow();
 
-                final Handler h = new Handler();
-                h.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        if(nf.isVisible())
-                            if(mService.getQueue().getSize() > 0)
-                                updateCurrentInfo(mService.getCurrentSong());
-                        Log.d(TAG, "Now updating..");
-                            h.removeCallbacks(this);
-                    }
-                }, 1000);
-            }
+//            if(nf.isVisible())
+//            if(mService.getQueue().getSize() > 0)
+//            updateCurrentInfo(mService.getCurrentSong());
 
-            if(nf.isVisible())
-            if(mService.getQueue().getSize() > 0)
-            updateCurrentInfo(mService.getCurrentSong());
-
+            return true;
         }
             return false;
     }

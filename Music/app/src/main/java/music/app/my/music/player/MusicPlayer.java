@@ -121,6 +121,8 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 		}
 	}
 	public void nextRequest() {
+		if(queue.repeatMode() == 1) playSongFromQueue(queue.getIndex());
+
 		if(queue.hasNext()){
 			
 			fadeOutOldPlayer();
@@ -208,6 +210,11 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 	public void onCompletion(MediaPlayer mp) {
 		Log.i("Music Service", mp + " player completed");
 		((myPlayer)mp).removeCallbacks();
+
+		if(player.contains(mp)){
+			player.remove(mp);
+			player.add(currentPlayer, new myPlayer());
+		}
 		mp.release();
 		mp = null;
 	//	nextRequest();
@@ -255,6 +262,8 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 	}
 
 	public int getProgress(){
+
+
 		if(!isPlaying()) return 0;
 
 		double a = player.get(currentPlayer).getCurrentPosition();
@@ -315,6 +324,11 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 		
 		return queue.repeat();
 	}
+	public int repeatMode() {
+
+		return queue.repeatMode();
+	}
+
 
 	public void setQueue(plist q) {
 		queue = q;

@@ -423,6 +423,8 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 	public boolean repeatSongs(){
 		return player.repeat();
 	}
+
+	public int repeatMode(){ return  player.repeatMode(); }
 	public void setQueue(plist q){
 		player.setQueue(q);
 	}
@@ -439,6 +441,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 		@Override
 		public void run()
 		{
+
 			 if(mListener != null){
 		            mListener.sendProgress(getUiInfo());		//send call to begin updating UI
 			 }

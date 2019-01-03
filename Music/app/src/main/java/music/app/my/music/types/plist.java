@@ -12,6 +12,7 @@ public class plist extends Qbase{
 	   // private ArrayList<HashMap<String, String>> songs;
 	    private ArrayList<Song> songs;
 	    private int songIndex=0;
+	    private int repeatmode = 0;	//0 off, 1 repeat song, 2 repeat all
 	    private boolean shuffled = false, repeatVal=false;
 	    private ArrayList<Song> backup;
 
@@ -24,9 +25,24 @@ public class plist extends Qbase{
 //	        songs = songloader.getPlayList();
 	    }
 	    public boolean repeat(){
-	    	repeatVal = !repeatVal;
+	    	if(repeatmode == 0){
+	    		repeatmode = 1;
+
+			}else if(repeatmode == 1){
+
+				repeatmode = 2;
+			}else if(repeatmode == 2){
+
+				repeatmode = 0;
+			}
+
+			repeatVal = repeatmode > 0;
 	    	return repeatVal;
 	    }
+
+		public int repeatMode(){
+			return repeatmode;
+		}
 	    public boolean shuffle(){
 	    	if(songs.size() == 0)
 	    		return false;
@@ -83,16 +99,22 @@ public class plist extends Qbase{
 	    }
 	   
 	    public void nextSong(){
+	    	if(repeatmode == 1) return;
+
 	    	if(hasNext())
 	    		songIndex++;
+			if(repeatmode == 2 && (songIndex == songs.size() )) {
+				//last song and repeat is on
+				songIndex = 0;
+			}
 	    }
 	    public void previousSong(){
 	    	if(hasPrevious())
 	    		songIndex--;
 	    }
 	    public boolean hasNext(){
-	    	if(repeatVal && (songIndex >= songs.size() -1))
-	    		songIndex = -1;
+	    	if(repeatmode == 1) return true;
+
 	    	return songs.size() > (songIndex + 1);
 	    }
 	    public boolean hasPrevious(){

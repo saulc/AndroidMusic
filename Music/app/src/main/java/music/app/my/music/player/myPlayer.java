@@ -72,6 +72,7 @@ public class myPlayer extends MediaPlayer {
   
     private void setVol(float v ){
     	try {
+
 			if(isPlaying()){
 			volumeValue = v;
 			setVolume(v, v);
@@ -81,6 +82,7 @@ public class myPlayer extends MediaPlayer {
 			e.printStackTrace();
 			//removeCallbacks();
 			mHandler.removeCallbacks(fadeOutVolume);
+			mHandler.removeCallbacks(fadeInVolume);
 		}
     	
     }

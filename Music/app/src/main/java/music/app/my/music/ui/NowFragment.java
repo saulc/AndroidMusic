@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageSwitcher;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
@@ -88,12 +89,12 @@ public class NowFragment extends ControlFragment {
             public View makeView() {
                 ImageView t = new ImageView(context);
                 t.setImageResource(R.drawable.android_robot_icon_2);
-
-
-                //image_view.requestLayout()
+              //image_view.requestLayout()
                 return t;
             }
         });
+
+
         //vertical animation
         icon.setInAnimation(context, R.anim.anim_in);
         icon.setOutAnimation(context, R.anim.anim_out);
@@ -115,6 +116,7 @@ public class NowFragment extends ControlFragment {
                     t.setTextSize(24);
                     t.setTypeface(Typeface.create("cursive", Typeface.NORMAL));
                     t.setGravity(Gravity.CENTER);
+                    t.setLines(1);
                     return t;
                 }
             });
@@ -124,6 +126,7 @@ public class NowFragment extends ControlFragment {
                     t.setTextSize(20);
                     t.setGravity(Gravity.CENTER);
                     t.setTypeface(Typeface.create("casual", Typeface.NORMAL));
+                    t.setLines(1);
                    // t.setTypeface(Typeface.MONOSPACE);
                     return t;
                 }
@@ -133,6 +136,7 @@ public class NowFragment extends ControlFragment {
                     TextView t = new TextView(context);
                     t.setGravity(Gravity.CENTER);
                     t.setTypeface(Typeface.create("casual", Typeface.BOLD));
+                    t.setLines(1);
                     return t;
                 }
             });
@@ -216,6 +220,8 @@ public class NowFragment extends ControlFragment {
             }
         });
 
+
+        mListener.onNowViewCreated();
         return view;
     }
 

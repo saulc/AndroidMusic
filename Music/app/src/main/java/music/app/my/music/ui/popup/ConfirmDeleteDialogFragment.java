@@ -28,6 +28,8 @@ public  class ConfirmDeleteDialogFragment extends DialogFragment {
 
         builder.setIcon(android.R.drawable.ic_dialog_alert);
         builder.setTitle( " Delete this playlist?");
+        if(n.compareTo("NOWPLAYING") == 0) builder.setTitle(" Clear now playing items?");
+
        // builder.setIconAttribute(android.R.drawable.ic_dialog_alert);
         builder.setMessage("Playlist : " + n)
                 .setPositiveButton("Delete!", new DialogInterface.OnClickListener() {

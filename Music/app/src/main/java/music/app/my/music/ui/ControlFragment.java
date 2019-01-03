@@ -52,6 +52,8 @@ public class ControlFragment extends Fragment {
         void nowIconClicked();
 
         void lineClicked(int i);
+
+        void onNowViewCreated();
     }
     private ControlFragmentListener mListener;
     private SeekBar sbar;
