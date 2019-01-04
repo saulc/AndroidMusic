@@ -39,7 +39,7 @@ public class myPlayer extends MediaPlayer {
 	}
 	public void stopAndFadeOut(){
 		mHandler.post(fadeOutVolume);
-		//mHandler.postDelayed(stopAndRelease, fadeOutDuration + 1500);
+	//	mHandler.postDelayed(stopAndRelease, fadeOutDuration + 1500);
 	}
 	public void pausePlayback(int ms){
 		fadeOutDuration = ms;
@@ -141,6 +141,7 @@ public class myPlayer extends MediaPlayer {
 	    		//this = null;
 	    	}
 	    };
+
 	    public Runnable pause = new Runnable(){
 	    	
 	    	@Override
@@ -189,5 +190,9 @@ public class myPlayer extends MediaPlayer {
 			public void setFadeOutGap(int fadeOutGap) {
 				this.fadeOutGap = fadeOutGap;
 			}
-	
+
+
+			public void idk(){
+
+			}
 }

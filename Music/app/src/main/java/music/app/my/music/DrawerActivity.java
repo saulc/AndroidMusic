@@ -39,15 +39,18 @@ import android.widget.ViewSwitcher;
 
 import java.util.ArrayList;
 
+import music.app.my.music.helpers.MixListener;
 import music.app.my.music.helpers.QueueListener;
 import music.app.my.music.player.MusicPlayer;
 import music.app.my.music.player.MusicService;
+import music.app.my.music.player.myPlayer;
 import music.app.my.music.types.Album;
 import music.app.my.music.types.Artist;
 import music.app.my.music.types.Genre;
 import music.app.my.music.types.plist;
 import music.app.my.music.types.Playlist;
 import music.app.my.music.types.Song;
+import music.app.my.music.ui.MixFragment;
 import music.app.my.music.ui.browser.AlbumFragment;
 import music.app.my.music.ui.browser.ArtistFragment;
 import music.app.my.music.ui.browser.HeaderFragment;
@@ -68,13 +71,14 @@ public class DrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         baseListFragment.OnListFragmentInteractionListener,
         HeaderFragment.OnFragmentInteractionListener,
-        QueueListener,
+        QueueListener, MixListener,
         ControlFragment.ControlFragmentListener,
         NewPlaylistDialog.OnDialogInteractionListener ,
         Toolbar.OnMenuItemClickListener{
 
     private  final String TAG = getClass().getSimpleName();
 
+    private MixFragment mf = null;
     private NowFragment nf = null;
     private QueueFragment qf = null;
     private ControlFragment cf = null;
@@ -105,7 +109,7 @@ public class DrawerActivity extends AppCompatActivity
         View decorView =  toolbar;
 //        int uiOptions = View.SYSTEM_UI_FLAG_LOW_PROFILE;
         int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_FULLSCREEN;
+                | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE;
         decorView.setSystemUiVisibility(uiOptions);
 //        decorView.setSystemUiVisibility(0);
 
@@ -665,6 +669,25 @@ public class DrawerActivity extends AppCompatActivity
 
     }
 
+
+    public void showMix(){
+        Log.d(TAG, "Showing MIX fragment");
+
+        if(mf != null && mf.isVisible() ) return;
+
+        mf =  MixFragment.newInstance();
+
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
+
+        transaction.replace(R.id.frame, mf);
+        transaction.addToBackStack(null);
+        transaction.commit();
+
+
+    }
+
+
     public void showNow(){
         Log.d(TAG, "Showing NOW fragment");
 
@@ -773,13 +796,15 @@ public class DrawerActivity extends AppCompatActivity
 
         }  else if (id == R.id.nav_settings) {
             log("Settings clicked.");
-            Fragment f = (Fragment) HeaderFragment.newInstance("", "");
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
-            transaction.replace(R.id.frame, f);
-            transaction.addToBackStack(null);
-            // Commit the transaction
-            transaction.commit();
+
+            showMix();
+//            Fragment f = (Fragment) HeaderFragment.newInstance("", "");
+//            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+//            transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
+//            transaction.replace(R.id.frame, f);
+//            transaction.addToBackStack(null);
+//            // Commit the transaction
+//            transaction.commit();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -1181,6 +1206,7 @@ public class DrawerActivity extends AppCompatActivity
     }
 
     public void updateProgress(MusicPlayer player){
+        if(mf != null) mf.updateInfo(player);
         if(nf != null) nf.updateInfo(player);
         if(controlsVisible)
         {
@@ -1555,4 +1581,47 @@ public class DrawerActivity extends AppCompatActivity
     public void onHeaderFragmentInteraction(Uri uri) {
         log("Header fragment interaction");
     }
+
+    @Override
+    public void onMixItemClicked(String mItem, int position) {
+        log("Mix item clicked: " + position);
+        ArrayList<myPlayer> p = mService.getPlayer().getmPlayers();
+        if(position < p.size()){
+            if(p.get(position).isPlaying() || !p.get(position).isPaused()) p.get(position).pausePlayback();
+            else  p.get(position).resumePlayback();
+            mf.updateInfo(mService.getPlayer());
+        }
+    }
+
+    @Override
+    public void onMixItemLongClicked(myPlayer mItem, int position) {
+        log("Mix item long clicked: " + position);
+    }
+
+
+    @Override
+    public void onMixViewCreated() {
+        log("Mix Fragment created");
+
+        if(mf != null && mf.isVisible()) {
+            log("Mix Fragment setting updater");
+
+            final Handler h = new Handler();
+            h.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (mf.isVisible()) {
+                        if (mService != null)
+                            updateProgress(mService.getPlayer());
+
+                        mf.updateAdapter();
+                        Log.d(TAG, "Mix updating..");
+                        h.removeCallbacks(this);
+                    }
+                }
+            }, 1000);
+        }
+
+    }
+
 }

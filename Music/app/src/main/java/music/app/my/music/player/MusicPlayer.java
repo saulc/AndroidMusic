@@ -89,8 +89,8 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 		 //   player.get(currentPlayer).removeCallbacks();
 			player.get(currentPlayer).stop();
 			//player.get(currentPlayer).reset();
-			player.get(currentPlayer).release();
-			player = null;
+//			player.get(currentPlayer).release();
+//			player.remove(currentPlayer);
 		} catch (IllegalStateException e) {
 			throw e;
 		}
@@ -153,16 +153,17 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 	}
 	
 	private void fadeOutOldPlayer(){
-//		player2 = player;
-//		player2.stopAndFadeOut();
 		myPlayer temp = new myPlayer();
 		int old = currentPlayer;
 		player.add(temp);
 		currentPlayer = player.size() - 1;
 		player.get(old).stopAndFadeOut();
-		
-//		for(int i = 0; i< player.size(); i++)
-//			if( i != currentPlayer)
+
+//		myPlayer temp = new myPlayer();
+//		player.add(currentPlayer, temp); //add new player
+//		int old = currentPlayer + 1;
+//		player.get(old).stopAndFadeOut();  //fade out the old player
+		//player.remove(old);
 				
 		
 	}
@@ -348,6 +349,6 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 		return queue.removeSong(index);
 	}
 
-	
+	public ArrayList<myPlayer> getmPlayers(){ return player; }
 	
 }

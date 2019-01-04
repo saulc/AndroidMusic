@@ -252,6 +252,9 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 	//	player.removeCallbacks();
 		super.onDestroy();
 	}
+
+	public MusicPlayer getPlayer(){ return player; }
+
 	public void pauseRequest() {
 		player.pauseRequest();
 
