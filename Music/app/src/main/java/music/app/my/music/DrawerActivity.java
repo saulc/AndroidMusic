@@ -301,7 +301,7 @@ public class DrawerActivity extends AppCompatActivity
 
     private void handleStartIntents(){
 
-        //search if we need to...
+        //handle share intents if we need to...
         // Get the intent, verify the action and get the query
         Intent intent = getIntent();
         String action = intent.getAction();
@@ -309,11 +309,7 @@ public class DrawerActivity extends AppCompatActivity
         log("Got intent! action: " + action);
 
         log("Got intent! action: " + action);
-        if (Intent.ACTION_SEARCH.equals(action)) {
-            String query = intent.getStringExtra(SearchManager.QUERY);
-            doMySearch(query);
-        }
-        else if(Intent.ACTION_SEND.equals(action) && type != null) {
+        if(Intent.ACTION_SEND.equals(action) && type != null) {
 
             log("GOt Action Send!!");
             log("Looking for data in extras!!");
