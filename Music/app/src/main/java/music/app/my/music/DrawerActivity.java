@@ -16,6 +16,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -83,14 +84,13 @@ public class DrawerActivity extends AppCompatActivity
     private ControlFragment cf = null;
     private PlaceholderFragment pf = null;
 
-    private int showq = 0; //0 == hidden, 1 = miniplayer q, 2 = half, 3 = full screen, 4 edit plist
+    private int showq = 0; //0 == hidden, 1 = miniplayer q, 2 = half, 3 = full screen, todo 4 edit plist
 
     private void log(String s){
         Log.d(TAG, s);
     }
     private MusicService mService;
     private boolean mBound = false;
-    private TextView  currentText;
     private TextSwitcher nextText;
     private Intent startIntent, toggleIntent, pauseIntent, playIntent,
     nextIntent, previousIntent;
@@ -155,17 +155,6 @@ public class DrawerActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
-
-        // Get the SearchView and set the searchable configuration
-//        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-//        SearchView searchView = (SearchView)  findViewById(R.id.search);
-//        // Assumes current activity is the searchable activity
-//        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-//        searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
-//        searchView.setSubmitButtonEnabled(true);
-//        searchView.setQueryRefinementEnabled(true);
-
 
 
 
@@ -331,15 +320,7 @@ public class DrawerActivity extends AppCompatActivity
         b.putString("QueryID", "0" );
         b.putString("Query", q);
         f.setArguments(b);
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
-        // Replace whatever is in the fragment_container view with this fragment,
-        // and add the transaction to the back stack
-        transaction.replace(R.id.frame, f);
-        transaction.addToBackStack(null);
-
-        // Commit the transaction
-        transaction.commit();
+        showFragment(R.id.frame, f, true);
 
     }
 
@@ -417,14 +398,14 @@ public class DrawerActivity extends AppCompatActivity
             LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
                     DrawerLayout.LayoutParams.MATCH_PARENT,
                     0,
-                    (float)( (showq>1) ? showq*2 : showq)
+                    (float)(2*showq)
             );
             findViewById(R.id.sidebar).setLayoutParams(param);
 
             param = new LinearLayout.LayoutParams(
                     DrawerLayout.LayoutParams.MATCH_PARENT,
                     0,
-                    5.0f
+                    (showq<3) ? 5.0f : 0.0f
             );
             findViewById(R.id.frame).setLayoutParams(param);
 
@@ -494,18 +475,25 @@ public class DrawerActivity extends AppCompatActivity
         //cf =  (ControlFragment) ControlFragment.newInstance();
 
         cf =   NowFragment.newInstance(true);
+        controlsVisible = true;
+
+        showFragment(R.id.controlFrame, cf, false);
+
+    }
+
+    private void showFragment(int r, Fragment f, boolean addTobs){
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
 
         // Replace whatever is in the fragment_container view with this fragment,
         // and add the transaction to the back stack
-        transaction.replace(R.id.controlFrame, cf);
-      //  transaction.addToBackStack("cf");
+        transaction.replace(r, f);
+        if(addTobs) transaction.addToBackStack(null);
 
         // Commit the transaction
         transaction.commit();
-        controlsVisible = true;
+
     }
 
     public void updateCurrentSongInfo(){
@@ -635,13 +623,7 @@ public class DrawerActivity extends AppCompatActivity
 
         mf =  MixFragment.newInstance();
 
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
-
-        transaction.replace(R.id.frame, mf);
-        transaction.addToBackStack(null);
-        transaction.commit();
-
+        showFragment(R.id.frame, mf, true);
 
     }
 
@@ -657,13 +639,7 @@ public class DrawerActivity extends AppCompatActivity
         if(nf != null && nf.isVisible() ) return;
 
         nf =  NowFragment.newInstance(false);
-
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
-
-        transaction.replace(R.id.frame, nf);
-        transaction.addToBackStack(null);
-        transaction.commit();
+        showFragment(R.id.frame, nf, true);
 
 
 //        updateCurrentInfo(new Song("", ""));
@@ -686,7 +662,13 @@ public class DrawerActivity extends AppCompatActivity
 
             showNow();
 
-        } else if( id == R.id.search) {
+        } else if( id == R.id.exit) {
+            log("Nav exit clicked!");
+            mService.pauseRequest();
+            finish();
+
+
+        }  else if( id == R.id.search) {
             log("Nav search clicked!");
             onSearchRequested();
 
@@ -710,48 +692,24 @@ public class DrawerActivity extends AppCompatActivity
             //show playlist after we added a new one. no else
         }  if (id == R.id.nav_playlists || id == R.id.new_playlist) {
             Fragment f = PlayListFragment.newInstance();
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
-            transaction.replace(R.id.frame, f);
-            transaction.addToBackStack(null);
-            // Commit the transaction
-            transaction.commit();
+            showFragment(R.id.frame, f, true);
+
 
         } else if (id == R.id.nav_artists) {
             Fragment f = ArtistFragment.newInstance();
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-           transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
-            transaction.replace(R.id.frame, f);
-            transaction.addToBackStack(null);
-            // Commit the transaction
-            transaction.commit();
+            showFragment(R.id.frame, f, true);
 
         } else if (id == R.id.nav_albums) {
             Fragment f = AlbumFragment.newInstance();
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-           transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
-            transaction.replace(R.id.frame, f);
-            transaction.addToBackStack(null);
-            // Commit the transaction
-            transaction.commit();
+            showFragment(R.id.frame, f, true);
 
         } else if (id == R.id.nav_genres) {
             Fragment f = GenreFragment.newInstance();
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-           transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
-            transaction.replace(R.id.frame, f);
-            transaction.addToBackStack(null);
-            // Commit the transaction
-            transaction.commit();
+            showFragment(R.id.frame, f, true);
 
         } else if (id == R.id.nav_songs) {
             Fragment f = SongFragment.newInstance();
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-           transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
-            transaction.replace(R.id.frame, f);
-            transaction.addToBackStack(null);
-            // Commit the transaction
-            transaction.commit();
+            showFragment(R.id.frame, f, true);
 
 
         }  else if (id == R.id.nav_settings) {
@@ -759,12 +717,7 @@ public class DrawerActivity extends AppCompatActivity
 
             showMix();
 //            Fragment f = (Fragment) HeaderFragment.newInstance("", "");
-//            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-//            transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
-//            transaction.replace(R.id.frame, f);
-//            transaction.addToBackStack(null);
-//            // Commit the transaction
-//            transaction.commit();
+//            showFragment(R.id.frame, f, true);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -788,15 +741,8 @@ public class DrawerActivity extends AppCompatActivity
         b.putString("ArtistID", mItem.getId());
         b.putString("ArtistName", mItem.getArtist());
         f.setArguments(b);
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
-        // Replace whatever is in the fragment_container view with this fragment,
-        // and add the transaction to the back stack
-        transaction.replace(R.id.frame, f);
-        transaction.addToBackStack(null);
+        showFragment(R.id.frame, f, true);
 
-        // Commit the transaction
-        transaction.commit();
     }
 
     @Override
@@ -811,15 +757,7 @@ public class DrawerActivity extends AppCompatActivity
         b.putString("AlbumName", mItem.getAlbum());
         b.putString("AlbumArt", mItem.getArt());
         f.setArguments(b);
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
-        // Replace whatever is in the fragment_container view with this fragment,
-        // and add the transaction to the back stack
-        transaction.replace(R.id.frame, f);
-        transaction.addToBackStack(null);
-
-        // Commit the transaction
-        transaction.commit();
+        showFragment(R.id.frame, f, true);
     }
 
     @Override
@@ -831,17 +769,7 @@ public class DrawerActivity extends AppCompatActivity
         b.putString("GenreID", item.getId());
         b.putString("GenreName", item.getGenre());
         f.setArguments(b);
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-
-       transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
-
-        // Replace whatever is in the fragment_container view with this fragment,
-        // and add the transaction to the back stack
-        transaction.replace(R.id.frame, f);
-        transaction.addToBackStack(null);
-
-        // Commit the transaction
-        transaction.commit();
+        showFragment(R.id.frame, f, true);
     }
 
 
@@ -890,9 +818,7 @@ public class DrawerActivity extends AppCompatActivity
     public void createNewPlaylist(boolean isQ) {
         NewPlaylistDialog d =   NewPlaylistDialog.newInstance(isQ);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-
         transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
-
         d.show(transaction, "playlist_name_dialog");
 
         //do the actual work above if nameEnterd() is triggered
@@ -1071,15 +997,7 @@ public class DrawerActivity extends AppCompatActivity
         b.putString("PlaylistID", item.getId());
         b.putString("PlaylistName", item.getName());
         f.setArguments(b);
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
-        // Replace whatever is in the fragment_container view with this fragment,
-        // and add the transaction to the back stack
-        transaction.replace(R.id.frame, f);
-        transaction.addToBackStack(null);
-
-        // Commit the transaction
-        transaction.commit();
+        showFragment(R.id.frame, f, true);
     }
 
 
@@ -1113,8 +1031,12 @@ public class DrawerActivity extends AppCompatActivity
     @Override
     public void onSongClicked(Song item) {
         Log.d(TAG, "Song item clicked" + item.getTitle() + " : " + item.getArtist());
+        View contextView = findViewById(R.id.controlFrame);
 
-        Toast.makeText(this, "Now Playing: "+ item.getTitle(), Toast.LENGTH_SHORT).show();
+        Snackbar.make(contextView, "Now Playing: "+ item.getTitle(), Snackbar.LENGTH_LONG)
+                .show();
+
+       // Toast.makeText(this, "Now Playing: "+ item.getTitle(), Toast.LENGTH_SHORT).show();
         plist p = mService.getQueue(); //new plist();
         if(p.getSize() > 0) {
             p.addNextSong(item);
@@ -1529,11 +1451,6 @@ public class DrawerActivity extends AppCompatActivity
             Log.d(TAG, "Now clicked");
 
                 showNow();
-
-//            if(nf.isVisible())
-//            if(mService.getQueue().getSize() > 0)
-//            updateCurrentInfo(mService.getCurrentSong());
-
             return true;
         }
             return false;

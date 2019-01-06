@@ -60,6 +60,10 @@
                 android:id="@+id/clear_queue"
                 android:icon="@android:drawable/ic_menu_delete"
                 android:title="Clear Queue" />
+            <item
+                android:id="@+id/exit"
+                android:icon="@android:drawable/btn_dialog"
+                android:title="Exit" />
         </menu>
     </item>
 
