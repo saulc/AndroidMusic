@@ -5,31 +5,34 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
 
-    app:layoutManager="LinearLayoutManager"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    app:layoutManager="LinearLayoutManager">
 
 
     <include
-        layout="@layout/fragment_baselistitem"
         android:id="@+id/header"
+        layout="@layout/fragment_baselistitem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
 
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/list"
+        android:name="music.app.my.music.ui.baseListFragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        app:fastScrollEnabled="true"
+        app:fastScrollHorizontalThumbDrawable="@drawable/thumb_drawable"
+        app:fastScrollHorizontalTrackDrawable="@drawable/fast_scroll_track"
+        app:fastScrollVerticalThumbDrawable="@drawable/thumb_drawable"
+        app:fastScrollVerticalTrackDrawable="@drawable/fast_scroll_track"
+        tools:listitem="@layout/fragment_baselistitem">
 
-<android.support.v7.widget.RecyclerView
-    android:id="@+id/list"
-    android:name="music.app.my.music.ui.baseListFragment"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginLeft="16dp"
-    android:layout_marginRight="16dp"
-    tools:listitem="@layout/fragment_baselistitem" >
-
-</android.support.v7.widget.RecyclerView>
-
+    </android.support.v7.widget.RecyclerView>
 
 
 </LinearLayout>

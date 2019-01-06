@@ -2,7 +2,8 @@ package music.app.my.music.types;
 
 
 public class Song extends Qbase{
-	private int playOrder, key;
+	private int  key;
+	private String playOrder;
 	private String title;
 	private String filePath;
 	private String artist;
@@ -53,15 +54,29 @@ public class Song extends Qbase{
 
 		this.artistId = artistId;
 	}
-	public Song(String title, String filePath, String artist, String album, String albumArt, String id, String genre, String duration, String artistId){
+
+	/*
+	playlistMemberProjection = {
+			MediaStore.Audio.Playlists.Members.TITLE,
+			MediaStore.Audio.Playlists.Members.DATA,
+			MediaStore.Audio.Playlists.Members.ARTIST,
+			MediaStore.Audio.Playlists.Members.ALBUM,
+			MediaStore.Audio.Playlists.Members.DURATION,
+			MediaStore.Audio.Playlists.Members.AUDIO_ID,
+			MediaStore.Audio.Playlists.Members.ALBUM_ID,
+			MediaStore.Audio.Playlists.Members.PLAY_ORDER,
+			MediaStore.Audio.Playlists.Members.ARTIST_ID
+
+	 */
+	public Song(String title, String filePath, String artist, String album, String duration, String id, String albumId, String play, String artistId){
 		super();
 		this.title = title;
 		this.filePath = filePath;
 		this.artist = artist;
 		this.album = album;
-		this.albumArt = albumArt;
+		this.albumId = albumId;
 		this.id = id;
-		this.genre = genre;
+		this.playOrder = play;
 		this.duration = duration;
 		this.artistId = artistId;
 	}
@@ -69,13 +84,13 @@ public class Song extends Qbase{
 	public int getKey(){
 		return key;
 	}
-	public int getPlayOrder(){
+	public String getPlayOrder(){
 		return playOrder;
 	}
 	public void setKey(int k){
 		key = k;
 	}
-	public void setPlayOrder(int i){
+	public void setPlayOrder(String i){
 		playOrder = i;
 	}
 	public String getAlbumArt(){

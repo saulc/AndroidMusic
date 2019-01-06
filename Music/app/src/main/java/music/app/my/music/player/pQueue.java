@@ -58,7 +58,7 @@ class SongOrderComparator implements Comparator<Song> {
 	@Override
 	public int compare(Song x, Song y) {
 		
-		return x.getPlayOrder() - y.getPlayOrder();
+		return Integer.parseInt(x.getPlayOrder() ) -  Integer.parseInt( y.getPlayOrder() );
 	}
 	
 }

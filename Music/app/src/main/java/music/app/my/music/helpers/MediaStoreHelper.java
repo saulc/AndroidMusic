@@ -293,7 +293,7 @@ public class MediaStoreHelper extends Fragment implements LoaderManager.LoaderCa
 			while(cursor.moveToNext()) {
 				songs.add(new Song(cursor.getString(0), cursor.getString(1),
 						cursor.getString(2), cursor.getString(3), cursor.getString(4)
-						, cursor.getString(5), cursor.getString(6), cursor.getString(7)));
+						, cursor.getString(5), cursor.getString(6), cursor.getString(7), cursor.getString(8)));
 			}
 			log("Returning Playlist with "+ songs.size() + " Items to activity");
 			if(pid.compareTo(qid) == 0) mListener.queueitemLoaderFinished(songs);

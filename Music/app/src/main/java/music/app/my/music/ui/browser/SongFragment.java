@@ -256,7 +256,7 @@ public class SongFragment extends baseListFragment implements MediaHelperListene
 
     @Override
     public void updateAdapter(){
-        mAdapter = new SongAdapter(items
+        mAdapter = new SongAdapter(myType == SF_TYPE.PLAYLISTITEMS, items
                 , ( baseListFragment.OnListFragmentInteractionListener) getActivity() );
 
         if(recyclerView == null) return;

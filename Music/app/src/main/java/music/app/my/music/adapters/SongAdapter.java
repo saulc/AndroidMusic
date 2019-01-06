@@ -25,10 +25,12 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
 
     private final List<Song> mValues;
     private final baseListFragment.OnListFragmentInteractionListener mListener;
+    private boolean isPlaylist;
 
-    public SongAdapter(List<Song> items, baseListFragment.OnListFragmentInteractionListener listener) {
+    public SongAdapter(boolean isPlaylist, List<Song> items, baseListFragment.OnListFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
+        this.isPlaylist = isPlaylist;
     }
 
     @Override
@@ -42,7 +44,11 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         holder.mItem = mValues.get(position);
         holder.mIdView.setText(mValues.get(position).getId());
-        holder.mContentView.setText(mValues.get(position).getTitle());
+
+        String temp = "";
+        if(isPlaylist) temp += holder.mItem.getPlayOrder() + " : ";
+        temp += position + " " + mValues.get(position).getTitle();
+        holder.mContentView.setText( temp);
 
         holder.nextupbtn.setOnClickListener(new View.OnClickListener() {
             @Override

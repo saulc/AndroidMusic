@@ -391,14 +391,14 @@ public class DrawerActivity extends AppCompatActivity
 
     //app bar menu. top Icons!
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(final Menu menu) {
         // Inflate the options menu from XML
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.drawer, menu);
 
         // Get the SearchView and set the searchable configuration
        // SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-         SearchView searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
+        final SearchView searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
         // Assumes current activity is the searchable activity
         //searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         //searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
@@ -406,13 +406,19 @@ public class DrawerActivity extends AppCompatActivity
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+                log("Query Text Submit: "+ query);
                 if(sf != null)
                 sf.updateQuery(query);
+                searchView.clearFocus();  //close keyboard
+                 MenuItem m =   menu.findItem(R.id.menu_search);
+                 m.collapseActionView();    //minimize search bar
+
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
+                log("Query Text Change: "+ newText);
                 if(sf != null)
                 sf.updateQuery(newText);
                 return true;
@@ -485,7 +491,9 @@ public class DrawerActivity extends AppCompatActivity
     private void doMySearch(String q){
         log("Searching for: " + q);
 
+        if(sf == null)
         sf =  (SongFragment) SongFragment.newInstance();
+
         Bundle b = new Bundle();
         b.putString("SFTYPE", SongFragment.SF_TYPE.QUERY.toString());
         b.putString("QueryID", "0" );
