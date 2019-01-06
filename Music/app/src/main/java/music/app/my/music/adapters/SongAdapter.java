@@ -46,7 +46,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         holder.mIdView.setText(mValues.get(position).getId());
 
         String temp = "";
-        if(isPlaylist) temp += holder.mItem.getPlayOrder() + " : ";
+        if(isPlaylist) temp += mValues.get(position).getPlayOrder() + " : ";
         temp += position + " " + mValues.get(position).getTitle();
         holder.mContentView.setText( temp);
 
