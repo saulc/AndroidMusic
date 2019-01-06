@@ -443,13 +443,7 @@ public class DrawerActivity extends AppCompatActivity
             if (qf == null)
                 qf = QueueFragment.newInstance();
             expandSidebar();
-
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
-            transaction.replace(R.id.qframe, qf);
-            //  transaction.addToBackStack(null);
-            // Commit the transaction
-            transaction.commit();
+        showFragment(R.id.qframe, qf, false);
 
         return  showq;
     }
@@ -483,6 +477,20 @@ public class DrawerActivity extends AppCompatActivity
 
     private void showFragment(int r, Fragment f, boolean addTobs){
 
+        if(r == R.id.frame){
+            //its the main frame.
+            //if its the now fragment, minimize the queue, hide the controls
+            //any other fragment set the queue to half.
+            if(f instanceof NowFragment){
+                showq = 0;
+                showQ();
+                hideControls(false);
+            } else if(showq > 2){
+                showq = 1;
+                showQ();
+                showControls();
+            }
+        }
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
 
@@ -635,6 +643,12 @@ public class DrawerActivity extends AppCompatActivity
         int orientation = getResources().getConfiguration().orientation;
         if (orientation == Configuration.ORIENTATION_PORTRAIT)
         hideControls(false);
+
+        //opens the queue when its fully closed.
+        if(showq > 2) {
+            showq = 1;
+            showQ();
+        }
 
         if(nf != null && nf.isVisible() ) return;
 
