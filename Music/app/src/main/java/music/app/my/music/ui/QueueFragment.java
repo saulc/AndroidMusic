@@ -195,7 +195,7 @@ public class QueueFragment extends baseListFragment {
                 int days = hr/24;
                 m += days + "d";
                 hr %= 24;
-            }  
+            }
             m +=   hr + "h" + min + "m" +  sec + "s ";
 
             if (headerMode > 1) {
