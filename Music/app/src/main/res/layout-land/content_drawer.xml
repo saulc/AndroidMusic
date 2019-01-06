@@ -23,13 +23,6 @@
 
     </FrameLayout>
 
-    <View
-        android:id="@+id/divider"
-        android:layout_width="1dp"
-        android:layout_height="match_parent"
-        android:layout_weight="0"
-        android:background="?android:attr/listDivider" />
-
 
     <LinearLayout
         android:id="@+id/sidebar"
@@ -42,8 +35,7 @@
 
             android:id="@+id/controlFrame"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/frame">
+            android:layout_height="wrap_content">
 
         </FrameLayout>
 

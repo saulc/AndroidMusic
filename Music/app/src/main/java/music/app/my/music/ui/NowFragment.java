@@ -109,7 +109,8 @@ public class NowFragment extends ControlFragment {
         icon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mListener.nowIconClicked(); //show q only?
+                if(isMini) mListener.controlIconClicked();
+                else mListener.nowIconClicked(); //show q only?
             }
         });
         //swipe

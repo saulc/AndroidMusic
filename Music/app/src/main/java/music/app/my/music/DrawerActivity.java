@@ -184,8 +184,8 @@ public class DrawerActivity extends AppCompatActivity
 
         //log("Starting service");
         //startService(startIntent);
-        if(controlsVisible)
-            showControls();
+//        if(controlsVisible)
+//            showControls();
 
 
         handleStartIntents(); //search media share....
@@ -400,7 +400,7 @@ public class DrawerActivity extends AppCompatActivity
             LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
                     0,
                     DrawerLayout.LayoutParams.MATCH_PARENT,
-                    (float)showq
+                    (float)( (showq>2) ? showq*2 : showq)
             );
             findViewById(R.id.sidebar).setLayoutParams(param);
 
@@ -417,14 +417,14 @@ public class DrawerActivity extends AppCompatActivity
             LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
                     DrawerLayout.LayoutParams.MATCH_PARENT,
                     0,
-                    (float)( (showq>2) ? showq*2 : showq)
+                    (float)( (showq>1) ? showq*2 : showq)
             );
             findViewById(R.id.sidebar).setLayoutParams(param);
 
             param = new LinearLayout.LayoutParams(
                     DrawerLayout.LayoutParams.MATCH_PARENT,
                     0,
-                    4.0f
+                    5.0f
             );
             findViewById(R.id.frame).setLayoutParams(param);
 
@@ -433,13 +433,7 @@ public class DrawerActivity extends AppCompatActivity
     }
     public int hideQ(){
         if(qf != null) {
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
-            transaction.replace(R.id.qframe, PlaceholderFragment.newInstance("something"));
-            //  transaction.addToBackStack(null);
-            // Commit the transaction
-            transaction.commit();
-
+            getSupportFragmentManager().beginTransaction().remove(qf).commit();
             qf = null;
             showq = 0;
         }
@@ -452,16 +446,16 @@ public class DrawerActivity extends AppCompatActivity
        // if(showq >0 && qf != null && qf.isVisible()) return showq;
 
         //showq = 1;
-        if(showq == 1 ) {
-            expandSidebar();
+        if(showq == 1) {
+            //expandSidebar();
             showControls();
-            return showq;
+           // return showq;
         }
 
-        if(showq > 4){
+        if(showq > 3){
             showq = 0;
             hideQ();
-            hideControls(false);
+            closeSidebar();
             return showq;
         }
 
@@ -479,89 +473,17 @@ public class DrawerActivity extends AppCompatActivity
         return  showq;
     }
 
-    public  void expandControlFrame(){
 
-        int orientation = getResources().getConfiguration().orientation;
-        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            // In landscape
-
-            showq = 1;
-            showQ();
-            //control frame
-        }
-        else {
-            //Im portrait
-
-//            LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
-//                    DrawerLayout.LayoutParams.MATCH_PARENT,
-//                    0,
-//                    1.0f
-//            );
-//            findViewById(R.id.controlFrame).setLayoutParams(param);
-//            //control frame
-//
-//            param = new LinearLayout.LayoutParams(
-//                    DrawerLayout.LayoutParams.MATCH_PARENT,
-//                    0,
-//                    (float) showq
-//            );
-//            findViewById(R.id.qframe).setLayoutParams(param);
-//            //queue frame
-
-        }
-    }
-
-    public  void closeControlFrame(){
-        int orientation = getResources().getConfiguration().orientation;
-        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            // In landscape
-
-            hideQ();
-            //control frame
-        }
-        else {
-            //Im portrait
-//            LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
-//                    DrawerLayout.LayoutParams.MATCH_PARENT,
-//                    0,
-//                    0.0f
-//            );
-//            findViewById(R.id.controlFrame).setLayoutParams(param);
-//            //control frame
-//
-//            param = new LinearLayout.LayoutParams(
-//                    DrawerLayout.LayoutParams.MATCH_PARENT,
-//                    0,
-//                    0.0f
-//            );
-//            findViewById(R.id.qframe).setLayoutParams(param);
-            //queue frame
-
-        }
-
-    }
     public void hideControls(boolean showPlaceholder){
 
-    closeControlFrame();
+        if(!controlsVisible) return;
+
         Log.d(TAG, "Hiding control fragement");
         controlsVisible = false;
 
-       // getSupportFragmentManager().popBackStack("cf", FragmentManager.POP_BACK_STACK_INCLUSIVE);
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
-
-        Song s = mService.getQueue().getCurrentSong();
-        String a = "";
-        if(s != null) a =  s.getTitle() + " by " + s.getArtist();
-
         updateNextSongInfo();
 
-        pf = PlaceholderFragment.newInstance(a);
-        transaction.replace(R.id.controlFrame, pf);
-        transaction.commit();
-
-        if(!showPlaceholder)
-        getSupportFragmentManager().beginTransaction().remove(pf).commit();
+        getSupportFragmentManager().beginTransaction().remove(cf).commit();
 
     }
 
@@ -570,7 +492,6 @@ public class DrawerActivity extends AppCompatActivity
 
         Log.d(TAG, "Showing control fragement");
         //cf =  (ControlFragment) ControlFragment.newInstance();
-        expandControlFrame();
 
         cf =   NowFragment.newInstance(true);
 
@@ -656,10 +577,7 @@ public class DrawerActivity extends AppCompatActivity
     public void nowIconClicked() {
 
         Log.d(TAG, "Now icon clicked");
-
-        if(showq == 0){
             showQ();
-        } else hideQ();
     }
 
     @Override
@@ -731,11 +649,13 @@ public class DrawerActivity extends AppCompatActivity
     public void showNow(){
         Log.d(TAG, "Showing NOW fragment");
 
+        //always show controls in landscape.
+        int orientation = getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_PORTRAIT)
+        hideControls(false);
+
         if(nf != null && nf.isVisible() ) return;
 
-        //hideControls(false);
-        //todo
-        //hideStatusLines(); //doesn't exist yet
         nf =  NowFragment.newInstance(false);
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -1265,8 +1185,8 @@ public class DrawerActivity extends AppCompatActivity
         if(cf != null) cf.updateInfo(s);
 
         updateNextSongInfo();
-//
-//        updateQueueFrag(mService.getQueue());
+
+        updateQueueFrag(mService.getQueue());
 
     }
 
