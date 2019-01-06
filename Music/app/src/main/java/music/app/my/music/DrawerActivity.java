@@ -32,6 +32,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
+import android.widget.SearchView;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -83,6 +84,7 @@ public class DrawerActivity extends AppCompatActivity
     private QueueFragment qf = null;
     private ControlFragment cf = null;
     private PlaceholderFragment pf = null;
+    private SongFragment sf = null; //search fragment
 
     private FloatingActionButton fab3;
     private FloatingActionButton fab2;
@@ -120,6 +122,7 @@ public class DrawerActivity extends AppCompatActivity
 //        decorView.setSystemUiVisibility(0);
 
         toolbar.setOnMenuItemClickListener((Toolbar.OnMenuItemClickListener) this);
+
         nextText = (TextSwitcher) findViewById(R.id.nextText);
         if(nextText!=null) {
             nextText.setFactory(new ViewSwitcher.ViewFactory() {
@@ -390,14 +393,74 @@ public class DrawerActivity extends AppCompatActivity
 
 
 
+    //app bar menu. top Icons!
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the options menu from XML
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.drawer, menu);
 
+        // Get the SearchView and set the searchable configuration
+       // SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+         SearchView searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
+        // Assumes current activity is the searchable activity
+        //searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        //searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                if(sf != null)
+                sf.updateQuery(query);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if(sf != null)
+                sf.updateQuery(newText);
+                return true;
+            }
+        });
 
         return true;
+    }
+
+
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.shuffle) {
+            log("Suffle clicked");
+            boolean b = mService.shuffleSongs();
+            Toast.makeText(mService, "Shuffle: " + b, Toast.LENGTH_SHORT).show();
+            updateQueueFrag(mService.getQueue());
+
+            return true;
+        } else if (id == R.id.repeat) {
+            log("Repeat clicked");
+            boolean b = mService.repeatSongs();
+            Toast.makeText(mService, "Repeat: " + b, Toast.LENGTH_SHORT).show();
+
+            return true;
+        } else if (id == R.id.mix) {
+            log("Mix clicked");
+            Song s = getRandomSong();
+            String b = "Mix: " + s.getTitle() + " by " + s.getArtist() + " added to Queue.";
+            Toast.makeText(mService,  b, Toast.LENGTH_SHORT).show();
+
+            onSongClicked(s);
+            // showNow();
+            return true;
+        } else if (id == R.id.menu_search) {
+            log("Search clicked");
+
+           // item.getActionView().setSelected(true);
+            doMySearch("");
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -407,7 +470,6 @@ public class DrawerActivity extends AppCompatActivity
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.shuffle) {
             return true;
         } else if (id == R.id.repeat) {
@@ -415,10 +477,10 @@ public class DrawerActivity extends AppCompatActivity
         } else if (id == R.id.mix) {
             return true;
         }
-//        else if(id == R.id.app_bar_search){
-//            onSearchRequested();
-//
-//        }
+        else if(id == R.id.menu_search){
+           // onSearchRequested();
+            return true;
+        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -427,13 +489,13 @@ public class DrawerActivity extends AppCompatActivity
     private void doMySearch(String q){
         log("Searching for: " + q);
 
-        Fragment f =  (Fragment) SongFragment.newInstance();
+        sf =  (SongFragment) SongFragment.newInstance();
         Bundle b = new Bundle();
         b.putString("SFTYPE", SongFragment.SF_TYPE.QUERY.toString());
         b.putString("QueryID", "0" );
         b.putString("Query", q);
-        f.setArguments(b);
-        showFragment(R.id.frame, f, true);
+        sf.setArguments(b);
+        showFragment(R.id.frame, sf, true);
 
     }
 
@@ -795,11 +857,6 @@ public class DrawerActivity extends AppCompatActivity
             finish();
 
 
-        }  else if( id == R.id.search) {
-            log("Nav search clicked!");
-            onSearchRequested();
-
-
         } else if( id == R.id.bluetooth) {
             log("Nav bluetooth clicked!");
             showBluetoothSettings();
@@ -1134,7 +1191,11 @@ public class DrawerActivity extends AppCompatActivity
     @Override
     public void onSongNextupClicked(int position, Song item) {
         Log.d(TAG, "Song nextup clicked" + item.getTitle() + " : " + item.getArtist());
-        Toast.makeText(this, item.getTitle() + " added next.", Toast.LENGTH_SHORT).show();
+
+        View contextView = findViewById(R.id.controlFrame);
+        Snackbar.make(contextView, item.getTitle() + " added next to queue.", Snackbar.LENGTH_LONG).show();
+
+        //Toast.makeText(this, item.getTitle() + " added next.", Toast.LENGTH_SHORT).show();
         plist p = mService.getQueue(); //new plist();
         p.addNextSong(item);
 
@@ -1147,7 +1208,10 @@ public class DrawerActivity extends AppCompatActivity
         Log.d(TAG, "Song option clicked" + item.getTitle() + " : " + item.getArtist());
         // TODO: 12/29/18 just add it to the list dont play. maybe open a menu later?
 
-        Toast.makeText(this, item.getTitle() + " added to queue.", Toast.LENGTH_SHORT).show();
+        View contextView = findViewById(R.id.controlFrame);
+        Snackbar.make(contextView, item.getTitle() + " added to queue.", Snackbar.LENGTH_LONG).show();
+
+        //Toast.makeText(this, item.getTitle() + " added to queue.", Toast.LENGTH_SHORT).show();
         plist p = mService.getQueue();
         p.addSong(item);
 
@@ -1158,10 +1222,9 @@ public class DrawerActivity extends AppCompatActivity
     @Override
     public void onSongClicked(Song item) {
         Log.d(TAG, "Song item clicked" + item.getTitle() + " : " + item.getArtist());
-        View contextView = findViewById(R.id.controlFrame);
 
-        Snackbar.make(contextView, "Now Playing: "+ item.getTitle(), Snackbar.LENGTH_LONG)
-                .show();
+        View contextView = findViewById(R.id.controlFrame);
+        Snackbar.make(contextView, "Now Playing: "+ item.getTitle(), Snackbar.LENGTH_LONG).show();
 
        // Toast.makeText(this, "Now Playing: "+ item.getTitle(), Toast.LENGTH_SHORT).show();
         plist p = mService.getQueue(); //new plist();
@@ -1547,40 +1610,6 @@ public class DrawerActivity extends AppCompatActivity
 
         return songs.get(i);
 
-    }
-    @Override
-    public boolean onMenuItemClick(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.shuffle) {
-             log("Suffle clicked");
-            boolean b = mService.shuffleSongs();
-            Toast.makeText(mService, "Shuffle: " + b, Toast.LENGTH_SHORT).show();
-            updateQueueFrag(mService.getQueue());
-
-            return true;
-        } else if (id == R.id.repeat) {
-            log("Repeat clicked");
-            boolean b = mService.repeatSongs();
-            Toast.makeText(mService, "Repeat: " + b, Toast.LENGTH_SHORT).show();
-
-            return true;
-        } else if (id == R.id.mix) {
-            log("Mix clicked");
-            Song s = getRandomSong();
-            String b = "Mix: " + s.getTitle() + " by " + s.getArtist() + " added to Queue.";
-            Toast.makeText(mService,  b, Toast.LENGTH_SHORT).show();
-
-            onSongClicked(s);
-           // showNow();
-            return true;
-        } else if(id == R.id.now){
-            Log.d(TAG, "Now clicked");
-
-                showNow();
-            return true;
-        }
-            return false;
     }
 
     @Override

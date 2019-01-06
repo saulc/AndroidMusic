@@ -303,18 +303,35 @@ public class SongFragment extends baseListFragment implements MediaHelperListene
     }
 
 
+    public void updateQuery(String s){
+        log("Update Query: " + s + " old: " + pname);
+        pname = s;
+
+        items = new ArrayList<>();
+        updateQuery();
+    }
+
+    private ArrayList<Song> slist;
     @Override
     public void queryLoaderFinished(ArrayList<Song> songs) {
         log("Query items Loaded " + songs.size() + " song(s)");
 
+        slist = songs;
         //do matching here. so i dont' need to do multiple where queries
+
+        updateQuery();
+    }
+
+
+    private void updateQuery(){
+
 
         updateAdapter();
         infoText.setText("Searching songs...");
 
         CharSequence q = new StringBuilder(pname.toLowerCase());
         int i = 0;
-        for(Song s: songs) {
+        for(Song s: slist) {
             if (s.getAlbum().toLowerCase().contains(q)) items.add(s);
             else if (s.getTitle().toLowerCase().contains(q)) items.add(s);
             else if (s.getArtist().toLowerCase().contains(q)) items.add(s);
