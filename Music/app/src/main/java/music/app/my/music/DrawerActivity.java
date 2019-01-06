@@ -84,6 +84,11 @@ public class DrawerActivity extends AppCompatActivity
     private ControlFragment cf = null;
     private PlaceholderFragment pf = null;
 
+    private FloatingActionButton fab3;
+    private FloatingActionButton fab2;
+    private FloatingActionButton fab1;
+
+    private boolean showfmenu = false; //show/hide floating control buttons.
     private int showq = 0; //0 == hidden, 1 = miniplayer q, 2 = half, 3 = full screen, todo 4 edit plist
 
     private void log(String s){
@@ -131,11 +136,19 @@ public class DrawerActivity extends AppCompatActivity
         }
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+         fab1 = (FloatingActionButton) findViewById(R.id.fab1);
+         fab2 = (FloatingActionButton) findViewById(R.id.fab2);
+         fab3 = (FloatingActionButton) findViewById(R.id.fab3);
+         iniFM();
+
         fab.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
+                //mService.duck();
+                Log.d(TAG, "Fab Long Clicked: " + showfmenu);
+                if(!showfmenu) showFM();
+                else hideFM();
 
-                mService.duck();
                 return true;
             }
         });
@@ -181,7 +194,107 @@ public class DrawerActivity extends AppCompatActivity
 
     }
 
-    private Song shared = null;
+
+    private void iniFM(){
+        //next
+        fab1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "Fab 1 Clicked: next");
+
+                nextPressed();
+            }
+        });
+
+        fab1.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                //mService.duck();
+                Log.d(TAG, "Fab 1 Long Clicked: next" );
+
+                return true;
+            }
+        });
+        //play/pause
+
+        fab2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "Fab 2 Clicked: play/pause");
+                playPausePressed();
+            }
+        });
+
+        fab2.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                //mService.duck();
+                Log.d(TAG, "Fab 2 Long Clicked: play/pause" );
+
+                return true;
+            }
+        });
+
+        //previous
+        fab3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "Fab 3 Clicked: next");
+                 prevPressed();
+            }
+        });
+
+        fab3.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                //mService.duck();
+                Log.d(TAG, "Fab 3 Long Clicked:previous " );
+
+                return true;
+            }
+        });
+
+    }
+
+
+    //bottom line
+//    private void showFM(){
+//        showfmenu = true;
+//        float r = -getResources().getDimension(R.dimen.fd);
+//        fab1.animate().translationX(r);
+//        fab2.animate().translationX(r*2);
+//        fab3.animate().translationX(r*3);
+//
+//    }
+//    private void hideFM(){
+//        showfmenu = false;
+//        fab1.animate().translationX(0);
+//        fab2.animate().translationX(0);
+//        fab3.animate().translationX(0);
+//    }
+
+   // circle?
+    private void showFM(){
+        showfmenu = true;
+        //if r == c its a square.
+        float r = -getResources().getDimension(R.dimen.fd);
+        float c = -getResources().getDimension(R.dimen.fc);
+
+        fab1.animate().translationY(c);
+        fab2.animate().translationY(r);
+        fab2.animate().translationX(r);
+        fab3.animate().translationX(c);
+
+    }
+    private void hideFM(){
+        showfmenu = false;
+        fab1.animate().translationY(0);
+        fab2.animate().translationY(0);
+        fab2.animate().translationX(0);
+        fab3.animate().translationX(0);
+
+    }
+
 
     private void handleStartIntents(){
 
@@ -207,7 +320,7 @@ public class DrawerActivity extends AppCompatActivity
             log("Oh its audio!!"  + uri.toString());
 
             String id = uri.toString().substring(uri.toString().lastIndexOf('/'), uri.toString().length());
-             shared = new Song("Shared Song", id );
+             //shared = new Song("Shared Song", id );
 
             //todo play the shared song.
 //            onSongClicked(shared);

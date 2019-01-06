@@ -11,6 +11,8 @@
     <dimen name="controlpad">60dp</dimen>
     <dimen name="big_button_pad">12dp</dimen>
     <dimen name="mini_button_pad">20dp</dimen>
+    <dimen name="fd">70dp</dimen>
+    <dimen name="fc">90dp</dimen>
     <item name="frame_height" type="dimen">80%</item>
 
 </resources>

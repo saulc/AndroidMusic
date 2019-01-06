@@ -1,12 +1,17 @@
 package music.app.my.music.ui;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextSwitcher;
+import android.widget.TextView;
+import android.widget.ViewSwitcher;
 
 import com.nhaarman.listviewanimations.appearance.simple.SwingBottomInAnimationAdapter;
 import com.nhaarman.listviewanimations.itemmanipulation.DynamicListView;
@@ -40,6 +45,9 @@ public class QueueFragment extends baseListFragment {
 
     private ArrayList<Song> items;
     private DynamicListView mListView;
+    private TextSwitcher qHeader;
+    private int headerMode = 0; //song count only, 1 = seconds. 2 = full count, 3 remaining playtime
+
     //private MediaStoreHelper msHelper;
     //private RecyclerView.Adapter mAdapter;
 
@@ -86,17 +94,27 @@ public class QueueFragment extends baseListFragment {
 
         mListView = (DynamicListView) view.findViewById(R.id.qlistview);
 
-//        mListView.setOnItemLongClickListener(
-//                new AdapterView.OnItemLongClickListener() {
-//                    @Override
-//                    public boolean onItemLongClick(final AdapterView<?> parent, final View view,
-//                                                   final int position, final long id) {
-//                        log("Queue item long click ");
-//                        mListView.startDragging(position);
-//                        return true;
-//                    }
-//                }
-//        );
+
+        qHeader = (TextSwitcher) view.findViewById(R.id.qfragheader);
+        qHeader.setFactory(new ViewSwitcher.ViewFactory() {
+            public View makeView() {
+                TextView t = new TextView(getContext());
+                t.setTextSize(8);
+                t.setTypeface(Typeface.MONOSPACE, Typeface.BOLD_ITALIC);
+               // t.setTypeface(Typeface.create("casual", Typeface.BOLD_ITALIC));
+                t.setGravity(Gravity.CENTER);
+                t.setLines(3);
+                return t;
+            }
+        });
+        qHeader.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(++headerMode > 3) headerMode = 0;
+                updateHeader();
+            }
+        });
+        qHeader.setText("Now playing queue: empty ");
 
         qListener.qFragCreated();
 
@@ -146,9 +164,49 @@ public class QueueFragment extends baseListFragment {
         log("Updating adapter");
         mAdapter.notifyDataSetChanged();
 
-        log("items:" + items.size());
+        updateHeader();
+
+        int s = items.size();
+        log("items:" + s);
     }
 
+    private  void updateHeader(){
+
+        int s = items.size();
+        String m = "Now playing queue contains: " + s + " song" + ( (s >1) ? "s": "");
+
+        //song count only, 1 = seconds. 2 = full count, 3 remaining playtime
+        if (headerMode > 2) {
+            int td = 0;     //total duration in seconds
+            for (int i=current; i< items.size(); i++) td += items.get(i).getDuration();
+            m += " Remaining Playtime: " + td + "Seconds ";
+
+        }
+        else if (headerMode > 0) {
+            //long version
+            int td = 0;     //total duration in seconds
+            for (Song i : items) td += i.getDuration();
+
+            int hr = td / 60 /60;
+            int min = td / 60;
+            int sec = td % 60;
+            m += " Playtime: ";
+            if(hr > 24) {
+                int days = hr/24;
+                m += days + "d";
+                hr %= 24;
+            }  
+            m +=   hr + "h" + min + "m" +  sec + "s ";
+
+            if (headerMode > 1) {
+//                if (td / 60 / 60 > 0) m += "~ " + (td / 60 / 60) + "d";
+//                if (td / 60 / 24 > 0) m += (td / 60 / 24) + "h";
+//                m += (td / 60) + "m" + (td % 60) + "s ";
+            }
+
+        }
+        qHeader.setText( m );
+    }
 
     @Override
     public void onAttach(Context context) {
