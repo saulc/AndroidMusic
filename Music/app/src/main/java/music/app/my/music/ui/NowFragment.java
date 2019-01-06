@@ -55,9 +55,12 @@ public class NowFragment extends ControlFragment {
 
 
 
-    public static NowFragment newInstance() {
+    public static NowFragment newInstance(boolean mini) {
         NowFragment fragment = new NowFragment();
 
+        Bundle b = new Bundle();
+        b.putBoolean("ISMINI", mini);
+        fragment.setArguments(b);
         return fragment;
     }
 
@@ -77,8 +80,12 @@ public class NowFragment extends ControlFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.now_layout, container, false);
-        log("Now fragment view created");
+        final boolean isMini = getArguments().getBoolean("ISMINI");
+        View view;
+        if(isMini) view = inflater.inflate(R.layout.nowmini_layout, container, false);
+        else  view = inflater.inflate(R.layout.now_layout, container, false);
+
+        log("Now fragment view created; mini: " + isMini);
             final Context context = view.getContext();
 
             icon = (ImageSwitcher) view.findViewById(R.id.currentIcon);
@@ -114,6 +121,7 @@ public class NowFragment extends ControlFragment {
                 public View makeView() {
                     TextView t = new TextView(context);
                     t.setTextSize(24);
+                    if(isMini) t.setTextSize(14);
                     t.setTypeface(Typeface.create("cursive", Typeface.NORMAL));
                     t.setGravity(Gravity.CENTER);
                     t.setLines(1);
@@ -124,6 +132,7 @@ public class NowFragment extends ControlFragment {
                 public View makeView() {
                     TextView t = new TextView(context);
                     t.setTextSize(20);
+                    if(isMini) t.setTextSize(14);
                     t.setGravity(Gravity.CENTER);
                     t.setTypeface(Typeface.create("casual", Typeface.NORMAL));
                     t.setLines(1);
@@ -137,6 +146,7 @@ public class NowFragment extends ControlFragment {
                     t.setGravity(Gravity.CENTER);
                     t.setTypeface(Typeface.create("casual", Typeface.BOLD));
                     t.setLines(1);
+                    if(isMini) t.setTextSize(14);
                     return t;
                 }
             });

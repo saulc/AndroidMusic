@@ -20,21 +20,6 @@
 
     </FrameLayout>
 
-    <View
-        android:id="@+id/divider"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_weight="0"
-        android:background="?android:attr/listDivider" />
-
-
-    <View
-        android:id="@+id/divider"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_weight="0"
-        android:background="?android:attr/listDivider"
-        android:paddingTop="3dp" />
 
     <TextSwitcher
         android:id="@+id/nextText"
@@ -46,26 +31,31 @@
         android:typeface="monospace" />
 
 
-    <View
-        android:id="@+id/divider"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="?android:attr/listDivider" />
-
-    <FrameLayout
-
-        android:id="@+id/qframe"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"></FrameLayout>
-
-    <FrameLayout
-
-        android:id="@+id/controlFrame"
+    <LinearLayout
+        android:id="@+id/sidebar"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_below="@id/frame"
-        android:layout_weight="0">
+        android:layout_weight="1"
+        android:gravity="bottom"
+        android:orientation="vertical">
 
-    </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/qframe"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+        </FrameLayout>
+
+        <FrameLayout
+
+            android:id="@+id/controlFrame"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+        </FrameLayout>
+
+    </LinearLayout>
 
 </LinearLayout>

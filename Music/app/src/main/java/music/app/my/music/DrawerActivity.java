@@ -1,6 +1,5 @@
 package music.app.my.music;
 
-import android.app.Notification;
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.ContentResolver;
@@ -83,7 +82,9 @@ public class DrawerActivity extends AppCompatActivity
     private QueueFragment qf = null;
     private ControlFragment cf = null;
     private PlaceholderFragment pf = null;
-    private int showq = 0; //0 == hidden, 1 = mini q, 2 = half, 3 = full screen, 4 edit plist
+
+    private int showq = 0; //0 == hidden, 1 = miniplayer q, 2 = half, 3 = full screen, 4 edit plist
+
     private void log(String s){
         Log.d(TAG, s);
     }
@@ -109,7 +110,7 @@ public class DrawerActivity extends AppCompatActivity
         View decorView =  toolbar;
 //        int uiOptions = View.SYSTEM_UI_FLAG_LOW_PROFILE;
         int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE;
+                | View.SYSTEM_UI_FLAG_FULLSCREEN; // | View.SYSTEM_UI_FLAG_IMMERSIVE;
         decorView.setSystemUiVisibility(uiOptions);
 //        decorView.setSystemUiVisibility(0);
 
@@ -141,18 +142,9 @@ public class DrawerActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d(TAG, "Hiding Q fragement");
-                if(controlsVisible){
-                    hideControls( false);
-                   // hideQ();
-                } else {
-                    showControls();
-                   // showQ();
-                }
-
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-            }
+                Log.d(TAG, "Fab Clicked: " + showq);
+                    showQ();
+     }
         });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -356,13 +348,13 @@ public class DrawerActivity extends AppCompatActivity
     public void placeholderCreated() {
 
         log("Placeholder created, q frame");
-        closeQframe();
+        closeSidebar();
     }
 
 
 
 
-    public void closeQframe(){
+    public void closeSidebar(){
         log("Closing q frame: ");
       //  mHandler.removeCallbacks(hideQframe);
         int orientation = getResources().getConfiguration().orientation;
@@ -389,27 +381,18 @@ public class DrawerActivity extends AppCompatActivity
                     0.0f
             );
             //queue frame ends at q == 0, f == 2
-            findViewById(R.id.qframe).setLayoutParams(param);
+            findViewById(R.id.sidebar).setLayoutParams(param);
+
             param = new LinearLayout.LayoutParams(
                     DrawerLayout.LayoutParams.MATCH_PARENT,
                     0,
-                    2.0f
+                    5.0f
             );
             findViewById(R.id.frame).setLayoutParams(param);
             //main frame
-
-//            param = new LinearLayout.LayoutParams(
-//                    DrawerLayout.LayoutParams.MATCH_PARENT,
-//                    0,
-//                    0.0f
-//            );
-//            findViewById(R.id.controlFrame).setLayoutParams(param);
-            //control frame
         }
-
-
     }
-    public void expandQframe(){
+    public void expandSidebar(){
         log("Expanding q frame");
         int orientation = getResources().getConfiguration().orientation;
         if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -417,14 +400,14 @@ public class DrawerActivity extends AppCompatActivity
             LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
                     0,
                     DrawerLayout.LayoutParams.MATCH_PARENT,
-                    2.0f
+                    (float)showq
             );
             findViewById(R.id.sidebar).setLayoutParams(param);
 
             param = new LinearLayout.LayoutParams(
                     0,
                     DrawerLayout.LayoutParams.MATCH_PARENT,
-                    2.0f
+                    4.0f
             );
             findViewById(R.id.frame).setLayoutParams(param);
 
@@ -434,14 +417,14 @@ public class DrawerActivity extends AppCompatActivity
             LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
                     DrawerLayout.LayoutParams.MATCH_PARENT,
                     0,
-                    1.0f
+                    (float)( (showq>2) ? showq*2 : showq)
             );
-            findViewById(R.id.qframe).setLayoutParams(param);
+            findViewById(R.id.sidebar).setLayoutParams(param);
 
             param = new LinearLayout.LayoutParams(
                     DrawerLayout.LayoutParams.MATCH_PARENT,
                     0,
-                    2.0f
+                    4.0f
             );
             findViewById(R.id.frame).setLayoutParams(param);
 
@@ -465,22 +448,144 @@ public class DrawerActivity extends AppCompatActivity
     }
 
     public int showQ(){
-        if(showq >1 && qf != null && qf.isVisible()) return showq;
+        log("Show Q:" + ++showq);
+       // if(showq >0 && qf != null && qf.isVisible()) return showq;
 
-        qf = QueueFragment.newInstance();
-        expandQframe();
-        showq = 1;
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
-        transaction.replace(R.id.qframe, qf);
-      //  transaction.addToBackStack(null);
-        // Commit the transaction
-        transaction.commit();
+        //showq = 1;
+        if(showq == 1 ) {
+            expandSidebar();
+            showControls();
+            return showq;
+        }
+
+        if(showq > 4){
+            showq = 0;
+            hideQ();
+            hideControls(false);
+            return showq;
+        }
+
+            if (qf == null)
+                qf = QueueFragment.newInstance();
+            expandSidebar();
+
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
+            transaction.replace(R.id.qframe, qf);
+            //  transaction.addToBackStack(null);
+            // Commit the transaction
+            transaction.commit();
 
         return  showq;
     }
 
+    public  void expandControlFrame(){
 
+        int orientation = getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            // In landscape
+
+            showq = 1;
+            showQ();
+            //control frame
+        }
+        else {
+            //Im portrait
+
+//            LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
+//                    DrawerLayout.LayoutParams.MATCH_PARENT,
+//                    0,
+//                    1.0f
+//            );
+//            findViewById(R.id.controlFrame).setLayoutParams(param);
+//            //control frame
+//
+//            param = new LinearLayout.LayoutParams(
+//                    DrawerLayout.LayoutParams.MATCH_PARENT,
+//                    0,
+//                    (float) showq
+//            );
+//            findViewById(R.id.qframe).setLayoutParams(param);
+//            //queue frame
+
+        }
+    }
+
+    public  void closeControlFrame(){
+        int orientation = getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            // In landscape
+
+            hideQ();
+            //control frame
+        }
+        else {
+            //Im portrait
+//            LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
+//                    DrawerLayout.LayoutParams.MATCH_PARENT,
+//                    0,
+//                    0.0f
+//            );
+//            findViewById(R.id.controlFrame).setLayoutParams(param);
+//            //control frame
+//
+//            param = new LinearLayout.LayoutParams(
+//                    DrawerLayout.LayoutParams.MATCH_PARENT,
+//                    0,
+//                    0.0f
+//            );
+//            findViewById(R.id.qframe).setLayoutParams(param);
+            //queue frame
+
+        }
+
+    }
+    public void hideControls(boolean showPlaceholder){
+
+    closeControlFrame();
+        Log.d(TAG, "Hiding control fragement");
+        controlsVisible = false;
+
+       // getSupportFragmentManager().popBackStack("cf", FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
+
+        Song s = mService.getQueue().getCurrentSong();
+        String a = "";
+        if(s != null) a =  s.getTitle() + " by " + s.getArtist();
+
+        updateNextSongInfo();
+
+        pf = PlaceholderFragment.newInstance(a);
+        transaction.replace(R.id.controlFrame, pf);
+        transaction.commit();
+
+        if(!showPlaceholder)
+        getSupportFragmentManager().beginTransaction().remove(pf).commit();
+
+    }
+
+    public void showControls(){
+        if(controlsVisible && cf != null && cf.isVisible()) return;
+
+        Log.d(TAG, "Showing control fragement");
+        //cf =  (ControlFragment) ControlFragment.newInstance();
+        expandControlFrame();
+
+        cf =   NowFragment.newInstance(true);
+
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
+
+        // Replace whatever is in the fragment_container view with this fragment,
+        // and add the transaction to the back stack
+        transaction.replace(R.id.controlFrame, cf);
+      //  transaction.addToBackStack("cf");
+
+        // Commit the transaction
+        transaction.commit();
+        controlsVisible = true;
+    }
 
     public void updateCurrentSongInfo(){
         if(mService != null ) {
@@ -489,7 +594,7 @@ public class DrawerActivity extends AppCompatActivity
             if (s != null) {
                 b = s.getTitle() + " by " + s.getArtist();
                 if(pf != null)
-                pf.setText(" Now Playing : " + b);
+                    pf.setText(" Now Playing : " + b);
 
 
             }
@@ -530,7 +635,7 @@ public class DrawerActivity extends AppCompatActivity
             String b = "";
             if (s != null) {
                 b = s.getTitle() + " by " + s.getArtist();
-                                //" Now Playing: "
+                //" Now Playing: "
                 nextText.setText( " Up Next: " + b);
             }
         }
@@ -538,72 +643,7 @@ public class DrawerActivity extends AppCompatActivity
 
     }
 
-    public  void expandControlFrame(){
-        LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
-                DrawerLayout.LayoutParams.MATCH_PARENT,
-                0,
-                2.0f
-        );
-            findViewById(R.id.controlFrame).setLayoutParams(param);
-        //control frame
 
-    }
-    public  void closeControlFrame(){
-        LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
-                DrawerLayout.LayoutParams.MATCH_PARENT,
-                0,
-                0.0f
-        );
-
-        findViewById(R.id.controlFrame).setLayoutParams(param);
-        //control frame
-
-    }
-    public void hideControls(boolean showPlaceholder){
-
-    closeControlFrame();
-        Log.d(TAG, "Hiding control fragement");
-        controlsVisible = false;
-
-       // getSupportFragmentManager().popBackStack("cf", FragmentManager.POP_BACK_STACK_INCLUSIVE);
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
-
-        Song s = mService.getQueue().getCurrentSong();
-        String a = "";
-        if(s != null) a =  s.getTitle() + " by " + s.getArtist();
-
-        updateNextSongInfo();
-
-        pf = PlaceholderFragment.newInstance(a);
-        transaction.replace(R.id.controlFrame, pf);
-        transaction.commit();
-
-        if(!showPlaceholder)
-        getSupportFragmentManager().beginTransaction().remove(pf).commit();
-
-    }
-    public void showControls(){
-        if(controlsVisible && cf != null && cf.isVisible()) return;
-
-        Log.d(TAG, "Showing control fragement");
-        //cf =  (ControlFragment) ControlFragment.newInstance();
-        expandControlFrame();
-
-        cf =   NowFragment.newInstance();
-
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
-
-        // Replace whatever is in the fragment_container view with this fragment,
-        // and add the transaction to the back stack
-        transaction.replace(R.id.controlFrame, cf);
-      //  transaction.addToBackStack("cf");
-
-        // Commit the transaction
-        transaction.commit();
-        controlsVisible = true;
-    }
 
     @Override
     public void controlIconClicked(){
@@ -696,7 +736,7 @@ public class DrawerActivity extends AppCompatActivity
         //hideControls(false);
         //todo
         //hideStatusLines(); //doesn't exist yet
-        nf =  NowFragment.newInstance();
+        nf =  NowFragment.newInstance(false);
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
@@ -1072,9 +1112,8 @@ public class DrawerActivity extends AppCompatActivity
         else{
             p.addTo(items);
         }
-        if(showq != 0)
-            qf.setQList(p);
 
+        updateQueueFrag(p);
         updateNextSongInfo();
         updateCurrentSongInfo();
     }
@@ -1096,8 +1135,8 @@ public class DrawerActivity extends AppCompatActivity
             if(play)
             startService(playIntent);
         }
-        if(showq != 0)
-            qf.setQList(p);
+
+        updateQueueFrag(p);
 
         updateNextSongInfo();
         updateCurrentSongInfo();
@@ -1130,12 +1169,11 @@ public class DrawerActivity extends AppCompatActivity
     @Override
     public void onSongNextupClicked(int position, Song item) {
         Log.d(TAG, "Song nextup clicked" + item.getTitle() + " : " + item.getArtist());
-
-
+        Toast.makeText(this, item.getTitle() + " added next.", Toast.LENGTH_SHORT).show();
         plist p = mService.getQueue(); //new plist();
         p.addNextSong(item);
-        if(showq >0)
-        qf.setQList(p);
+
+        updateQueueFrag(p);
         updateNextSongInfo();
     }
 
@@ -1144,10 +1182,11 @@ public class DrawerActivity extends AppCompatActivity
         Log.d(TAG, "Song option clicked" + item.getTitle() + " : " + item.getArtist());
         // TODO: 12/29/18 just add it to the list dont play. maybe open a menu later?
 
+        Toast.makeText(this, item.getTitle() + " added to queue.", Toast.LENGTH_SHORT).show();
         plist p = mService.getQueue();
         p.addSong(item);
-        if(showq >0)
-        qf.setQList(p);
+
+        updateQueueFrag(p);
     }
 
 
@@ -1155,6 +1194,7 @@ public class DrawerActivity extends AppCompatActivity
     public void onSongClicked(Song item) {
         Log.d(TAG, "Song item clicked" + item.getTitle() + " : " + item.getArtist());
 
+        Toast.makeText(this, "Now Playing: "+ item.getTitle(), Toast.LENGTH_SHORT).show();
         plist p = mService.getQueue(); //new plist();
         if(p.getSize() > 0) {
             p.addNextSong(item);
@@ -1166,13 +1206,18 @@ public class DrawerActivity extends AppCompatActivity
             p.addSong(item);
             startService(playIntent);
         }
-        if(showq != 0)
-        qf.setQList(p);
+
+        updateQueueFrag(p);
         updateNextSongInfo();
         updateCurrentSongInfo();
     }
 
 
+
+    public void updateQueueFrag(plist p){
+        if(qf != null && showq != 0)
+            qf.setQList(p);
+    }
 
     @Override
     public void playPausePressed(){
@@ -1220,9 +1265,8 @@ public class DrawerActivity extends AppCompatActivity
         if(cf != null) cf.updateInfo(s);
 
         updateNextSongInfo();
-
-        if(showq > 0) qf.setQList(mService.getQueue());
-
+//
+//        updateQueueFrag(mService.getQueue());
 
     }
 
@@ -1240,7 +1284,7 @@ public class DrawerActivity extends AppCompatActivity
             log("Music service bound!");
             //	loadQueue();
             //System.out.println("Service Binded");
-           // updateQueue();
+           // updateQueueFrag();
 
             binder.setListener(new MusicService.BoundServiceListener() {
 
@@ -1290,7 +1334,7 @@ public class DrawerActivity extends AppCompatActivity
     public void qFragCreated() {
         log("Q frag created");
         if(mService != null  )
-        qf.setQList(mService.getQueue());
+            updateQueueFrag(mService.getQueue());
     }
 
     @Override
@@ -1299,9 +1343,8 @@ public class DrawerActivity extends AppCompatActivity
        if( mService.getQueue().getIndex() != position)
             mService.playSongFromQueue(position);
 
-       if(showq == 0)        updateCurrentSongInfo();
-        if(showq != 0)
-            qf.setQList(mService.getQueue());
+        updateCurrentSongInfo();
+        updateQueueFrag(mService.getQueue());
         updateNextSongInfo();
     }
 
@@ -1320,9 +1363,8 @@ public class DrawerActivity extends AppCompatActivity
 
         }
 
-        if(showq == 0)        updateCurrentSongInfo();
-        if(showq != 0)
-            qf.setQList(mService.getQueue());
+        updateCurrentSongInfo();
+        updateQueueFrag(mService.getQueue());
         updateNextSongInfo();
 
     }
@@ -1362,8 +1404,7 @@ public class DrawerActivity extends AppCompatActivity
         log(position + " Removing " + mItem.getTitle() + " from queue.");
         mService.removeSong(position);
 
-        if(showq != 0)
-            qf.setQList(mService.getQueue());
+        updateQueueFrag(mService.getQueue());
     }
 
 
@@ -1546,7 +1587,8 @@ public class DrawerActivity extends AppCompatActivity
              log("Suffle clicked");
             boolean b = mService.shuffleSongs();
             Toast.makeText(mService, "Shuffle: " + b, Toast.LENGTH_SHORT).show();
-             if(showq != 0) qf.setQList(mService.getQueue());
+            updateQueueFrag(mService.getQueue());
+
             return true;
         } else if (id == R.id.repeat) {
             log("Repeat clicked");
