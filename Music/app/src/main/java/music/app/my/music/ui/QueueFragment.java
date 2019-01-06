@@ -155,6 +155,7 @@ public class QueueFragment extends baseListFragment {
         swipeUndoAdapter.setAbsListView(mListView);
         mListView.setAdapter(swipeUndoAdapter);
         mListView.enableSimpleSwipeUndo();
+        mListView.setFastScrollEnabled(true);
 
 
         ((QueueAdapter)  mAdapter).setCurrent(current);
