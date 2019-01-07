@@ -9,6 +9,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -53,6 +55,10 @@ public class SongFragment extends baseListFragment implements MediaHelperListene
     private  TextView infoText;
     private String pid = null;
     private String pname = null;
+
+    private ProgressBar songbar;
+    private int songprogress = 0;
+    private Handler mhandler;
 
     public static SongFragment newInstance() {
         SongFragment fragment = new SongFragment();
@@ -157,7 +163,9 @@ public class SongFragment extends baseListFragment implements MediaHelperListene
         View view;
         if(myType == SF_TYPE.ALBUMS)
             view = inflater.inflate(R.layout.fragment_album, container, false);
-        else  view = inflater.inflate(R.layout.fragment_baselistitem_list, container, false);
+        else
+            view = inflater.inflate(R.layout.fragment_baselistitem_list, container, false);
+
 
         View v = view.findViewById(R.id.list);
         // Set the adapter
@@ -166,6 +174,14 @@ public class SongFragment extends baseListFragment implements MediaHelperListene
             recyclerView = (RecyclerView) v;
             recyclerView.setLayoutManager(new GridLayoutManager(context, 1));
 
+            songbar = view.findViewById(R.id.songbar);
+            songbar.setProgress(songprogress);
+            songbar.setMax(100);
+
+
+            mhandler = new Handler();
+            mhandler.postDelayed(updatesongbar, 10);
+            //songbar.setOnClickListener();
 
             if(myType == SF_TYPE.ALBUMS) {
                 if (pid != null) {
@@ -254,8 +270,32 @@ public class SongFragment extends baseListFragment implements MediaHelperListene
     }
 
 
+    private Runnable updatesongbar = new Runnable() {
+        @Override
+        public void run() {
+            progress(0);
+            mhandler.postDelayed(updatesongbar, 5);
+        }
+    };
+
+
+    private void progress(int i){
+        if(i!=0)
+        songbar.setProgress(i);
+        else songbar.setProgress(songprogress+=2);
+
+        if(songprogress>=100) songbar.setProgress(100);
+        mhandler.removeCallbacks(updatesongbar);
+
+        log("progress: " + songbar.getProgress());
+
+    }
     @Override
     public void updateAdapter(){
+ 
+     //   mhandler.removeCallbacks(updatesongbar);
+
+
         mAdapter = new SongAdapter(myType == SF_TYPE.PLAYLISTITEMS, items
                 , ( baseListFragment.OnListFragmentInteractionListener) getActivity() );
 
@@ -271,6 +311,8 @@ public class SongFragment extends baseListFragment implements MediaHelperListene
         if(infoText != null) infoText.setText(s);
 
         log("items:" + s );
+
+
     }
 
 
@@ -311,9 +353,11 @@ public class SongFragment extends baseListFragment implements MediaHelperListene
         updateQuery();
     }
 
+    //secondary list for fast query results.
     private ArrayList<Song> slist;
     @Override
     public void queryLoaderFinished(ArrayList<Song> songs) {
+
         log("Query items Loaded " + songs.size() + " song(s)");
 
         slist = songs;

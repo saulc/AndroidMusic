@@ -18,6 +18,12 @@
             android:layout_weight="1"
             android:src="@drawable/android_robot_icon_2" />
 
+        <ProgressBar
+            android:id="@+id/songbar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
         <include
             layout="@layout/fragment_baselistitem"
             android:id="@+id/header"
