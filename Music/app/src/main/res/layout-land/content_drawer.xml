@@ -12,6 +12,8 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="music.app.my.music.DrawerActivity"
+    android:animateLayoutChanges="true"
+    android:id="@+id/llRoot"
     tools:showIn="@layout/app_bar_drawer">
 
     <FrameLayout
@@ -26,6 +28,7 @@
 
     <LinearLayout
         android:id="@+id/sidebar"
+        android:animateLayoutChanges="true"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="0"

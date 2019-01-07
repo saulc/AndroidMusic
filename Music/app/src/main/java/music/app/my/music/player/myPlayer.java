@@ -39,7 +39,7 @@ public class myPlayer extends MediaPlayer {
 	}
 	public void stopAndFadeOut(){
 		mHandler.post(fadeOutVolume);
-	//	mHandler.postDelayed(stopAndRelease, fadeOutDuration + 1500);
+		mHandler.postDelayed(stopAndRelease, fadeOutDuration + 1500);
 	}
 	public void pausePlayback(int ms){
 		fadeOutDuration = ms;

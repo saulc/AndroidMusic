@@ -5,6 +5,8 @@
     android:layout_height="match_parent"
     android:background="@drawable/qbg"
     android:gravity="center_vertical|center_horizontal"
+    android:animateLayoutChanges="true"
+    android:id="@+id/llnow"
     android:orientation="vertical">
 
     <ImageSwitcher

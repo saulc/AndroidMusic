@@ -49,7 +49,7 @@ public class ControlFragment extends Fragment {
 
         void controlIconClicked();
 
-        void nowIconClicked();
+        void nowIconClicked(boolean close);
 
         void lineClicked(int i);
 

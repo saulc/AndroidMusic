@@ -1,5 +1,6 @@
 package music.app.my.music;
 
+import android.animation.LayoutTransition;
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.ContentResolver;
@@ -31,6 +32,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.SearchView;
 import android.widget.TextSwitcher;
@@ -111,6 +113,14 @@ public class DrawerActivity extends AppCompatActivity
         setContentView(R.layout.activity_drawer);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        //add android default trasitions to main layout changes.
+        // //smooth movement on queue/miniplayer
+        ((ViewGroup) findViewById(R.id.llRoot)).getLayoutTransition()
+                .enableTransitionType(LayoutTransition.CHANGING);
+        ((ViewGroup) findViewById(R.id.sidebar)).getLayoutTransition()
+                .enableTransitionType(LayoutTransition.CHANGING);
+
 
         //dim the systems  status and control bars
         // 0 == show
@@ -212,7 +222,6 @@ public class DrawerActivity extends AppCompatActivity
         fab1.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                //mService.duck();
                 Log.d(TAG, "Fab 1 Long Clicked: next" );
 
                 return true;
@@ -231,9 +240,9 @@ public class DrawerActivity extends AppCompatActivity
         fab2.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                //mService.duck();
                 Log.d(TAG, "Fab 2 Long Clicked: play/pause" );
 
+                showNow();
                 return true;
             }
         });
@@ -250,7 +259,6 @@ public class DrawerActivity extends AppCompatActivity
         fab3.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                //mService.duck();
                 Log.d(TAG, "Fab 3 Long Clicked:previous " );
 
                 return true;
@@ -611,18 +619,15 @@ public class DrawerActivity extends AppCompatActivity
             showControls();
            // return showq;
         }
-
         if(showq > 3){
             showq = 0;
             hideQ();
             closeSidebar();
             return showq;
         }
-
-            if (qf == null)
-                qf = QueueFragment.newInstance();
+            if (qf == null)  qf = QueueFragment.newInstance();
             expandSidebar();
-        showFragment(R.id.qframe, qf, false);
+            showFragment(R.id.qframe, qf, false);
 
         return  showq;
     }
@@ -634,9 +639,7 @@ public class DrawerActivity extends AppCompatActivity
 
         Log.d(TAG, "Hiding control fragement");
         controlsVisible = false;
-
-        updateNextSongInfo();
-
+      //  updateNextSongInfo();
         getSupportFragmentManager().beginTransaction().remove(cf).commit();
 
     }
@@ -646,12 +649,9 @@ public class DrawerActivity extends AppCompatActivity
 
         Log.d(TAG, "Showing control fragement");
         //cf =  (ControlFragment) ControlFragment.newInstance();
-
         cf =   NowFragment.newInstance(true);
         controlsVisible = true;
-
         showFragment(R.id.controlFrame, cf, false);
-
     }
 
     private void showFragment(int r, Fragment f, boolean addTobs){
@@ -671,7 +671,11 @@ public class DrawerActivity extends AppCompatActivity
             }
         }
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.setCustomAnimations(R.anim.anim_in, R.anim.anim_out, R.anim.anim_in, R.anim.anim_out);
+        transaction.setCustomAnimations(R.anim.slidein_left, R.anim.slideout_right, R.anim.slidein_right, R.anim.slideout_left);
+        if(f instanceof SongFragment)
+        transaction.setCustomAnimations(R.anim.slidein_right, R.anim.slideout_left, R.anim.slidein_left, R.anim.slideout_right);
+        else if(f instanceof NowFragment)
+            transaction.setCustomAnimations(R.anim.slidein_up, R.anim.slideout_left, R.anim.slidein_left, R.anim.slideout_down);
 
         // Replace whatever is in the fragment_container view with this fragment,
         // and add the transaction to the back stack
@@ -749,9 +753,10 @@ public class DrawerActivity extends AppCompatActivity
     }
 
     @Override
-    public void nowIconClicked() {
+    public void nowIconClicked(boolean close) {
 
-        Log.d(TAG, "Now icon clicked");
+        Log.d(TAG, "Now icon clicked " + close);
+        if(close) showq=-1;
             showQ();
     }
 
