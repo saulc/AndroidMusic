@@ -1,0 +1,218 @@
+package music.app.my.music.ui.browser;
+
+
+import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Handler;
+import android.provider.MediaStore;
+import android.support.design.widget.FloatingActionButton;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.RelativeLayout;
+
+import java.util.ArrayList;
+
+import music.app.my.music.R;
+import music.app.my.music.adapters.SongAdapter;
+import music.app.my.music.types.Song;
+
+/**
+ * A simple {@link SongFragment} subclass.
+ * Use the {@link BubbleFragment#newInstance} factory method to
+ * create an instance of this fragment.
+ */
+public class BubbleFragment extends SongFragment {
+
+    private  final String TAG = getClass().getSimpleName();
+
+    private void log(String s){
+        Log.d(TAG, s);
+    }
+
+    public BubbleFragment() {
+        // Required empty public constructor
+    }
+
+    public static BubbleFragment newInstance() {
+        BubbleFragment fragment = new BubbleFragment();
+        Bundle b = new Bundle();
+        b.putString("SFTYPE", SF_TYPE.BUBBLE.toString());
+        fragment.setArguments(b);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+        }
+    }
+
+    private FloatingActionButton bubbleButton;
+    private RelativeLayout bubbleFrame;
+    private ArrayList<Song> items;
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        log("Bubble frag view created");
+        View view = inflater.inflate(R.layout.fragment_bubble, container, false);
+
+        bubbleFrame = view.findViewById(R.id.bubbleframe);
+
+        bubbleButton = view.findViewById(R.id.bubble);
+        bubbleButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                log("Bubble? oh kay.");
+                makeBubbles();
+            }
+        });
+
+        mhandler = new Handler();
+
+
+        return view;
+    }
+
+
+
+    private Runnable updateBubbles = new Runnable() {
+        @Override
+        public void run() {
+            //
+
+            //mhandler.postDelayed(updateBubbles, 5);
+        }
+    };
+
+    @Override
+    public void updateAdapter(){
+        log("Updating Bubble 'adapter' ");
+        if(items == null)
+            items = new ArrayList<>();
+
+        String s = items.size() + " song";
+        log("items:" + s );
+
+        makeBubbles();
+
+    }
+
+    private void expandBubble(int i){
+        log("Expand Bubble: " + i  + " items: " + items.size());
+        if(i < items.size()) {
+                String s =items.get(i).getTitle() + " "
+                        + items.get(i).getArtist() + " : "
+                        +  items.get(i).getAlbum();
+
+               //FloatingActionButton f = (FloatingActionButton) bubbleFrame.getChildAt(i);
+
+
+
+        }
+
+    }
+
+
+    private void popBubble(int i){
+        log("Popbubble: " + i  + " items: " + items.size());
+        if(i < items.size()){
+            String s =items.get(i).getTitle() + " "
+                    + items.get(i).getArtist() + " : "
+                    +  items.get(i).getAlbum();
+
+            log("Pop! "+s);
+            mListener.onSongClicked(items.get(i));
+        }
+    }
+
+    private void makeBubbles(){
+        if(items.size() > 0){
+//            if(bubbleFrame.getChildCount() > 2)
+                bubbleFrame.removeAllViews();
+//            bubbleButton.animate().translationY(100);
+
+            int s = items.size();
+            int icon = 100; //icon size
+            for(int i =0; i< items.size(); i++){
+                FloatingActionButton fab = new FloatingActionButton(getContext());
+                final int ii = i;
+                fab.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        log("Fab clicked: " + ii);
+                        expandBubble(ii);
+                    }
+                });
+                fab.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View view) {
+                        log("Bubble long Clicked: " + ii);
+                        popBubble(ii);
+                        return  true;
+                    }
+                });
+
+                if (items.get(ii).getAlbumId() != null) {
+                    String p = findAlbumArt(items.get(ii).getAlbumId());
+
+                    log("Now fragment updating albumart: " + p);
+                    Drawable d = Drawable.createFromPath(p);
+                    if (d != null) {
+                        items.get(ii).setAlbumArt(p);
+                        Bitmap bitmap = ((BitmapDrawable) d).getBitmap();
+                        d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, icon, icon, true));
+
+                        fab.setImageDrawable(d);
+                    }
+                }
+                fab.setTag(i);
+                bubbleFrame.addView(fab, i);
+
+                int x = i*60;
+                fab.animate().translationX(x%600);
+                fab.animate().translationY( (int)(x/600)*60 );
+            }
+        }
+
+    }
+
+    @Override
+    public void songLoadedFinished(ArrayList<Song> songs) {
+        log("SONGS Loaded " + songs.size() + " song(s)");
+        items = songs;
+        updateAdapter();
+    }
+
+            private  String findAlbumArt(String albumid){
+                String[] cols = new String[] {
+                        MediaStore.Audio.Albums._ID,
+                        MediaStore.Audio.Albums.ALBUM_ART
+                };
+                ContentValues values = new ContentValues();
+                if(getContext()==null) return null;
+                ContentResolver resolver = getContext().getContentResolver();
+                Uri uri = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI;
+                String selection =  MediaStore.Audio.Albums._ID + "=?";
+                String[] arg = { albumid };
+                Cursor cur = resolver.query(uri, cols, selection, arg, null);
+                cur.moveToFirst();
+                int base = cur.getInt(0);
+                String id = cur.getString(1);
+                Log.d("Music service", "--->>>>>base: " + base + " " + id);
+
+                return id;
+            }
+
+
+}

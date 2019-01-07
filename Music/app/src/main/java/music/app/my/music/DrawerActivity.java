@@ -56,6 +56,7 @@ import music.app.my.music.types.Song;
 import music.app.my.music.ui.MixFragment;
 import music.app.my.music.ui.browser.AlbumFragment;
 import music.app.my.music.ui.browser.ArtistFragment;
+import music.app.my.music.ui.browser.BubbleFragment;
 import music.app.my.music.ui.browser.HeaderFragment;
 import music.app.my.music.ui.popup.ChoosePlaylistDialogFragment;
 import music.app.my.music.ui.popup.ConfirmDeleteDialogFragment;
@@ -79,7 +80,6 @@ public class DrawerActivity extends AppCompatActivity
         NewPlaylistDialog.OnDialogInteractionListener ,
         Toolbar.OnMenuItemClickListener{
 
-    private  final String TAG = getClass().getSimpleName();
 
     private MixFragment mf = null;
     private NowFragment nf = null;
@@ -95,6 +95,8 @@ public class DrawerActivity extends AppCompatActivity
 
     private boolean showfmenu = false; //show/hide floating control buttons.
     private int showq = 0; //0 == hidden, 1 = miniplayer q, 2 = half, 3 = full screen, todo 4 edit plist
+
+    private  final String TAG = getClass().getSimpleName();
 
     private void log(String s){
         Log.d(TAG, s);
@@ -896,6 +898,13 @@ public class DrawerActivity extends AppCompatActivity
         if (id == R.id.nav_now) {
 
             showNow();
+
+        } else if( id == R.id.nav_bubble) {
+            log("Nav bubble clicked!");
+
+            Fragment b = BubbleFragment.newInstance();
+            showFragment(R.id.frame, b, false);
+
 
         } else if( id == R.id.exit) {
             log("Nav exit clicked!");

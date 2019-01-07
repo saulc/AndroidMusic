@@ -37,7 +37,7 @@ import music.app.my.music.ui.ControlFragment;
  */
 public class SongFragment extends baseListFragment implements MediaHelperListener {
 
-    public enum SF_TYPE {QUEUE, PLAYLISTITEMS, SONGS, ALBUMS, ARTISTS, GENRE, QUERY };
+    public enum SF_TYPE {QUEUE, PLAYLISTITEMS, SONGS, ALBUMS, ARTISTS, GENRE, QUERY, BUBBLE };
     private SF_TYPE myType = SF_TYPE.SONGS;
 
     private final String TAG = getClass().getSimpleName();
@@ -58,7 +58,7 @@ public class SongFragment extends baseListFragment implements MediaHelperListene
 
     private ProgressBar songbar;
     private int songprogress = 0;
-    private Handler mhandler;
+    protected Handler mhandler;
 
     public static SongFragment newInstance() {
         SongFragment fragment = new SongFragment();
@@ -114,6 +114,12 @@ public class SongFragment extends baseListFragment implements MediaHelperListene
                 pid = b.getString("QueryID");
                 pname = b.getString("Query");
 
+            }else if(s.compareTo(SF_TYPE.BUBBLE.toString())==0) {
+                myType = SF_TYPE.BUBBLE;
+
+                pid = b.getString("QueryID");
+                pname = b.getString("Query");
+
             }
         }
 
@@ -137,25 +143,7 @@ public class SongFragment extends baseListFragment implements MediaHelperListene
     private void opClicked(){
         mListener.addSongsToQueue(items, false);
     }
-    private  String findAlbumArt(String albumid){
-        String[] cols = new String[] {
-                MediaStore.Audio.Albums._ID,
-                MediaStore.Audio.Albums.ALBUM_ART
-        };
-        ContentValues values = new ContentValues();
-        if(getContext()==null) return null;
-        ContentResolver resolver = getContext().getContentResolver();
-        Uri uri = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI;
-        String selection =  MediaStore.Audio.Albums._ID + "=?";
-        String[] arg = { albumid };
-        Cursor cur = resolver.query(uri, cols, selection, arg, null);
-        cur.moveToFirst();
-        int base = cur.getInt(0);
-        String id = cur.getString(1);
-        Log.d("Music service", "--->>>>>base: " + base + " " + id);
 
-        return id;
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -274,6 +262,7 @@ public class SongFragment extends baseListFragment implements MediaHelperListene
         @Override
         public void run() {
             progress(0);
+            if(songprogress < 101)
             mhandler.postDelayed(updatesongbar, 5);
         }
     };
@@ -284,14 +273,17 @@ public class SongFragment extends baseListFragment implements MediaHelperListene
         songbar.setProgress(i);
         else songbar.setProgress(songprogress+=2);
 
-        if(songprogress>=100) songbar.setProgress(100);
-        mhandler.removeCallbacks(updatesongbar);
+        if(songprogress>=100) {
+            songbar.setProgress(100);
+            mhandler.removeCallbacks(updatesongbar);
+        }
 
         log("progress: " + songbar.getProgress());
 
     }
     @Override
     public void updateAdapter(){
+
 
      //   mhandler.removeCallbacks(updatesongbar);
 
@@ -325,6 +317,7 @@ public class SongFragment extends baseListFragment implements MediaHelperListene
                 case QUERY: msHelper.search(pname);
                 break;
 
+                case BUBBLE:
                 case SONGS:
                     msHelper.loadSongs();
                     break;
