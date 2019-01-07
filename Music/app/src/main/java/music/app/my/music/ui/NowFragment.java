@@ -113,8 +113,11 @@ public class NowFragment extends ControlFragment {
 
 
         // animation
-        icon.setInAnimation(context, R.anim.slidein_left);
-        icon.setOutAnimation(context, R.anim.slideout_right);
+//        icon.setInAnimation(context, R.anim.slidein_left);
+//        icon.setOutAnimation(context, R.anim.slideout_right);
+
+        icon.setInAnimation(getContext(), R.anim.slidein_up);
+        icon.setOutAnimation(getContext(), R.anim.slideout_up);
 
         //mini player uses only simple click. for now.
         if(isMini) {
@@ -225,7 +228,7 @@ public class NowFragment extends ControlFragment {
         pp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               prevPressed();
+               playPressed();
             }
         });
         ImageButton nb = (ImageButton) view.findViewById(R.id.nextButton);
@@ -239,13 +242,10 @@ public class NowFragment extends ControlFragment {
         pb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (null != mListener) {
-                    // Notify the active callbacks interface (the activity, if the
-                    // fragment is attached to one) that an item has been selected.
-                    mListener.prevPressed();
-                }
+               prevPressed();
             }
         });
+
 
 
         mListener.onNowViewCreated();
@@ -255,13 +255,24 @@ public class NowFragment extends ControlFragment {
     private  void iconClicked(boolean close){
         if(mListener != null) mListener.nowIconClicked(close);
     }
+    private void playPressed(){
+        if (null != mListener) {
+            // Notify the active callbacks interface (the activity, if the
+            // fragment is attached to one) that an item has been selected.
+            mListener.playPausePressed();
+//            icon.setInAnimation(getContext(), R.anim.slidein_up);
+//            icon.setOutAnimation(getContext(), R.anim.slideout_up);
+
+        }
+    }
+
     private void nextPressed(){
         if (null != mListener) {
             // Notify the active callbacks interface (the activity, if the
             // fragment is attached to one) that an item has been selected.
             mListener.nextPressed();
-            icon.setInAnimation(getContext(), R.anim.slidein_left);
-            icon.setOutAnimation(getContext(), R.anim.slideout_right);
+//            icon.setInAnimation(getContext(), R.anim.slidein_left);
+//            icon.setOutAnimation(getContext(), R.anim.slideout_right);
 
         }
     }
@@ -269,9 +280,9 @@ public class NowFragment extends ControlFragment {
         if (null != mListener) {
             // Notify the active callbacks interface (the activity, if the
             // fragment is attached to one) that an item has been selected.
-            mListener.nextPressed();
-            icon.setInAnimation(getContext(), R.anim.slidein_right);
-            icon.setOutAnimation(getContext(), R.anim.slideout_left);
+            mListener.prevPressed();
+//            icon.setInAnimation(getContext(), R.anim.slidein_right);
+//            icon.setOutAnimation(getContext(), R.anim.slideout_left);
 
         }
     }
@@ -352,23 +363,21 @@ public class NowFragment extends ControlFragment {
 //                if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MAX_OFF_PATH)
 //                    return false;
 
-                if (e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
+                if ( e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY){
                     log("Swiped up?!");
-                    iconClicked(false);
+                    iconClicked(true);
                     return true;
 
 
-                }else if (e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY)
-                {
+                }else if(Math.abs( e1.getY() - e2.getY() ) > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY){
                     log("Swiped down!");
-                   iconClicked(true);
+                   iconClicked(false);
                     return true;
 
 
-                }else
-                    // right to left swipe
-                if (e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+                }else if (e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
                     log("Swiped left!");
+                    // right to left swipe
                        prevPressed();
                        return true;
 

@@ -6,6 +6,7 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">2dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="fab_marginvert">64dp</dimen>
     <dimen name="text_margin">16dp</dimen>
     <dimen name="top_text_margin">4dp</dimen>
     <dimen name="controlpad">60dp</dimen>

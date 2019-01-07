@@ -91,6 +91,7 @@ public class DrawerActivity extends AppCompatActivity
     private FloatingActionButton fab3;
     private FloatingActionButton fab2;
     private FloatingActionButton fab1;
+    private FloatingActionButton fab;
 
     private boolean showfmenu = false; //show/hide floating control buttons.
     private int showq = 0; //0 == hidden, 1 = miniplayer q, 2 = half, 3 = full screen, todo 4 edit plist
@@ -148,11 +149,12 @@ public class DrawerActivity extends AppCompatActivity
             nextText.setText("Nothing to play...");
         }
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+         fab = (FloatingActionButton) findViewById(R.id.fab);
          fab1 = (FloatingActionButton) findViewById(R.id.fab1);
          fab2 = (FloatingActionButton) findViewById(R.id.fab2);
          fab3 = (FloatingActionButton) findViewById(R.id.fab3);
          iniFM();
+         moveFab(true);
 
         fab.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -285,8 +287,32 @@ public class DrawerActivity extends AppCompatActivity
 //    }
 
    // circle?
+   private void moveFab(boolean up){
+
+      // if(showfmenu) return;
+
+
+       if(up) {
+           float r = -getResources().getDimension(R.dimen.fab_marginvert);
+           fab1.animate().translationY(r);
+           fab2.animate().translationY(r);
+           fab3.animate().translationY(r);
+           fab.animate().translationY(r);
+       }else {
+
+           float r = 0f;
+           fab1.animate().translationY(r);
+           fab2.animate().translationY(r);
+           fab3.animate().translationY(r);
+           fab.animate().translationY(r);
+       }
+
+
+   }
+
     private void showFM(){
         showfmenu = true;
+        moveFab(false);
         //if r == c its a square.
         float r = -getResources().getDimension(R.dimen.fd);
         float c = -getResources().getDimension(R.dimen.fc);
@@ -303,6 +329,9 @@ public class DrawerActivity extends AppCompatActivity
         fab2.animate().translationY(0);
         fab2.animate().translationX(0);
         fab3.animate().translationX(0);
+
+        moveFab(showq == 0); //move menu back up
+
 
     }
 
@@ -612,8 +641,7 @@ public class DrawerActivity extends AppCompatActivity
     public int showQ(){
         log("Show Q:" + ++showq);
        // if(showq >0 && qf != null && qf.isVisible()) return showq;
-
-        //showq = 1;
+ 
         if(showq == 1) {
             //expandSidebar();
             showControls();
@@ -621,6 +649,7 @@ public class DrawerActivity extends AppCompatActivity
         }
         if(showq > 3){
             showq = 0;
+            moveFab(true); //move menu back up
             hideQ();
             closeSidebar();
             return showq;
@@ -756,7 +785,13 @@ public class DrawerActivity extends AppCompatActivity
     public void nowIconClicked(boolean close) {
 
         Log.d(TAG, "Now icon clicked " + close);
-        if(close) showq=-1;
+        if(close) {
+            showq = -1;
+            hideFM();
+
+        } //else showq=2;
+
+
             showQ();
     }
 
@@ -786,6 +821,7 @@ public class DrawerActivity extends AppCompatActivity
         log("Now Fragment created");
 
         if( nf == null)  showNow();
+
 
 
         // if(controlsVisible && cf != null && cf.isVisible()) {
