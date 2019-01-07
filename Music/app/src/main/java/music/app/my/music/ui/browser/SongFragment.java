@@ -292,7 +292,7 @@ public class SongFragment extends baseListFragment implements MediaHelperListene
     }
     @Override
     public void updateAdapter(){
- 
+
      //   mhandler.removeCallbacks(updatesongbar);
 
 

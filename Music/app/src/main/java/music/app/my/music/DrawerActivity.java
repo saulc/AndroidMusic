@@ -205,6 +205,7 @@ public class DrawerActivity extends AppCompatActivity
 //            showControls();
 
 
+
         showNow();
 
         handleStartIntents(); //search media share....

@@ -77,7 +77,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
    private Notification mNotification = null;
   // private Equalizer eq;
    private  AudioFocusHelper audioFocus;
-   private String queuePlaylist = "m7 Now Playing";
+   private String queuePlaylist = "QUEUE";
    private long queuePlaylistId =  0;
 
 	private void log(String s){
@@ -542,24 +542,26 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 					MediaStore.Audio.Playlists.Members.ARTIST,
 					MediaStore.Audio.Playlists.Members.ALBUM,
 					MediaStore.Audio.Playlists.Members.DURATION,
-					MediaStore.Audio.Playlists.Members._ID,
+					MediaStore.Audio.Playlists.Members.AUDIO_ID,
+					MediaStore.Audio.Playlists.Members.ALBUM_ID,
 					MediaStore.Audio.Playlists.Members.PLAY_ORDER,
 					MediaStore.Audio.Playlists.Members.ARTIST_ID
-
 
 			};
 			Uri memebersUri =  MediaStore.Audio.Playlists.Members.getContentUri("external", queuePlaylistId);
 			String sort =  MediaStore.Audio.Playlists.Members.PLAY_ORDER + " COLLATE LOCALIZED ASC";
-			Cursor cur = resolver.query(memebersUri, memberProjection, null, null, sort);
+			Cursor cursor = resolver.query(memebersUri, memberProjection, null, null, sort);
 			//  ArrayList<Song> songs = new ArrayList<Song>();
-			while(cur.moveToNext()){
-				Log.d("Music service", "Adding song: " + cur.getString(0) + cur.getString(5));
-				player.addSong(new Song(cur.getString(0), cur.getString(1), cur.getString(2),
-						cur.getString(3), cur.getString(4), cur.getString(5), cur.getString(6) ));
+			while(cursor.moveToNext()){
+				Log.d("Music service", "Adding song: " + cursor.getString(0) + cursor.getString(5));
+				player.addSong(new Song(cursor.getString(0), cursor.getString(1),
+						cursor.getString(2), cursor.getString(3), cursor.getString(4)
+						, cursor.getString(5), cursor.getString(6), cursor.getString(7), cursor.getString(8)));
 			}
+			cursor.close();
 
-			Uri uri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
-			this.getApplicationContext().getContentResolver().delete(uri, MediaStore.Audio.Playlists._ID +" = "+queuePlaylistId, null);
+			//Uri uri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
+			//this.getApplicationContext().getContentResolver().delete(uri, MediaStore.Audio.Playlists._ID +" = "+queuePlaylistId, null);
 		} else Log.i("Music Service", "no saved queue found");
 		// addGroupToQueue(songs);
 	}
