@@ -205,6 +205,8 @@ public class DrawerActivity extends AppCompatActivity
 //            showControls();
 
 
+        showNow();
+
         handleStartIntents(); //search media share....
 
     }
@@ -788,7 +790,7 @@ public class DrawerActivity extends AppCompatActivity
             showq = 3; //reset
             hideFM();
 
-        } //else showq=2;
+        } else showq=2; //open full
 
 
             showQ();
@@ -799,6 +801,7 @@ public class DrawerActivity extends AppCompatActivity
 
         Log.d(TAG, "Now line clicked: " + i);
 
+        if(mService.getCurrentSong() == null) return;
         if(i== 1) {
             Log.d(TAG, "Current song clicked, doing nothing... ");
         } else if(i==2){
@@ -820,8 +823,6 @@ public class DrawerActivity extends AppCompatActivity
         log("Now Fragment created");
 
         if( nf == null)  showNow();
-
-
 
         // if(controlsVisible && cf != null && cf.isVisible()) {
              log("Now Fragment setting updater");
@@ -864,10 +865,10 @@ public class DrawerActivity extends AppCompatActivity
         hideControls(false);
 
         //opens the queue when its fully closed.
-        if(showq > 2) {
-            showq = 1;
-            showQ();
-        }
+//        if(showq > 2) {
+//            showq = 1;
+//            showQ();
+//        }
 
         if(nf != null && nf.isVisible() ) return;
 
