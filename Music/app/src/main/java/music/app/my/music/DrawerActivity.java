@@ -289,8 +289,6 @@ public class DrawerActivity extends AppCompatActivity
    // circle?
    private void moveFab(boolean up){
 
-      // if(showfmenu) return;
-
 
        if(up) {
            float r = -getResources().getDimension(R.dimen.fab_marginvert);
@@ -641,7 +639,7 @@ public class DrawerActivity extends AppCompatActivity
     public int showQ(){
         log("Show Q:" + ++showq);
        // if(showq >0 && qf != null && qf.isVisible()) return showq;
- 
+
         if(showq == 1) {
             //expandSidebar();
             showControls();
@@ -649,6 +647,7 @@ public class DrawerActivity extends AppCompatActivity
         }
         if(showq > 3){
             showq = 0;
+            if(showfmenu) hideFM();
             moveFab(true); //move menu back up
             hideQ();
             closeSidebar();
@@ -786,7 +785,7 @@ public class DrawerActivity extends AppCompatActivity
 
         Log.d(TAG, "Now icon clicked " + close);
         if(close) {
-            showq = -1;
+            showq = 3; //reset
             hideFM();
 
         } //else showq=2;

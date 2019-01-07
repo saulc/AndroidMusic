@@ -113,7 +113,6 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 			playSongFromQueue(queue.getIndex());
 		else if(queue.hasPrevious()){
 			fadeOutOldPlayer();
-			sListener.stopUiCallbacks();
 			queue.previousSong();
 			playWhenPrepared = true;
 			prepareSong();
@@ -126,7 +125,6 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 		if(queue.hasNext()){
 			
 			fadeOutOldPlayer();
-			sListener.stopUiCallbacks();
 			queue.nextSong();
 			playWhenPrepared = true;
 			prepareSong();
@@ -138,8 +136,6 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 		if( index < queue.getSize() ){
 			
 			fadeOutOldPlayer();
-			sListener.stopUiCallbacks();
-		//	mHandler.removeCallbacks(updateUi);
 			queue.setIndex(index);
 			playWhenPrepared = true;
 			prepareSong();
@@ -153,6 +149,9 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 	}
 	
 	private void fadeOutOldPlayer(){
+
+		sListener.stopUiCallbacks();
+
 		myPlayer temp = new myPlayer();
 		int old = currentPlayer;
 		player.add(temp);
