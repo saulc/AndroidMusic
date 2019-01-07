@@ -254,5 +254,7 @@ public  class baseListFragment extends Fragment  implements MediaHelperListener 
         void addSongsToPlaylist(ArrayList<Song> items, boolean top);
 
         void onNextLongClicked(Song song);
+
+        void onBubblesReady();
     }
 }

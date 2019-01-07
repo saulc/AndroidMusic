@@ -8,6 +8,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Typeface;
@@ -127,11 +128,11 @@ public class DrawerActivity extends AppCompatActivity
 
         //dim the systems  status and control bars
         // 0 == show
-        View decorView =  toolbar;
-//        int uiOptions = View.SYSTEM_UI_FLAG_LOW_PROFILE;
-        int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_FULLSCREEN; // | View.SYSTEM_UI_FLAG_IMMERSIVE;
-        decorView.setSystemUiVisibility(uiOptions);
+//        View decorView =  toolbar;
+////        int uiOptions = View.SYSTEM_UI_FLAG_LOW_PROFILE;
+//        int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+//                | View.SYSTEM_UI_FLAG_FULLSCREEN; // | View.SYSTEM_UI_FLAG_IMMERSIVE;
+//        decorView.setSystemUiVisibility(uiOptions);
 //        decorView.setSystemUiVisibility(0);
 
         toolbar.setOnMenuItemClickListener((Toolbar.OnMenuItemClickListener) this);
@@ -209,6 +210,7 @@ public class DrawerActivity extends AppCompatActivity
 
 
         showNow();
+       // showBubbles();
 
         handleStartIntents(); //search media share....
 
@@ -889,6 +891,14 @@ public class DrawerActivity extends AppCompatActivity
         startActivity(intentBluetooth);
 
     }
+
+    private  void showBubbles(){
+
+        log("Showing Bubble fragment");
+        Fragment b = BubbleFragment.newInstance();
+        showFragment(R.id.frame, b, false);
+
+    }
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -901,10 +911,7 @@ public class DrawerActivity extends AppCompatActivity
 
         } else if( id == R.id.nav_bubble) {
             log("Nav bubble clicked!");
-
-            Fragment b = BubbleFragment.newInstance();
-            showFragment(R.id.frame, b, false);
-
+            showBubbles();
 
         } else if( id == R.id.exit) {
             log("Nav exit clicked!");
@@ -1184,6 +1191,18 @@ public class DrawerActivity extends AppCompatActivity
         Log.d(TAG, "Option long clicked, add to top of playlist");
         DialogFragment c = ChoosePlaylistDialogFragment.newInstance(song.getTitle(), false, true);
         c.show(getSupportFragmentManager(), song.getId());
+    }
+
+    @Override
+    public void onBubblesReady() {
+        log("Bubbles ready. locking screen.");
+        int currentOrientation = getResources().getConfiguration().orientation;
+        if (currentOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+        }
+        else {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
+        }
     }
 
     @Override

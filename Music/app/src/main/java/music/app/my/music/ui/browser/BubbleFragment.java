@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 
 import java.util.ArrayList;
@@ -81,8 +82,10 @@ public class BubbleFragment extends SongFragment {
         mhandler = new Handler();
 
 
+        mListener.onBubblesReady();
         return view;
     }
+
 
 
 
@@ -90,8 +93,9 @@ public class BubbleFragment extends SongFragment {
         @Override
         public void run() {
             //
-
-            //mhandler.postDelayed(updateBubbles, 5);
+            moveBubbles();
+            if(bubbleFrame.getChildAt(3).getY() < 60)
+            mhandler.postDelayed(updateBubbles, 250);
         }
     };
 
@@ -105,6 +109,17 @@ public class BubbleFragment extends SongFragment {
         log("items:" + s );
 
         makeBubbles();
+      //  mhandler.postDelayed(updateBubbles, 1000);
+
+    }
+
+    private  void moveBubbles(){
+        for(int i=0; i<items.size(); i++){
+            bubbleFrame.getChildAt(i).animate().translationYBy(80f);
+        }
+//        log( bubbleFrame.getChildAt(3).getX() + " " + bubbleFrame.getChildAt(3).getY()
+//                + " " + bubbleFrame.getChildAt(3).getTranslationY() );
+
 
     }
 
@@ -143,9 +158,13 @@ public class BubbleFragment extends SongFragment {
 //            bubbleButton.animate().translationY(100);
 
             int s = items.size();
-            int icon = 100; //icon size
+            int space = 80;
+            int width = 470;
+            int icon = 60; //icon size
+
             for(int i =0; i< items.size(); i++){
-                FloatingActionButton fab = new FloatingActionButton(getContext());
+                //FloatingActionButton fab = new FloatingActionButton(getContext());
+                ImageButton fab = new ImageButton(getContext());
                 final int ii = i;
                 fab.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -174,14 +193,14 @@ public class BubbleFragment extends SongFragment {
                         d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, icon, icon, true));
 
                         fab.setImageDrawable(d);
-                    }
+                    } else fab.setImageResource(R.drawable.android_robot_icon_2128);
                 }
                 fab.setTag(i);
                 bubbleFrame.addView(fab, i);
 
-                int x = i*60;
-                fab.animate().translationX(x%600);
-                fab.animate().translationY( (int)(x/600)*60 );
+                int x = i*space;
+                fab.animate().translationX(x%width + 40f);
+                fab.animate().translationY( (int)(x/width)*space );
             }
         }
 
