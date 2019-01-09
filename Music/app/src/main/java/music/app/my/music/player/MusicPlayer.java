@@ -120,7 +120,7 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 		}
 	}
 	public void nextRequest() {
-		if(queue.repeatMode() == 1) playSongFromQueue(queue.getIndex());
+		if(queue.getRepeatMode() == 1) playSongFromQueue(queue.getIndex());
 
 		if(queue.hasNext()){
 			
@@ -326,7 +326,7 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 	}
 	public int repeatMode() {
 
-		return queue.repeatMode();
+		return queue.getRepeatMode();
 	}
 
 

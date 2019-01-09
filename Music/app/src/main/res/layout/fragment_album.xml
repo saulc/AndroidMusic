@@ -16,7 +16,8 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:src="@drawable/android_robot_icon_2" />
+            android:src="@drawable/android_robot_icon_2"
+            android:foreground="@drawable/qbg" />
 
         <ProgressBar
             android:id="@+id/songbar"

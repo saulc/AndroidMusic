@@ -29,10 +29,9 @@ public class plist extends Qbase{
 	    		repeatmode = 1;
 
 			}else if(repeatmode == 1){
-
 				repeatmode = 2;
-			}else if(repeatmode == 2){
 
+			}else if(repeatmode == 2){
 				repeatmode = 0;
 			}
 
@@ -40,7 +39,7 @@ public class plist extends Qbase{
 	    	return repeatVal;
 	    }
 
-		public int repeatMode(){
+		public int getRepeatMode(){
 			return repeatmode;
 		}
 	    public boolean shuffle(){
@@ -99,27 +98,45 @@ public class plist extends Qbase{
 	    }
 	   
 	    public void nextSong(){
-	    	if(repeatmode == 1) return;
+	    	if(repeatmode == 1) return; //just play the same same. forever.
 
 	    	if(hasNext())
 	    		songIndex++;
+
 			if(repeatmode == 2 && (songIndex == songs.size() )) {
 				//last song and repeat is on
 				songIndex = 0;
 			}
 	    }
 	    public void previousSong(){
-	    	if(hasPrevious())
+			if(repeatmode == 1) return; //just play the same same. forever.
+
+			if(hasPrevious()) 		//regular
 	    		songIndex--;
+
+			//repeat list.
+			if(repeatmode == 2 && (songIndex < 0 )) {
+				//last song and repeat is on
+				songIndex = songs.size() - 1;
+			}
 	    }
 	    public boolean hasNext(){
-	    	if(repeatmode == 1) return true;
+	    	if(repeatmode == 1) return (songs.size() > 0); //either repeat mode is on as lnog as the queue isn't empty
 
+			if(repeatmode == 2 && (songIndex == songs.size()-1 )) {
+				//last song and repeat is on
+				return true;
+			}
+			//regular mode, just make sure its in the list.
 	    	return songs.size() > (songIndex + 1);
 	    }
 	    public boolean hasPrevious(){
-	    	if(repeatVal && (songIndex <= 0))
-	    		songIndex = songs.size();
+	    	if(repeatmode == 1) return ( songs.size() > 0);
+	    	//if its the first song
+			if(repeatmode == 2 && (songIndex == 0 )) {
+				//first song and repeat is on
+				return true;
+			}
 	    	return (songIndex- 1) >= 0;
 	    }
 	    

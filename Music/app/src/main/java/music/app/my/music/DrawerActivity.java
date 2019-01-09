@@ -233,11 +233,16 @@ public class DrawerActivity extends AppCompatActivity
             public boolean onLongClick(View v) {
                 Log.d(TAG, "Fab 1 Long Clicked: next" );
 
+                //close q
+                showq = 2;
+                showQ();
+                showControls();
                 return true;
             }
         });
         //play/pause
 
+        fab2.setImageResource(android.R.drawable.ic_media_play);
         fab2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -251,6 +256,9 @@ public class DrawerActivity extends AppCompatActivity
             public boolean onLongClick(View v) {
                 Log.d(TAG, "Fab 2 Long Clicked: play/pause" );
 
+                //mini q
+                showq = 0;
+                showQ();
                 showNow();
                 return true;
             }
@@ -269,6 +277,10 @@ public class DrawerActivity extends AppCompatActivity
             @Override
             public boolean onLongClick(View v) {
                 Log.d(TAG, "Fab 3 Long Clicked:previous " );
+
+                showq = 0;
+                showQ();
+                hideFM();
 
                 return true;
             }
@@ -1339,6 +1351,8 @@ public class DrawerActivity extends AppCompatActivity
     public void setpp(Boolean isPlaying){
         if(nf != null) nf.setPlayPause(isPlaying);
         if(controlsVisible) cf.setPlayPause(isPlaying);
+        int r = !isPlaying ? android.R.drawable.ic_media_play : android.R.drawable.ic_media_pause;
+        fab2.setImageResource(r);
     }
 
     public void updateProgress(MusicPlayer player){

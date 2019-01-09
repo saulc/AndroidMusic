@@ -184,6 +184,7 @@ public class SongFragment extends baseListFragment implements MediaHelperListene
                         d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, 600, 600, true));
 
                         bigIcon.setImageDrawable(d);
+
                     }//else icon.setImageResource(R.drawable.android_robot_icon_2);
                 }
             }
