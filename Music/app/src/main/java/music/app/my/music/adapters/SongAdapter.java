@@ -26,11 +26,13 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
     private final List<Song> mValues;
     private final baseListFragment.OnListFragmentInteractionListener mListener;
     private boolean isPlaylist;
+    private String pid;
 
-    public SongAdapter(boolean isPlaylist, List<Song> items, baseListFragment.OnListFragmentInteractionListener listener) {
+    public SongAdapter(boolean isPlaylist, String id,  List<Song> items, baseListFragment.OnListFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
         this.isPlaylist = isPlaylist;
+        pid = id;
     }
 
     @Override
@@ -85,12 +87,21 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         holder.mLine2View.setText( s.getArtist() + " : " + s.getAlbum());
 
 
+        holder.mView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                if(isPlaylist)
+                mListener.onPlaylistSongLongClicked(holder.mItem, pid);
+                return true;
+            }
+        });
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (null != mListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
+
                     mListener.onSongClicked(holder.mItem);
                 }
             }

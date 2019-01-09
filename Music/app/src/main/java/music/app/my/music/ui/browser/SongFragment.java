@@ -194,10 +194,10 @@ public class SongFragment extends baseListFragment implements MediaHelperListene
             infoText.setText("type?");
 
             String a = "";
-            if(myType == SF_TYPE.QUERY)
-                a += "Search results: ";
+            if(myType == SF_TYPE.QUERY)  a += "Search results: ";
 
-            a += pname;
+            if(pname == null) a = "All Songs";
+            else a += pname;
             t.setText(a);
 
             ImageButton next = (ImageButton) view.findViewById(R.id.nextupbtn);
@@ -288,7 +288,7 @@ public class SongFragment extends baseListFragment implements MediaHelperListene
      //   mhandler.removeCallbacks(updatesongbar);
 
 
-        mAdapter = new SongAdapter(myType == SF_TYPE.PLAYLISTITEMS, items
+        mAdapter = new SongAdapter(myType == SF_TYPE.PLAYLISTITEMS, pid, items
                 , ( baseListFragment.OnListFragmentInteractionListener) getActivity() );
 
         if(recyclerView == null) return;

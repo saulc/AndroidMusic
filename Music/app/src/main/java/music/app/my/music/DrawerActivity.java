@@ -1141,37 +1141,22 @@ public class DrawerActivity extends AppCompatActivity
     @Override
     public void addSongsToPlaylist(ArrayList<Song> items, boolean top) {
         Log.d(TAG, "Group Option long clicked, add to playlist");
-        DialogFragment c = ChoosePlaylistDialogFragment.newInstance( items.get(0).getTitle(), true, top);
+        long[] ids = new long[items.size()];
+        for(int a = 0; a <items.size(); a++) ids[a] = Long.parseLong( items.get(a).getId() );
+
+        DialogFragment c = ChoosePlaylistDialogFragment.newInstance("", "", top , true, ids );
         c.show(getSupportFragmentManager(), items.get(0).getId());
+    }
 
+    public void addPlaylistPicked(long[] items, boolean top, String pid){
         //happens after dialog name entered.
-        try {
+
             ArrayList<Long> i = new ArrayList<>();
-            for(Song s: items) i.add(Long.parseLong( s.getId() ));
+            for(int j = 0; j < items.length; j++) i.add(items[j]);
 
-            if(temptag != 0) {
-                Log.d(TAG, "adding Group to playlist: " + temptag);
-                addListToPlaylist(temptag, i, top);
-                temptag = 0;
-            }
-        } catch (NumberFormatException e) {
-            e.printStackTrace();
-        }
+                addListToPlaylist(Long.parseLong(pid), i, top);
 
     }
-    private long temptag = 0;
-
-    public void addSongsToPlaylist(String name, String sid, int pos, String pid){
-        Log.d(TAG, "Playlist picked: " + pos + " pid:" + pid);
-        try {
-            long id = Long.parseLong(pid);
-            temptag = id;
-            //then let the above method resume.
-        } catch (NumberFormatException e) {
-            e.printStackTrace();
-        }
-    }
-
 
 
     /*
@@ -1182,14 +1167,14 @@ public class DrawerActivity extends AppCompatActivity
     @Override
     public void onOptionLongClicked(Song song) {
         Log.d(TAG, "Option long clicked, add to playlist");
-        DialogFragment c = ChoosePlaylistDialogFragment.newInstance(song.getTitle(), false, false);
+        DialogFragment c = ChoosePlaylistDialogFragment.newInstance(song.getTitle(), song.getId(), false, false, null);
         c.show(getSupportFragmentManager(), song.getId());
     }
 
     @Override
     public void onNextLongClicked(Song song) {
         Log.d(TAG, "Option long clicked, add to top of playlist");
-        DialogFragment c = ChoosePlaylistDialogFragment.newInstance(song.getTitle(), false, true);
+        DialogFragment c = ChoosePlaylistDialogFragment.newInstance(song.getTitle(), song.getId(), false, true, null);
         c.show(getSupportFragmentManager(), song.getId());
     }
 
@@ -1523,76 +1508,61 @@ public class DrawerActivity extends AppCompatActivity
                  MediaStore.Audio.Playlists.Members.PLAY_ORDER,
                 MediaStore.Audio.Playlists.Members.AUDIO_ID
         };
-        ContentValues values = new ContentValues();
+
         ContentResolver resolver = this.getApplicationContext().getContentResolver();
         Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external", pid);
         Cursor cur = resolver.query(uri, cols, null, null, null);
-         cur.moveToFirst();
-        int base = cur.getInt(0);
-        String id = cur.getString(1);
-        Log.d("Music service", "--->>>>>base: " + base + " " + id);
-        ArrayList<String> temp = new ArrayList<>();
+        int base = 0;
+         if(!top &&  cur.moveToLast()) {
 
-    while(cur.moveToNext()) {
+             base = cur.getInt(0);
+             base += 1;
+             String id = cur.getString(1);
+         }
+        cur.close();
+        log("adding item --->>>>>base: " + base + " to " + pname);
 
-        base = cur.getInt(0);
-        id = cur.getString(1);
-        temp.add(id);
-        Log.d("Music service", "--->>>>>base: " + base + " " + id);
-    }
-    cur.close();
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Audio.Playlists.Members.PLAY_ORDER, base);
+        values.put(MediaStore.Audio.Playlists.Members.AUDIO_ID, sid);
+        resolver.insert(uri, values);
 
-//    if( top ) temp.add(0, sid.toString());
-//    else temp.add(sid.toString());
-//
-//    deletePlaylist(pid.toString());
-//    newPlaylist(pname);
-//    pid = findPlaylistId(pname);
-//        uri = MediaStore.Audio.Playlists.Members.getContentUri("external", pid);
-//        cur = resolver.query(uri, cols, null, null, null);
-//        Log.d("Music service", "--->>>>>base: " + base + " " + id);
-//        while(cur.moveToNext()) {
-//
-//            base = cur.getInt(0);
-//            id = cur.getString(1);
-//            //temp.add(id);
-//            Log.d("Music service", "--->>>>>base: " + base + " " + id);
-//        }
-//        cur.close();
-//        resolver.query(uri, cols, null, null, null);
-//
-//        for(int i=0; i<temp.size(); i++) {
-//            Log.d("Music service", "--->>>>>base: " + i + " " + temp.get(i));
-//        values = new ContentValues();
-//        // Log.d("Music service", i +" saving song: " + t.getTitle() + songid);
-//        values.put(MediaStore.Audio.Playlists.Members.PLAY_ORDER, i);
-//        values.put(MediaStore.Audio.Playlists.Members.AUDIO_ID, temp.get(i));
-//        resolver.insert(uri, values);
-//    }
 
     }
 
     public void addListToPlaylist(Long pid, ArrayList<Long> ids, boolean top) {
+
+       log("adding songs to playlist Ids: " + ids.size());
+
         String[] cols = new String[]{
                 MediaStore.Audio.Playlists.Members.PLAY_ORDER, MediaStore.Audio.Playlists.Members.AUDIO_ID
         };
         ContentValues values = new ContentValues();
         ContentResolver resolver = this.getApplicationContext().getContentResolver();
         Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external", pid);
-        int base = 0;
-        if(!top){
-        Cursor cur = resolver.query(uri, cols, null, null, null);
-        cur.moveToFirst();
-            base = cur.getInt(0);
-            cur.close();
-            Log.d("Music service", "base: " + base);
 
-        }
+        Cursor cur = resolver.query(uri, cols, null, null, null);
+
+        //ids already has our new items at the top, just add the old ones to it
+        // if adding to the end, just insert the old items. at 0
+            cur.moveToFirst();
+            while(cur.moveToNext()){
+                long l = Long.parseLong(cur.getString(1));
+                if(top) ids.add(0, l);
+                else ids.add( l );
+
+            }
+            cur.close();
+            log("songs added to playlist Ids: " + ids.size());
+
+            //todo delete old items
+        //add the all the items in the new order
+
 
         for(int i=0; i<ids.size(); i++) {
             values = new ContentValues();
             // Log.d("Music service", i +" saving song: " + t.getTitle() + songid);
-            values.put(MediaStore.Audio.Playlists.Members.PLAY_ORDER, base + i);
+            values.put(MediaStore.Audio.Playlists.Members.PLAY_ORDER, i);
             values.put(MediaStore.Audio.Playlists.Members.AUDIO_ID, ids.get(i));
             resolver.insert(uri, values);
         }
@@ -1614,6 +1584,32 @@ public class DrawerActivity extends AppCompatActivity
 
         }
 
+    }
+
+    @Override
+    public  void onPlaylistSongLongClicked(Song s, String pid){
+
+        log("Playlist song long clicked! deleting item: " +s.getTitle() + "from playlist " + pid );
+
+        View contextView = findViewById(R.id.controlFrame);
+        Snackbar.make(contextView, "deleting item: " +s.getTitle() + "from playlist ", Snackbar.LENGTH_LONG).show();
+
+        deleleFromPlaylist(Long.parseLong(pid), s.getId());
+
+    }
+
+    public void deleleFromPlaylist( Long pid, String sid) {
+        String[] cols = new String[]{
+                MediaStore.Audio.Playlists.Members.PLAY_ORDER,
+                MediaStore.Audio.Playlists.Members.AUDIO_ID
+        };
+        ContentResolver resolver = this.getApplicationContext().getContentResolver();
+        Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external", pid);
+
+        String[] arg = { sid };
+        resolver.delete(uri, MediaStore.Audio.Playlists.Members.AUDIO_ID+"=?", arg );
+
+        log(sid + " deleted from playlist: " + pid);
     }
 
 
