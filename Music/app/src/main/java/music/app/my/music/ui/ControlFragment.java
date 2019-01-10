@@ -172,11 +172,11 @@ public class ControlFragment extends Fragment {
         String[] arg = { albumid };
         Cursor cur = resolver.query(uri, cols, selection, arg, null);
         cur.moveToFirst();
-        int base = cur.getInt(0);
-        String id = cur.getString(1);
-        Log.d("Music service", "--->>>>>base: " + base + " " + id);
+        int id = cur.getInt(0);
+        String base = cur.getString(1);
+        Log.d("Now Fragment", "Found album art: " + id + " " + base);
 
-        return id;
+        return base;
     }
 
 

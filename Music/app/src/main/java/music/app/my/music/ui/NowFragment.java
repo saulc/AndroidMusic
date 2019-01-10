@@ -23,6 +23,8 @@ import android.widget.TextSwitcher;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
 
+import java.nio.file.Path;
+
 import music.app.my.music.DrawerActivity;
 import music.app.my.music.R;
 import music.app.my.music.player.MusicPlayer;
@@ -311,13 +313,16 @@ public class NowFragment extends ControlFragment {
             String p = findAlbumArt(s.getAlbumId());
 
             log("Now fragment updating albumart: " + p);
+
             Drawable d = Drawable.createFromPath(p);
+
             if (d != null) {
+                log("Drawable created.");
                 Bitmap bitmap = ((BitmapDrawable) d).getBitmap();
                 // Scale it to 50 x 50
-
+                log("Bitmap created.");
                 d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, 600, 600, true));
-
+                log("Bitmap scaled");
                 icon.setImageDrawable(d);
             } else icon.setImageResource(R.drawable.android_robot_icon_2);
         }

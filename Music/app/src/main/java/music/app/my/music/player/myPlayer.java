@@ -2,8 +2,10 @@ package music.app.my.music.player;
 
 import android.media.MediaPlayer;
 import android.os.Handler;
+import android.util.Log;
 
-public class myPlayer extends MediaPlayer {
+public class myPlayer extends MediaPlayer
+		implements MediaPlayer.OnErrorListener {
 
 	private Handler mHandler = new Handler();
 	private float volumeValue = 0f;
@@ -195,4 +197,17 @@ public class myPlayer extends MediaPlayer {
 			public void idk(){
 
 			}
+
+	/*
+    boolean	True if the method handled the error, false if it didn't.
+    Returning false, or not having an OnErrorListener at all,
+    will cause the OnCompletionListener to be called.
+     */
+	@Override
+	public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
+		Log.d(getClass().getSimpleName().toString(), "onError: " + i + " i1: " + i1);
+
+
+		return true;
+	}
 }

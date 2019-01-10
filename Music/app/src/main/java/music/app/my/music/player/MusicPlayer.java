@@ -168,6 +168,30 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 				
 		
 	}
+
+
+	@Override
+	public void onCompletion(MediaPlayer mp) {
+		Log.i("Music Service", mp + " player completed");
+		((myPlayer)mp).removeCallbacks();
+
+		if(player.contains(mp)){
+			player.remove(mp);
+			player.add(currentPlayer, new myPlayer());
+		}
+		mp.release();
+		//	mp = null;
+		//	nextRequest();
+//		if(player2 !=null){
+//		player2.stop();
+//		player2.release();
+//		player2 = null;
+//		}
+
+	}
+
+
+
 	public void playRequest() {
 
 
@@ -251,26 +275,6 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 		} //else player.get(currentPlayer).pause();
 	}
 
-	@Override
-	public void onCompletion(MediaPlayer mp) {
-		Log.i("Music Service", mp + " player completed");
-		((myPlayer)mp).removeCallbacks();
-
-		if(player.contains(mp)){
-			player.remove(mp);
-			player.add(currentPlayer, new myPlayer());
-		}
-		mp.release();
-		mp = null;
-	//	nextRequest();
-//		if(player2 !=null){
-//		player2.stop();
-//		player2.release();
-//		player2 = null;
-//		}
-		
-	}
-	
 	private void prepareSong() {
 		if(queue.getSize() > 0){
 			try {
