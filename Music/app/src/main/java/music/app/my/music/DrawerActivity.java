@@ -1,7 +1,6 @@
 package music.app.my.music;
 
 import android.animation.LayoutTransition;
-import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -12,7 +11,6 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Typeface;
-import android.media.audiofx.Visualizer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -1401,18 +1399,18 @@ public class DrawerActivity extends AppCompatActivity
     }
 
     public void updateProgress(MusicPlayer player){
-        if(mf != null) mf.updateInfo(player);
-        if(nf != null) nf.updateInfo(player);
+        if(mf != null) mf.updateProgressBar(player);
+        if(nf != null) nf.updateProgressBar(player);
         if(controlsVisible)
         {
-                cf.updateInfo(player);
+                cf.updateProgressBar(player);
         }
 
     }
 
     public void updateCurrentInfo(Song s){
-        if(nf != null) nf.updateInfo(s);
-        if(cf != null) cf.updateInfo(s);
+        if(nf != null) nf.updateSongInfo(s);
+        if(cf != null) cf.updateSongInfo(s);
 
         updateNextSongInfo();
 
@@ -1440,7 +1438,7 @@ public class DrawerActivity extends AppCompatActivity
 
                 @Override
                 public void sendProgress(MusicPlayer player) {
-                    //this happens alot, don't leave active
+                    //this happens at 1hz, don't leave active
                   //  log("Activty got progress info. updating ui...");
 
                     //update seekbar.
@@ -1464,10 +1462,7 @@ public class DrawerActivity extends AppCompatActivity
 
                 }
 
-                @Override
-                public void setAlbumArt() {
 
-                }
 
             });
         }
@@ -1753,7 +1748,7 @@ public class DrawerActivity extends AppCompatActivity
         if(position < p.size()){
             if(p.get(position).isPlaying() || !p.get(position).isPaused()) p.get(position).pausePlayback();
             else  p.get(position).resumePlayback();
-            mf.updateInfo(mService.getPlayer());
+            mf.updateProgressBar(mService.getPlayer());
         }
     }
 

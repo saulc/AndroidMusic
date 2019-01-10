@@ -20,7 +20,10 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 	private Equalizer eq;
 	
 	private ArrayList<myPlayer> player;
-	private int currentPlayer = 0;
+	private int currentPlayer = 0;	//the one actually palying
+	private int oldPlayer = -1;	//fade out
+	private int auxPlayer = -1;	//fade out fast skip?
+
 	private MusicPlayerStateListener sListener;
 	public enum MUSICPLAYER_STATE {PLAYING, PAUSED_USER, PAUSED, PREPARING, PREPARED, STOPPED, PLAYING_DUCKING};
 	interface MusicPlayerStateListener{
@@ -55,15 +58,24 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 		index = 0;
 		
 	}
-	
+
+	//3 myplayers only! never add. never remove. only reset.
 	private void iniPlayer(){
 		if(player == null){
 			player = new ArrayList<myPlayer>();
 			currentPlayer = 0;
+			auxPlayer = 1;
+			oldPlayer = 2;
+
+			myPlayer temp = new myPlayer();
+			player.add(temp);
+			temp = new myPlayer();
+			player.add(temp);
+			temp = new myPlayer();
+			player.add(temp);
+
 		}
-		
-		myPlayer temp = new myPlayer();
-		player.add(temp);
+
 	}
 	
 	private void setState(MUSICPLAYER_STATE s){
@@ -149,45 +161,63 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 	public boolean isPlaying(){
 		return !player.get(currentPlayer).isPaused();
 	}
-	
+
+
+	//fade out whats playing
+	//get the player (LIST) ready to play the next song.
+	//never add or remove a player.
+	//normal playback
+	/*
+	cp = playing
+	op = fadeing out / none
+	aux = fading out / none
+
+	next();
+	op = cp = fading out;
+	cp = aux = reset()
+	aux = temp (old)
+	 */
 	private void fadeOutOldPlayer(){
 
+		log("Fadeout Old: old: " + oldPlayer + " cp: " + currentPlayer + " aux: " + auxPlayer);
+
+		if(!isPlaying()) return; //if not playing no need to fade it out.
+
+		//other wise stop the ui updates.
 		sListener.stopUiCallbacks();
 
-		myPlayer temp = new myPlayer();
-		int old = currentPlayer;
-		player.add(temp);
-		currentPlayer = player.size() - 1;
-		player.get(old).stopAndFadeOut();
+		int temp = oldPlayer;		//save
 
-//		myPlayer temp = new myPlayer();
-//		player.add(currentPlayer, temp); //add new player
-//		int old = currentPlayer + 1;
-//		player.get(old).stopAndFadeOut();  //fade out the old player
-		//player.remove(old);
-				
-		
+		oldPlayer = currentPlayer;
+		player.get(oldPlayer).pausePlayback(); //fade out.
+//		player.get(oldPlayer).stopAndFadeOut();
+
+		//aux player should have been siting for one song
+		//or at least a few seconds
+		currentPlayer = auxPlayer;
+		player.get(currentPlayer).reset();
+
+		auxPlayer = temp;
+		log("Fadeout Old end: " + oldPlayer + " cp: " + currentPlayer + " aux: " + auxPlayer);
+
 	}
 
 
+
+	//this should never be called!!
 	@Override
 	public void onCompletion(MediaPlayer mp) {
-		Log.i("Music Service", mp + " player completed");
+		Log.i("Music Service", mp + " player completed! wft!!! <<------");
 		((myPlayer)mp).removeCallbacks();
 
 		if(player.contains(mp)){
 			player.remove(mp);
-			player.add(currentPlayer, new myPlayer());
+			player.add(new myPlayer());
 		}
 		mp.release();
-		//	mp = null;
-		//	nextRequest();
-//		if(player2 !=null){
-//		player2.stop();
-//		player2.release();
-//		player2 = null;
-//		}
+		mp = null;
 
+		Log.i("Music Service", mp + "Get ready...Crunch? --->>>");
 	}
 
 

@@ -160,7 +160,10 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 	@Override
 	public void stopUiCallbacks() {
 
+   	//stop ui from trying to access a null player
    	mHandler.removeCallbacks(updateUi);
+		mHandler.removeCallbacks(updateUi);
+
 	}
 
 	/**
@@ -188,9 +191,6 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 
 		public void setCurrentInfo(Song s);
 		public void setAudioId(int aid);
-
-		public void setAlbumArt();
-
 
    	}
    @Override
@@ -594,8 +594,9 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 		case PLAYING :
 			mListener.setPlayPause(true);
 			mListener.setCurrentInfo(player.getCurrentSong());
-			mListener.setAlbumArt();
+			mListener.setAudioId(player.getAID());
 			mHandler.postDelayed(updateUi, 1000);
+
 			setUpAsForeground("Playing");;
 			// Tell any remote controls that our playback state is 'paused'.
 	        if (mRemoteControlClientCompat != null) {
@@ -622,7 +623,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 	        } break;
 		case PREPARED :
 		case PREPARING :  // Tell any remote controls that our playback state is 'paused'.
-			mHandler.post(updateUi);
+			//mHandler.post(updateUi);
 	        if (mRemoteControlClientCompat != null) {
 	            mRemoteControlClientCompat
 	                    .setPlaybackState(RemoteControlClient.PLAYSTATE_BUFFERING);

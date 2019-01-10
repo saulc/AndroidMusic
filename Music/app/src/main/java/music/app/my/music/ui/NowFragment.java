@@ -17,15 +17,11 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageSwitcher;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
 
-import java.nio.file.Path;
-
-import music.app.my.music.DrawerActivity;
 import music.app.my.music.R;
 import music.app.my.music.player.MusicPlayer;
 import music.app.my.music.types.Song;
@@ -290,7 +286,8 @@ public class NowFragment extends ControlFragment {
     }
     private boolean infoset = false;
 
-    public void updateInfo(MusicPlayer player) {
+    @Override
+    public void updateProgressBar(MusicPlayer player) {
         if (sbar != null)
             if (player.isPlaying()) {
                 sbar.setProgress(player.getProgress());
@@ -301,10 +298,12 @@ public class NowFragment extends ControlFragment {
     }
 
 
-    public void updateInfo(Song s) {
+    @Override
+    public void updateSongInfo(Song s) {
         log("Now fragment updating song info.");
         //avoid doing this every second, it doesn't change
 
+        log("Now Playing: "+ s.getTitle() + " : " + s.getArtist());
 
         line1.setText(s.getTitle());
         line2.setText(s.getArtist());
@@ -328,11 +327,11 @@ public class NowFragment extends ControlFragment {
         }
     }
 
-    public void setPlayPause(Boolean isPlaying) {
-        if (isPlaying)
-            pp.setImageResource(android.R.drawable.ic_media_pause);
-        else pp.setImageResource(android.R.drawable.ic_media_play);
-    }
+//    public void setPlayPause(Boolean isPlaying) {
+//        if (isPlaying)
+//            pp.setImageResource(android.R.drawable.ic_media_pause);
+//        else pp.setImageResource(android.R.drawable.ic_media_play);
+//    }
 
 
     class MyGestureDetector extends GestureDetector.SimpleOnGestureListener {

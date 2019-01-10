@@ -100,7 +100,7 @@ public class MixFragment extends ControlFragment {
 
 
     @Override
-    public void updateInfo(MusicPlayer player) {
+    public void updateProgressBar(MusicPlayer player) {
 
         log("MIX fragment updating");
         if(player != null){
@@ -136,7 +136,7 @@ public class MixFragment extends ControlFragment {
     }
 
 
-    public void updateInfo(Song s){
+    public void updateSongInfo(Song s){
         log("Mix fragment updating song info.");
         //avoid doing this every second, it doesn't change
 

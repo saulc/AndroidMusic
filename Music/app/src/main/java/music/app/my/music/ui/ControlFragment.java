@@ -182,7 +182,7 @@ public class ControlFragment extends Fragment {
 
     private boolean infoset = false;
 
-    public void updateInfo(MusicPlayer player){
+    public void updateProgressBar(MusicPlayer player){
         if(sbar != null)
             if(player.isPlaying()) {
                 sbar.setProgress(player.getProgress());
@@ -214,7 +214,7 @@ public class ControlFragment extends Fragment {
        // log("Control fragment updating");
     }
 
-    public void updateInfo(Song s){
+    public void updateSongInfo(Song s){
         log("Now fragment updating song info.");
         //avoid doing this every second, it doesn't change
 
