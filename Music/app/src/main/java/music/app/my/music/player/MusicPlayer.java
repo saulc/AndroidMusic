@@ -4,6 +4,7 @@ package music.app.my.music.player;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
+import android.media.audiofx.Equalizer;
 import android.util.Log;
 
 
@@ -16,6 +17,7 @@ import music.app.my.music.types.plist;
 
 public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 
+	private Equalizer eq;
 	
 	private ArrayList<myPlayer> player;
 	private int currentPlayer = 0;
@@ -189,13 +191,56 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 	    }
 	
 	}
-	
+
+	public int getAID(){
+		return player.get(currentPlayer).getAudioSessionId();
+	}
+	public String setEQ(int preset){
+		if(eq ==null)  return "";
+
+			short np = eq.getNumberOfPresets();
+			if(preset < np) {
+				eq.usePreset((short) preset);
+				String n = eq.getPresetName((short) preset);
+				log("Setting eq: " + n);
+				n = eq.getPresetName(eq.getCurrentPreset());
+				log("SET eq: " + n);
+				return n;
+			}
+		return "";
+	}
+
+	public ArrayList<String> getEQPresets(){
+		if(eq==null) return null;
+		ArrayList<String> p = new ArrayList<String>();
+		int np = eq.getNumberOfPresets();
+		for(short i =0; i< np; i++ ) p.add(eq.getPresetName(i));
+
+
+		return p;
+	}
+
+
+	private void iniAFX(int aid){
+		log("Setting eq.");
+		eq = new Equalizer(0, aid);
+
+		short np = eq.getNumberOfPresets();
+	//	for(short i =0; i< np; i++ ) log("Presents: " + i + " " + eq.getPresetName(i));
+
+		if(np>0)
+		eq.usePreset((short)0);
+
+		log("Setting eq: " + eq.getPresetName((short)0));
+	}
+
 
 	@Override
 	public void onPrepared(MediaPlayer arg0) {
 		Log.d("Music Service", "Prepared!! :p");
 		setState(MUSICPLAYER_STATE.PREPARED);
 		player.get(currentPlayer).prepared();
+		iniAFX(player.get(currentPlayer).getAudioSessionId());
 		//mListener.setAudioId(player);
 		if(seekMe != 0) {
 			player.get(currentPlayer).seekTo(seekMe);

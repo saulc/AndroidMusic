@@ -12,6 +12,7 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Typeface;
+import android.media.audiofx.Visualizer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -63,6 +64,7 @@ import music.app.my.music.ui.popup.ChoosePlaylistDialogFragment;
 import music.app.my.music.ui.popup.ConfirmDeleteDialogFragment;
 import music.app.my.music.ui.ControlFragment;
 import music.app.my.music.ui.browser.GenreFragment;
+import music.app.my.music.ui.popup.EQDialogFragment;
 import music.app.my.music.ui.popup.NewPlaylistDialog;
 import music.app.my.music.ui.NowFragment;
 import music.app.my.music.ui.PlaceholderFragment;
@@ -71,6 +73,7 @@ import music.app.my.music.ui.QueueFragment;
 import music.app.my.music.ui.browser.SongFragment;
 import music.app.my.music.ui.browser.baseListFragment;
 import music.app.my.music.ui.dummy.DummyContent;
+import music.app.my.music.ui.popup.VisualizerDialogFragment;
 
 public class DrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -81,6 +84,8 @@ public class DrawerActivity extends AppCompatActivity
         NewPlaylistDialog.OnDialogInteractionListener ,
         Toolbar.OnMenuItemClickListener{
 
+
+    private VisualizerDialogFragment vf = null;
 
     private MixFragment mf = null;
     private NowFragment nf = null;
@@ -483,6 +488,41 @@ public class DrawerActivity extends AppCompatActivity
     }
 
 
+    public void setEQ(int selection, String eqname){
+        log("Set eq: " + eqname);
+        if(mService !=null) mService.getPlayer().setEQ(selection);
+    }
+
+    public void showEQTab(){
+        log("Showing eq Tab");
+        if(mService== null || mService.getPlayer()==null) return;
+
+        ArrayList<String> pre = mService.getPlayer().getEQPresets();
+        if(pre == null) return;
+        DialogFragment c = EQDialogFragment.newInstance(pre);
+        c.show(getSupportFragmentManager(), "EQ");
+
+
+    }
+    public void visualizerCreated(){
+        log("Vis created.");
+        if(mService!=null && mService.getPlayer() !=null) {
+            vf.setPlayer(mService.getPlayer());
+            vf.setEnabled(true);
+        }
+
+    }
+    public void visualizerClosed(){
+        log("Vis closed.");
+
+    }
+
+    private void showVisualizer(){
+        log("Showing visualizer!.");
+        vf = VisualizerDialogFragment.newInstance();
+        vf.show(getSupportFragmentManager(), "Visualizer");
+
+    }
     @Override
     public boolean onMenuItemClick(MenuItem item) {
         int id = item.getItemId();
@@ -923,7 +963,12 @@ public class DrawerActivity extends AppCompatActivity
 
         } else if( id == R.id.nav_bubble) {
             log("Nav bubble clicked!");
-            showBubbles();
+            showEQTab();
+            //showBubbles();
+
+        }  else if( id == R.id.nav_vis) {
+            log("Nav visualizer clicked!");
+            showVisualizer();
 
         } else if( id == R.id.exit) {
             log("Nav exit clicked!");
