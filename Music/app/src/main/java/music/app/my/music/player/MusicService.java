@@ -631,8 +631,8 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 			default :
 		}
 
-		if(mListener != null)
-		mListener.setPlayPause(player.isPlaying());
+//		if(mListener != null)
+//		mListener.setPlayPause(player.isPlaying());
 	}
 
 

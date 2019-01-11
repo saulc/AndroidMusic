@@ -327,11 +327,12 @@ public class NowFragment extends ControlFragment {
         }
     }
 
-//    public void setPlayPause(Boolean isPlaying) {
-//        if (isPlaying)
-//            pp.setImageResource(android.R.drawable.ic_media_pause);
-//        else pp.setImageResource(android.R.drawable.ic_media_play);
-//    }
+    @Override
+    public void setPlayPause(Boolean isPlaying) {
+        if (isPlaying)
+            pp.setImageResource(android.R.drawable.ic_media_pause);
+        else pp.setImageResource(android.R.drawable.ic_media_play);
+    }
 
 
     class MyGestureDetector extends GestureDetector.SimpleOnGestureListener {

@@ -398,6 +398,18 @@ public class DrawerActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onPause(){
+        log("Pause activity.");
+        super.onPause();
+
+    }
+    @Override
+    protected void onResume(){
+        super.onResume();
+
+        log("Resume activity.");
+    }
+    @Override
     protected void onStart() {
         super.onStart();
         // Bind to LocalService
@@ -1393,14 +1405,14 @@ public class DrawerActivity extends AppCompatActivity
 
     public void setpp(Boolean isPlaying){
         if(nf != null) nf.setPlayPause(isPlaying);
-        if(controlsVisible) cf.setPlayPause(isPlaying);
+        if(cf != null && controlsVisible) cf.setPlayPause(isPlaying);
         int r = !isPlaying ? android.R.drawable.ic_media_play : android.R.drawable.ic_media_pause;
         fab2.setImageResource(r);
     }
 
     public void updateProgress(MusicPlayer player){
-        if(mf != null) mf.updateProgressBar(player);
-        if(nf != null) nf.updateProgressBar(player);
+        if(mf != null && mf.isVisible()) mf.updateProgressBar(player);
+        if(nf != null && nf.isVisible()) nf.updateProgressBar(player);
         if(controlsVisible)
         {
                 cf.updateProgressBar(player);
@@ -1641,18 +1653,26 @@ public class DrawerActivity extends AppCompatActivity
     }
 
     @Override
-    public  void onPlaylistSongLongClicked(Song s, String pid){
+    public  void onPlaylistSongLongClicked(Song s, String pid, String pname, int pos) {
 
-        log("Playlist song long clicked! deleting item: " +s.getTitle() + "from playlist " + pid );
+        log("Playlist song long clicked! deleting item: " + s.getTitle() + "from playlist " + pname);
 
-        View contextView = findViewById(R.id.controlFrame);
-        Snackbar.make(contextView, "deleting item: " +s.getTitle() + "from playlist ", Snackbar.LENGTH_LONG).show();
-
-        deleleFromPlaylist(Long.parseLong(pid), s.getId());
+        DialogFragment c = ConfirmDeleteDialogFragment.newInstance(pname, pid, s.getId(), pos);
+        c.show(getSupportFragmentManager(), "REMOVESONG");
 
     }
 
-    public void deleleFromPlaylist( Long pid, String sid) {
+
+        public void deletedSong(String pname, String pid, String sid, int pos) {
+
+        View contextView = findViewById(R.id.controlFrame);
+        Snackbar.make(contextView, "deleting item: " +sid + " from playlist " + pname, Snackbar.LENGTH_LONG).show();
+
+        deleleFromPlaylist(Long.parseLong(pid), pname, sid , pos);
+
+    }
+
+    public void deleleFromPlaylist( Long pid, String pname,  String sid, int pos) {
         String[] cols = new String[]{
                 MediaStore.Audio.Playlists.Members.PLAY_ORDER,
                 MediaStore.Audio.Playlists.Members.AUDIO_ID
@@ -1660,10 +1680,12 @@ public class DrawerActivity extends AppCompatActivity
         ContentResolver resolver = this.getApplicationContext().getContentResolver();
         Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external", pid);
 
-        String[] arg = { sid };
-        resolver.delete(uri, MediaStore.Audio.Playlists.Members.AUDIO_ID+"=?", arg );
+        String[] arg = { sid, pos+"" };
+        String where = MediaStore.Audio.Playlists.Members.AUDIO_ID+"=? AND " +
+                MediaStore.Audio.Playlists.Members.PLAY_ORDER+"=?";
+        resolver.delete(uri, where, arg );
 
-        log(sid + " deleted from playlist: " + pid);
+        log(sid + " deleted from playlist: " + pname + " pos: "+ pos);
     }
 
 

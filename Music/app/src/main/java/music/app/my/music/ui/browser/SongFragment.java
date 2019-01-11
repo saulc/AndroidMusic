@@ -289,7 +289,7 @@ public class SongFragment extends baseListFragment implements MediaHelperListene
      //   mhandler.removeCallbacks(updatesongbar);
 
 
-        mAdapter = new SongAdapter(myType == SF_TYPE.PLAYLISTITEMS, pid, items
+        mAdapter = new SongAdapter(myType == SF_TYPE.PLAYLISTITEMS, pid, pname, items
                 , ( baseListFragment.OnListFragmentInteractionListener) getActivity() );
 
         if(recyclerView == null) return;

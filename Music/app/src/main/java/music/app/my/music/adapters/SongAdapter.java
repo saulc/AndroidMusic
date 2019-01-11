@@ -26,13 +26,14 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
     private final List<Song> mValues;
     private final baseListFragment.OnListFragmentInteractionListener mListener;
     private boolean isPlaylist;
-    private String pid;
+    private String pid, pname;
 
-    public SongAdapter(boolean isPlaylist, String id,  List<Song> items, baseListFragment.OnListFragmentInteractionListener listener) {
+    public SongAdapter(boolean isPlaylist, String id, String name,  List<Song> items, baseListFragment.OnListFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
         this.isPlaylist = isPlaylist;
         pid = id;
+        pname = name;
     }
 
     @Override
@@ -91,7 +92,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
             @Override
             public boolean onLongClick(View view) {
                 if(isPlaylist)
-                mListener.onPlaylistSongLongClicked(holder.mItem, pid);
+                mListener.onPlaylistSongLongClicked(holder.mItem, pid, pname, position);
                 return true;
             }
         });
