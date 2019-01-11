@@ -2,19 +2,24 @@ package music.app.my.music.ui.popup;
 
 
 
+import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.SurfaceTexture;
 import android.graphics.drawable.Drawable;
 import android.hardware.Camera;
 import android.media.audiofx.Visualizer;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import java.io.IOException;
 
@@ -22,8 +27,7 @@ import music.app.my.music.DrawerActivity;
 import music.app.my.music.R;
 import music.app.my.music.player.MusicPlayer;
 
-public  class VisualizerDialogFragment extends DialogFragment implements Visualizer.OnDataCaptureListener,
-        TextureView.SurfaceTextureListener  {
+public  class VisualizerDialogFragment extends DialogFragment implements Visualizer.OnDataCaptureListener {
 
     public static VisualizerDialogFragment newInstance() {
         VisualizerDialogFragment fragment = new VisualizerDialogFragment();
@@ -32,6 +36,16 @@ public  class VisualizerDialogFragment extends DialogFragment implements Visuali
 //        fragment.setArguments(b);
         return fragment;
     }
+
+    public static VisualizerDialogFragment newInstance(int width, int height) {
+        VisualizerDialogFragment fragment = new VisualizerDialogFragment();
+        Bundle b = new Bundle();
+        b.putInt("Width", width);
+        b.putInt("Height", height);
+        fragment.setArguments(b);
+        return fragment;
+    }
+
 
     public VisualizerDialogFragment(){
 
@@ -45,17 +59,19 @@ public  class VisualizerDialogFragment extends DialogFragment implements Visuali
     private int aid;
     private  boolean enabled = true;
 
-    private MusicPlayer player;
     private Visualizer vis = null;
 
-    private Camera mCamera;
-    private TextureView mTextureView;
+    private ImageView iv, iv2;
 
 
-    public void setPlayer(MusicPlayer player){
-        log("Visualizer Player set");
-        this.player = player;
+    public void setAid(int id){
+        if(id != aid){
+            if (vis != null)
+            setEnabled(false);
+            aid = id;
+            setEnabled(true);
 
+         }
     }
 
     public boolean isEnabled() {
@@ -65,38 +81,191 @@ public  class VisualizerDialogFragment extends DialogFragment implements Visuali
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
         if(enabled) startVis();
-        else vis.setEnabled(enabled);
+
+         vis.setEnabled(enabled);
     }
 
-    private void startVis(){
+    private void startVis() {
         log("Starting Vis");
-        if(vis == null) vis = new Visualizer(player.getAID());
+       // if (vis == null)
+            vis = new Visualizer(aid);
 
+        log("Capture size: " + Visualizer.getCaptureSizeRange());
+
+        vis.setCaptureSize(Visualizer.getCaptureSizeRange()[0]);
+        vis.setDataCaptureListener(this,
+                Visualizer.getMaxCaptureRate() / 8, true, false);
         log("Capture size: " + vis.getCaptureSize());
         log("Capture rate: " + vis.getSamplingRate());
-        vis.setDataCaptureListener(this, 10, true, true);
 
-        vis.setEnabled(enabled);
+        // vis.setDataCaptureListener(this, vis., true, true);
+        //vis.setEnabled(enabled);
+
+
+        Bundle b = getArguments();
+        if (b != null) {
+            width = b.getInt("Width");
+            height = b.getInt("Height");
+        } else {
+        width = 600;
+        height = 600;
+        }
+
+        log("Starting Vis! width: " + width + " height: " + height);
+    }
+
+    public void setWidth(int w){ width = w;
+    }
+    public int getWidth(){ return width; }
+    public void setHeight(int h){ height = h;
+    }
+    public int getHeight(){ return height; }
+
+
+    private int width, height;
+    private Bitmap oldbit;
+    private  int mode = 0, modes = 6;
+
+    private void clicked(){
+    if(++mode >= modes) mode = 0;
+    log("VIs clicked. mode: " + mode);
+    }
+
+    private void updateIV(byte[] waves){
+     //   log("Updating waves...");
+
+
+       // log("Updating waves..." + width + " " + height);
+
+        final Bitmap rc = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
+        Canvas cc = new Canvas((rc));
+        Paint p = new Paint();
+        p.setStrokeWidth(3.0f);
+        p.setColor(Color.GREEN);
+        float space = 4.5f;
+
+        float angle =  1.4f;  // 180 /128 + overlap?
+        float amp = 90f; //inner space
+        int af = 2; //length
+
+        for(int j=0; j<waves.length; j++) {
+            //log(j + " Wave: " + waves[j]);
+            float w = (float) waves[j];
+            if(w > 110f) p.setColor(Color.RED);
+            else if(w > 88f) p.setColor(Color.MAGENTA);
+            else if(w > 66f) p.setColor(Color.CYAN);
+            else if(w > -88f) p.setColor(Color.BLUE);
+            else if(w > -110f) p.setColor(Color.YELLOW);
+            else p.setColor(Color.GREEN);
+//
+            float x =  (float) Math.cos(angle*j);
+            float y = (float) Math.sin(angle*j);
+           // log("x: " + x +" y: " + y);
+
+            p.setAlpha(255);
+
+            switch (mode) {
+                case 5:
+                    cc.drawLine(width / 2 + x * amp, height / 2 + y * amp,
+                            width / 2 + x * w * af, height / 2 + y * w * af, p);
+
+                    break;
+
+
+                case 4:  p.setAlpha(150);
+                cc.drawCircle( j*space, height / 2  , w , p);
+
+//                    p.setColor(Color.WHITE);
+//                    cc.drawCircle( j*space, height / 2  , w-5 , p);
+                    break;
+
+                case 3:
+                cc.drawLine(width / 2 + x * amp, height / 2 + y * amp, width / 2 + x * w * af, height / 2 + y * w * af, p);
+                case 2: cc.drawCircle(width / 2 + x * w * af, height / 2 + y * w * af, w / 3, p);
+                p.setColor(Color.BLACK);
+                cc.drawCircle(width / 2 + x * w * af, height / 2 + y * w * af, w / 3 - 3, p);
+                break;
+
+                case 1: cc.drawLine(j*space, height/2, j*space, height/2+w, p);
+                break;
+
+
+                case 0:
+                    cc.drawLine(width / 2 *(1 + x) , height / 2 *(1 + y) ,
+                            width / 2 + x * w *af, height / 2 + y * w *af, p);
+                    break;
+
+            }
+
+
+        }
+        iv2.setImageBitmap(oldbit);
+        oldbit = rc;
+        iv.setImageBitmap(rc);
+
     }
 
     @Override
     public void onWaveFormDataCapture(Visualizer visualizer, byte[] bytes, int i) {
 
-        log("Visualizer Data capture Wave:");
-        for(int j=0; j<bytes.length; j++)
-            log(j + " Wave: " + bytes[j]);
+        log("Visualizer Data capture Wave: " + bytes.length);
+        updateIV(bytes);
 
+
+    }
+
+    private void updateFTT(byte[] ftt){
+        log("Updating ftt...");
+
+//        width = getDialog().getWindow().getAttributes().width;
+//        height = getDialog().getWindow().getAttributes().height;
+//
+        width = 600;
+        height = 100;
+
+        // log("Updating waves..." + width + " " + height);
+
+        final Bitmap rc = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
+        Canvas cc = new Canvas((rc));
+        Paint p = new Paint();
+        p.setColor(Color.CYAN);
+        int space = 4; //width / ftt.length;
+        for(int j=0; j<ftt.length; j++) {
+            //log(j + " Wave: " + waves[j]);
+
+            float w = (float) ftt[j];
+            cc.drawLine(j*space, 100f, j*space, 100f-w, p);
+
+        }
+        iv2.setImageBitmap(rc);
 
     }
 
     @Override
     public void onFftDataCapture(Visualizer visualizer, byte[] bytes, int i) {
         log("Visualizer Data capture FFT:");
-        for(int j=0; j<bytes.length; j++)
-            log(j + " FFT: " + bytes[j]);
+        updateFTT(bytes);
+//        for(int j=0; j<bytes.length; j++)
+//            log(j + " FFT: " + bytes[j]);
 
     }
 
+
+    @Override
+    public void onStop(){
+
+        try {
+            vis.setEnabled(false);
+            vis.release();
+            vis = null;
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        }
+
+
+        super.onStop();
+
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -114,10 +283,25 @@ public  class VisualizerDialogFragment extends DialogFragment implements Visuali
         View v = inflater.inflate(R.layout.visualizer_dialog, container, false);
 
 
-        mTextureView = v.findViewById(R.id.visTexture);
-        mTextureView.setSurfaceTextureListener(this);
-        mTextureView.setAlpha(.5f);
+        iv = v.findViewById(R.id.visImage);
+        //iv.setAlpha(.5f);
+        iv2 = v.findViewById(R.id.visImage2);
 
+        iv2.setAlpha(.5f);
+        iv2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                clicked();
+            }
+        });
+
+        iv2.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                longClick();
+                return true;
+            }
+        });
 
         ((DrawerActivity) getActivity()).visualizerCreated();
         return v;
@@ -125,60 +309,11 @@ public  class VisualizerDialogFragment extends DialogFragment implements Visuali
     }
 
 
+    private  void longClick(){
+        log("Visualizer long clicked");
 
-    public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-
-        log("SurfaceTexture Available!");
-        final Drawable picture = getActivity().getResources().getDrawable(R.drawable.android_robot_icon_2);
-        Canvas canvas = mTextureView.lockCanvas();
-        picture.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-        picture.draw(canvas);
-        Paint p = new Paint();
-        canvas.drawCircle(300,200, 200f, p);
-        mTextureView.unlockCanvasAndPost(canvas);
-
-
-//        mCamera = Camera.open();
-//
-//        try {
-//
-//
-//            mCamera.setDisplayOrientation(90);
-//            mCamera.setPreviewTexture(surface);
-//            mCamera.startPreview();
-//        } catch (IOException ioe) {
-//            // Something bad happened
-//        }
-    }
-
-    public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
-        // Ignored, Camera does all the work for us
-    }
-
-    public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-//        mCamera.stopPreview();
-//        mCamera.release();
-        return true;
-    }
-
-    public void onSurfaceTextureUpdated(SurfaceTexture surface) {
-        // Invoked every time there's a new Camera preview frame
+        ((DrawerActivity) getActivity()).visualizerLongClicked();
     }
 
 
-//    @Override
-//    public Dialog onCreateDialog(Bundle savedInstanceState) {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-//
-//        builder.setTitle("Now Playing: ");
-//        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int which) {
-//                ((DrawerActivity) getActivity()).visualizerClosed();
-//                dismiss();
-//            }
-//        });
-//        ((DrawerActivity) getActivity()).visualizerCreated();
-//        return builder.create();
-//    }
 }

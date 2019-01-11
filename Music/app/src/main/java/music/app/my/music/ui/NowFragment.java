@@ -118,7 +118,7 @@ public class NowFragment extends ControlFragment {
         icon.setOutAnimation(getContext(), R.anim.slideout_up);
 
         //mini player uses only simple click. for now.
-        if(isMini) {
+
             icon.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -126,7 +126,17 @@ public class NowFragment extends ControlFragment {
                     else mListener.nowIconClicked(true); //show q only?
                 }
             });
-        }else {
+
+            icon.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    mListener.nowIconLongClicked();
+                    return true;
+
+                }
+            });
+
+        if (!isMini) {
             //swipe
             // Gesture detection
             gestureDetector = new GestureDetector(new MyGestureDetector());
@@ -141,8 +151,8 @@ public class NowFragment extends ControlFragment {
             };
 
             icon.setOnTouchListener(gestureListener);
-
         }
+
         line1.setFactory(new ViewSwitcher.ViewFactory() {
             public View makeView() {
                 TextView t = new TextView(context);
@@ -358,7 +368,7 @@ public class NowFragment extends ControlFragment {
         @Override
         public boolean onDown(MotionEvent e) {
             log("On down!");
-            return true;
+            return false;
         }
 
         @Override

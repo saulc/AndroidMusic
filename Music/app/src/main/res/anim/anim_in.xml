@@ -9,13 +9,13 @@
         android:fillAfter="false"
         android:startOffset="200"
         android:duration="300"
-        android:pivotX = "50%"
-        android:pivotY = "-90%"
+        android:pivotX = "0%"
+        android:pivotY = "0%"
         />
     <translate
         android:fromYDelta="50%"
         android:toYDelta="0"
         android:startOffset="0"
-        android:duration="400"
+        android:duration="500"
         />
 </set>

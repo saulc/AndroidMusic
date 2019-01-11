@@ -514,11 +514,19 @@ public class DrawerActivity extends AppCompatActivity
 
 
     }
+
+    public void visualizerLongClicked(){
+        log("Vis long clicked.");
+
+        showNow();
+    }
+
+
     public void visualizerCreated(){
         log("Vis created.");
         if(mService!=null && mService.getPlayer() !=null) {
-            vf.setPlayer(mService.getPlayer());
-            vf.setEnabled(true);
+            vf.setAid(mService.getPlayer().getAID());
+            //vf.setEnabled(true);
         }
 
     }
@@ -773,6 +781,8 @@ public class DrawerActivity extends AppCompatActivity
         transaction.setCustomAnimations(R.anim.slidein_right, R.anim.slideout_left, R.anim.slidein_left, R.anim.slideout_right);
         else if(f instanceof NowFragment)
             transaction.setCustomAnimations(R.anim.slidein_up, R.anim.slideout_left, R.anim.slidein_left, R.anim.slideout_down);
+        else if(f instanceof VisualizerDialogFragment)
+            transaction.setCustomAnimations(R.anim.anim_in, R.anim.slideout_up, R.anim.slidein_up, R.anim.slideout_down);
 
         // Replace whatever is in the fragment_container view with this fragment,
         // and add the transaction to the back stack
@@ -850,17 +860,28 @@ public class DrawerActivity extends AppCompatActivity
     }
 
     @Override
+    public void nowIconLongClicked(){
+
+        Log.d(TAG, "Now icon clicked ");
+        vf = VisualizerDialogFragment.newInstance();
+        showFragment(R.id.frame, vf, true);
+    }
+
+
+    @Override
     public void nowIconClicked(boolean close) {
 
         Log.d(TAG, "Now icon clicked " + close);
-        if(close) {
-            showq = 3; //reset
-            hideFM();
-
-        } else showq=2; //open full
 
 
-            showQ();
+//        if(close) {
+//            showq = 3; //reset
+//            hideFM();
+//
+//        } else showq=2; //open full
+//
+//
+//            showQ();
     }
 
     @Override
@@ -1421,6 +1442,8 @@ public class DrawerActivity extends AppCompatActivity
     }
 
     public void updateCurrentInfo(Song s){
+
+        if(vf != null && vf.isVisible()) vf.setAid(mService.getPlayer().getAID());
         if(nf != null) nf.updateSongInfo(s);
         if(cf != null) cf.updateSongInfo(s);
 

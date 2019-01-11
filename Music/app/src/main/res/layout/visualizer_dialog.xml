@@ -1,37 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="300dp"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@android:color/transparent"
-    android:gravity="center_horizontal"
-    android:orientation="vertical"
-    android:theme="@android:style/Theme.Dialog">
+    android:background="@android:color/transparent">
 
 
-    <TextView
-        android:id="@+id/visText"
+    <ImageView
+        android:id="@+id/visImage"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Now Playing..."
-        android:textAlignment="center"
-        android:textSize="18sp"
-        android:textStyle="bold" />
+        android:layout_height="match_parent"
+        app:srcCompat="@drawable/mainbg" />
 
 
-    <TextureView
-        android:id="@+id/visTexture"
+    <ImageView
+        android:id="@+id/visImage2"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="match_parent"
+        app:srcCompat="@drawable/mainbg" />
 
-    <Button
-        android:id="@+id/visClose"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/qbg"
-        android:padding="@dimen/text_margin"
-        android:text="Close"
-        android:textColor="@android:color/white" />
 
-</LinearLayout>
+</RelativeLayout>
