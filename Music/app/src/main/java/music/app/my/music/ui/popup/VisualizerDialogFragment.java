@@ -65,10 +65,15 @@ public  class VisualizerDialogFragment extends DialogFragment implements Visuali
 
 
     public void setAid(int id){
+        log("Set Vis aid: " + id + " aid: " + aid);
         if(id != aid){
             if (vis != null)
             setEnabled(false);
             aid = id;
+            vis = new Visualizer(aid);
+            if(enabled) setEnabled(false);
+            iniVis();
+
             setEnabled(true);
 
          }
@@ -80,17 +85,14 @@ public  class VisualizerDialogFragment extends DialogFragment implements Visuali
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
-        if(enabled) startVis();
 
          vis.setEnabled(enabled);
     }
 
-    private void startVis() {
-        log("Starting Vis");
-       // if (vis == null)
-            vis = new Visualizer(aid);
+    private void iniVis() {
+        log("ini Vis");
 
-        log("Capture size: " + Visualizer.getCaptureSizeRange());
+      //  log("Capture size: " + Visualizer.getCaptureSizeRange());
 
         vis.setCaptureSize(Visualizer.getCaptureSizeRange()[0]);
         vis.setDataCaptureListener(this,
@@ -254,13 +256,14 @@ public  class VisualizerDialogFragment extends DialogFragment implements Visuali
     @Override
     public void onStop(){
 
-        try {
-            vis.setEnabled(false);
-            vis.release();
-            vis = null;
-        } catch (IllegalStateException e) {
-            e.printStackTrace();
-        }
+        log("Visualizer stopped.");
+//        try {
+//            vis.setEnabled(false);
+//            vis.release();
+//            vis = null;
+//        } catch (IllegalStateException e) {
+//            e.printStackTrace();
+//        }
 
 
         super.onStop();

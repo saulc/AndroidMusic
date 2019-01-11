@@ -524,7 +524,7 @@ public class DrawerActivity extends AppCompatActivity
 
     public void visualizerCreated(){
         log("Vis created.");
-        if(mService!=null && mService.getPlayer() !=null) {
+        if(mService!=null && mService.getPlayer() !=null && mService.getPlayer().isPlaying()) {
             vf.setAid(mService.getPlayer().getAID());
             //vf.setEnabled(true);
         }

@@ -18,7 +18,9 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.MediaMetadataRetriever;
 import android.media.RemoteControlClient;
@@ -326,55 +328,55 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 	   Log.i("Music Service", "Setting service as Foreground");
 
 			   mBuilder =  new NotificationCompat.Builder(this);
+
+	   //RemoteViews rv = new RemoteViews(getPackageName(), R.layout.notification_layout);
+
 	   Song s = getQueue().getCurrentSong();
-
-   		        mBuilder.setSmallIcon(R.drawable.android_robot_icon_128)
-   		        .setContentTitle(s.getTitle())
-   		        .setContentText(text + s.getArtist());
-
-//   	 PendingIntent nextIntent = PendingIntent.getService(getApplicationContext(), 0,
-//   			 	new Intent(MusicService.ACTION_NEXT), PendingIntent.FLAG_UPDATE_CURRENT);
-//	   PendingIntent preIntent = PendingIntent.getService(getApplicationContext(), 0,
-//			   new Intent(MusicService.ACTION_PREVIOUS), PendingIntent.FLAG_UPDATE_CURRENT);
-//
-//	    PendingIntent resultPendingIntent = PendingIntent.getActivity(getApplicationContext(),
-//               0,  new Intent(DrawerActivity.class), PendingIntent.FLAG_CANCEL_CURRENT);
-
 	   Intent resultIntent = new Intent(this, DrawerActivity.class);
- 	   TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+	   TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
 	   stackBuilder.addNextIntentWithParentStack(resultIntent);
- 	   PendingIntent resultPendingIntent =
+	   PendingIntent resultPendingIntent =
 			   stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 
-	   mBuilder.setContentIntent(resultPendingIntent);
-	   mBuilder.setOngoing(true);
-       	 int pr = android.R.drawable.ic_media_play;
+	   int pr = android.R.drawable.ic_media_pause;
 	   if(text.contains("Paused"))
-		  pr = android.R.drawable.ic_media_pause;
-	   // Add media control buttons that invoke intents in your media service
-	   resultIntent = new Intent(MusicService.ACTION_PREVIOUS);
-	   stackBuilder.addNextIntentWithParentStack(resultIntent);
-	   PendingIntent pauseIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+		   pr = android.R.drawable.ic_media_play;
 
 
-        mBuilder.addAction(pr, "Pause", pauseIntent) ; // #1
-	   //.addAction(android.R.drawable.ic_media_previous, "Previous", preIntent) // #0
-//			   .addAction(android.R.drawable.ic_media_next, "Next", nextIntent);
+	   Intent pi = new Intent(this, MusicService.class);
+	   pi.setAction(MusicService.ACTION_TOGGLE_PLAYBACK);
+	   PendingIntent togglepi = PendingIntent.getService(this, 21, pi, PendingIntent.FLAG_UPDATE_CURRENT );
+	   NotificationCompat.Action pp = new NotificationCompat.Action(pr, "Play/Pause", togglepi);
 
-//	   RemoteViews rv = new RemoteViews(this.getPackageName(), R.layout.notification);
-//	   mBuilder.setContent(rv);
-//			rv.setOnClickPendingIntent(R.id.noti, resultPendingIntent);
-//      // 	 mBuilder.addAction(R.drawable.pausebutton, "Pause", pauseIntent);
-//       	 rv.setTextViewText(R.id.title, s.getTitle());
-////
-//       	 rv.setTextViewText(R.id.nowplaying, "("+text+ ") " + s.getArtist() );
-////      	 rv.setImageViewResource(R.id.icon, R.drawable.android_robot_icon_128);
-//       	 rv.setOnClickPendingIntent(R.id.next, nextIntent);
-//       	 rv.setOnClickPendingIntent(R.id.playpause, pauseIntent);
+	   //previous
+	   Intent prei = new Intent(this, MusicService.class);
+	   prei.setAction(MusicService.ACTION_PREVIOUS);
+	   PendingIntent prevpi = PendingIntent.getService(this, 22, prei, PendingIntent.FLAG_UPDATE_CURRENT );
+	   NotificationCompat.Action previous = new NotificationCompat.Action(android.R.drawable.ic_media_previous, "Previous", prevpi);
 
-//       	if(text.contains("Paused"))
-//       	 rv.setImageViewResource(R.id.playpause, R.drawable.playbutton);
-//       	else rv.setImageViewResource(R.id.playpause, R.drawable.pausebutton);
+	   //next
+	   Intent nexi = new Intent(this, MusicService.class);
+	   nexi.setAction(MusicService.ACTION_NEXT);
+	   PendingIntent nextpi = PendingIntent.getService(this, 23, nexi, PendingIntent.FLAG_UPDATE_CURRENT );
+	   NotificationCompat.Action next = new NotificationCompat.Action(android.R.drawable.ic_media_next, "Next", nextpi);
+
+
+	   Bitmap li = BitmapFactory.decodeResource(getResources(), R.drawable.android_robot_icon_2128);
+	    mBuilder.setSmallIcon(R.drawable.android_robot_icon_2128)
+				.setLargeIcon(li)
+						//.setStyle(new NotificationCompat.DecoratedCustomViewStyle())
+				.setColor(Color.argb(100, 50, 0 , 30))
+						.setOngoing(true)
+						.setContentIntent(resultPendingIntent)
+				.addAction(previous)
+				.addAction(pp)
+				.addAction(next)
+   		        .setContentTitle(s.getTitle() + " (" + text + ") ")
+   		        .setContentText( s.getArtist())
+				.setSubText(s.getAlbum())
+				.setStyle(new NotificationCompat.BigTextStyle().bigText(s.getArtist()));
+
+
 
    		 mNotificationManager =  (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
    		 mNotification = mBuilder.build();
