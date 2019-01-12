@@ -12,6 +12,7 @@ import android.provider.MediaStore;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -88,6 +89,8 @@ public  class ChoosePlaylistDialogFragment extends DialogFragment {
 
                     }
                 });
+
+
         return builder.create();
     }
 

@@ -1,7 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#31004e</color>
+    <color name="colorPrimary">#400066</color>
     <color name="colorPrimaryDark">#000000</color>
-    <color name="colorAccent">#400066</color>
+    <color name="colorAccent">#dcfd22</color>
     <color name="background_material_dark">#49484a</color>
+    <color name="primary_material_light">#d0d0d0</color>
+    <color name="primary_dark_material_light">#4e4e4e</color>
+    <color name="accent_material_dark">#7e7e7e</color>
+    <color name="primary_dark_material_dark">#a0000000</color>
+    <color name="primary_material_dark">#373737</color>
+    <color name="darksidecp">#000000</color>
+    <color name="darksidecd">#af9c1111</color>
+    <color name="darksideca">#ffffffff</color>
+    <color name="colorsca">#aa01ff</color>
+    <color name="colorscd">#a00046b7</color>
+    <color name="colorscp">#e91e63</color>
+    <color name="jarvisca">#ef4001</color>
+    <color name="jarviscd">#0a6796</color>
+    <color name="jarviscp">#ffffff</color>
 </resources>

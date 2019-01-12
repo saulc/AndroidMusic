@@ -40,5 +40,27 @@
         <item name="android:windowExitAnimation">@anim/anim_out</item>
     </style>
 
+    <style name="AppThemeLight" parent="Theme.AppCompat.Light.NoActionBar" />
+
+    <style name="DarkSide" parent="Theme.AppCompat.NoActionBar" >
+        <item name="colorPrimary">@color/darksidecp</item>
+        <item name="colorPrimaryDark">@color/darksidecd</item>
+        <item name="colorAccent">@color/darksideca</item>
+    </style>
+
+    <style name="AppThemeNior" parent="Theme.AppCompat.NoActionBar" />
+
+    <style name="AppThemeColors" parent="Theme.AppCompat.NoActionBar" >
+        <item name="colorPrimary">@color/colorscp</item>
+        <item name="colorPrimaryDark">@color/colorscd</item>
+        <item name="colorAccent">@color/colorsca</item>
+    </style>
+
+    <style name="AppThemeJarvis" parent="Theme.AppCompat.Light.NoActionBar" >
+        <item name="colorPrimary">@color/jarviscp</item>
+        <item name="colorPrimaryDark">@color/jarviscd</item>
+        <item name="colorAccent">@color/jarvisca</item>
+    </style>
+
 
 </resources>

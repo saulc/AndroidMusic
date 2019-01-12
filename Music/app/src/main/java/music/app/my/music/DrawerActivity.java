@@ -59,6 +59,7 @@ import music.app.my.music.ui.browser.ArtistFragment;
 import music.app.my.music.ui.browser.BubbleFragment;
 import music.app.my.music.ui.browser.HeaderFragment;
 import music.app.my.music.ui.popup.ChoosePlaylistDialogFragment;
+import music.app.my.music.ui.popup.ChooseThemeDialogFragment;
 import music.app.my.music.ui.popup.ConfirmDeleteDialogFragment;
 import music.app.my.music.ui.ControlFragment;
 import music.app.my.music.ui.browser.GenreFragment;
@@ -111,12 +112,19 @@ public class DrawerActivity extends AppCompatActivity
     private Intent startIntent, toggleIntent, pauseIntent, playIntent,
     nextIntent, previousIntent;
 
+    private String actionSetTheme = "ACTION_SET_THEME";
+    private int currentTheme = R.style.AppTheme_NoActionBar;
 
     private boolean controlsVisible = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         log("on create");
+
+        log("Setting app Theme.");
+        handleThemeIntent();
+
+
         setContentView(R.layout.activity_drawer);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -205,12 +213,10 @@ public class DrawerActivity extends AppCompatActivity
         previousIntent = new Intent(getApplicationContext(), MusicService.class);
         previousIntent.setAction(MusicService.ACTION_PREVIOUS);
 
-        //log("Starting service");
-        //startService(startIntent);
+        log("Starting service");
+        startService(startIntent);
 //        if(controlsVisible)
 //            showControls();
-
-
 
         showNow();
        // showBubbles();
@@ -219,6 +225,37 @@ public class DrawerActivity extends AppCompatActivity
 
     }
 
+    private void showThemeDialog(){
+
+        log("Showing Theme picker.");
+        ChooseThemeDialogFragment ct =  ChooseThemeDialogFragment.newInstance(currentTheme);
+        ct.show(getSupportFragmentManager(), "Choose Theme");
+    }
+
+    private  void handleThemeIntent(){
+        Intent intent = getIntent();
+        String action = intent.getAction();
+        log("Theme Got intent! action: " + action);
+        if(actionSetTheme.equals(action)) {
+            int r = intent.getIntExtra("THEME", -22);
+            if( r == -22){
+                log("Error: no valid theme extra in intent.");
+                return;
+            }
+            setTheme(r);
+        }
+    }
+
+    public void themePicked(String name, int theme){
+        log("Theme picked: "+ name + " id: " + theme + " cur: " + currentTheme);
+        if(theme == currentTheme) return;
+
+
+        Intent i = new Intent(getApplicationContext(), DrawerActivity.class);
+        i.setAction(actionSetTheme);
+        i.putExtra("THEME", theme);
+        startActivity(i);
+    }
 
     private void iniFM(){
         //next
@@ -417,14 +454,13 @@ public class DrawerActivity extends AppCompatActivity
         final Intent intent = new Intent("music.app.my.music.player.MUSICSERVICE");  //Intent(DrawerActivity.this, music.app.my.music.player.MusicService.class);
         //startService(intent);
         Log.d("Main Activity", "binding service");
-        boolean r = getApplicationContext().bindService(new Intent(this, MusicService.class), mConnection
-                , Context.BIND_AUTO_CREATE);
-        //bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        boolean r = getApplicationContext()
+                        .bindService(new Intent(this, MusicService.class),
+                        mConnection
+                        , Context.BIND_AUTO_CREATE);
 
         if(r) log("Service should be bound");
         else log("Service binding failed.");
-
-
 
         //am.registerMediaButtonEventReceiver(myEventReceiver);
 
@@ -997,9 +1033,9 @@ public class DrawerActivity extends AppCompatActivity
             showEQTab();
             //showBubbles();
 
-        }  else if( id == R.id.nav_vis) {
-            log("Nav visualizer clicked!");
-            showVisualizer();
+        }  else if( id == R.id.nav_theme) {
+            log("Nav theme clicked!");
+            showThemeDialog();
 
         } else if( id == R.id.exit) {
             log("Nav exit clicked!");

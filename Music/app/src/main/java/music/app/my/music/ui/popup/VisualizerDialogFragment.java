@@ -139,9 +139,12 @@ public  class VisualizerDialogFragment extends DialogFragment implements Visuali
 
        // log("Updating waves..." + width + " " + height);
 
-        final Bitmap rc = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
+        final Bitmap rc = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas cc = new Canvas((rc));
         Paint p = new Paint();
+      //  p.setColor(Color.TRANSPARENT);
+        //cc.drawColor(Color.TRANSPARENT);
+        cc.drawARGB(0, 0, 0, 0);
         p.setStrokeWidth(3.0f);
         p.setColor(Color.GREEN);
         float space = 4.5f;
@@ -153,11 +156,12 @@ public  class VisualizerDialogFragment extends DialogFragment implements Visuali
         for(int j=0; j<waves.length; j++) {
             //log(j + " Wave: " + waves[j]);
             float w = (float) waves[j];
-            if(w > 110f) p.setColor(Color.RED);
-            else if(w > 88f) p.setColor(Color.MAGENTA);
-            else if(w > 66f) p.setColor(Color.CYAN);
-            else if(w > -88f) p.setColor(Color.BLUE);
-            else if(w > -110f) p.setColor(Color.YELLOW);
+            float ww = Math.abs(w);
+            if(ww > 110f) p.setColor(Color.RED);
+            else if(ww > 88f) p.setColor(Color.MAGENTA);
+            else if(ww > 66f) p.setColor(Color.CYAN);
+            else if(ww > 48f) p.setColor(Color.BLUE);
+            else if(ww > 20f) p.setColor(Color.YELLOW);
             else p.setColor(Color.GREEN);
 //
             float x =  (float) Math.cos(angle*j);
@@ -201,7 +205,11 @@ public  class VisualizerDialogFragment extends DialogFragment implements Visuali
 
 
         }
-        iv2.setImageBitmap(oldbit);
+//        iv2.setImageBitmap(oldbit);
+//        oldbit = rc;
+        p.setAlpha(150);
+        if(oldbit != null)
+        cc.drawBitmap(oldbit, 0, 0, p);
         oldbit = rc;
         iv.setImageBitmap(rc);
 

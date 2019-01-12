@@ -41,7 +41,6 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
         android:layout_marginBottom="@dimen/fab_marginvert"
-        app:backgroundTint="@color/colorPrimary"
         app:fabSize="normal"
         app:srcCompat="@android:drawable/ic_media_pause" />
 
@@ -64,7 +63,9 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
         android:layout_marginBottom="@dimen/fab_marginvert"
+        android:background="?colorPrimaryDark"
         android:src="@android:drawable/ic_menu_compass"
+        app:borderWidth="3dp"
         app:fabSize="normal" />
 
 </android.support.design.widget.CoordinatorLayout>
