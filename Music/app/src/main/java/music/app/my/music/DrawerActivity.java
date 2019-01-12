@@ -564,6 +564,7 @@ public class DrawerActivity extends AppCompatActivity
     public void visualizerCreated(){
         log("Vis created.");
         if(mService!=null && mService.getPlayer() !=null && mService.getPlayer().isPlaying()) {
+            vf.setImageView(nf.getIcon());
             vf.setAid(mService.getPlayer().getAID());
             //vf.setEnabled(true);
         }
@@ -576,8 +577,8 @@ public class DrawerActivity extends AppCompatActivity
 
     private void showVisualizer(){
         log("Showing visualizer!.");
-        vf = VisualizerDialogFragment.newInstance();
-        vf.show(getSupportFragmentManager(), "Visualizer");
+        //vf = VisualizerDialogFragment.newInstance();
+        //vf.show(getSupportFragmentManager(), "Visualizer");
 
     }
     @Override
@@ -901,9 +902,18 @@ public class DrawerActivity extends AppCompatActivity
     @Override
     public void nowIconLongClicked(){
 
-        Log.d(TAG, "Now icon clicked ");
-        vf = VisualizerDialogFragment.newInstance();
-        showFragment(R.id.frame, vf, true);
+        Log.d(TAG, "Now icon Long clicked ");
+
+        if (vf == null) {
+            vf = VisualizerDialogFragment.newInstance();
+            getSupportFragmentManager().beginTransaction().show(vf).commit();
+        } else {
+          getSupportFragmentManager().beginTransaction().remove(vf).commit();
+          vf = null;
+          nowIconLongClicked();
+        }
+
+        //showFragment(R.id.frame, vf, true);
     }
 
 
@@ -912,6 +922,7 @@ public class DrawerActivity extends AppCompatActivity
 
         Log.d(TAG, "Now icon clicked " + close);
 
+        if(vf!=null) vf.clicked();
 
 //        if(close) {
 //            showq = 3; //reset
@@ -1483,7 +1494,7 @@ public class DrawerActivity extends AppCompatActivity
 
     public void updateCurrentInfo(Song s){
 
-        if(vf != null && vf.isVisible()) vf.setAid(mService.getPlayer().getAID());
+        if(vf != null) vf.setAid(mService.getPlayer().getAID());
         if(nf != null) nf.updateSongInfo(s);
         if(cf != null) cf.updateSongInfo(s);
 

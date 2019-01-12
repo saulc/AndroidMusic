@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageSwitcher;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
@@ -47,7 +48,8 @@ public class NowFragment extends ControlFragment {
     private SeekBar sbar;
     private ImageButton pp;
     private TextSwitcher line1, line2, line3;
-    private ImageSwitcher icon;
+    private ImageView icon;
+    private LinearLayout bg;
     private GestureDetector gestureDetector;
     private View.OnTouchListener gestureListener;
 
@@ -80,6 +82,9 @@ public class NowFragment extends ControlFragment {
     }
 
 
+    public ImageView getIcon(){
+        return icon;
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -96,28 +101,31 @@ public class NowFragment extends ControlFragment {
         log("Now fragment view created; mini: " + isMini);
         final Context context = view.getContext();
 
-        icon = (ImageSwitcher) view.findViewById(R.id.currentIcon);
+        bg = (LinearLayout) view.findViewById(R.id.llnow);
+        icon = (ImageView) view.findViewById(R.id.currentIcon);
         line1 = (TextSwitcher) view.findViewById(R.id.currentText);
         line2 = (TextSwitcher) view.findViewById(R.id.currentSubText);
         line3 = (TextSwitcher) view.findViewById(R.id.currentSubText2);
-        icon.setFactory(new ViewSwitcher.ViewFactory() {
-            public View makeView() {
-                ImageView t = new ImageView(context);
-                t.setImageResource(R.drawable.android_robot_icon_2);
-                //image_view.requestLayout()
-                return t;
-            }
-        });
-
-
-        // animation
-//        icon.setInAnimation(context, R.anim.slidein_left);
-//        icon.setOutAnimation(context, R.anim.slideout_right);
-
-        icon.setInAnimation(getContext(), R.anim.slidein_up);
-        icon.setOutAnimation(getContext(), R.anim.slideout_up);
+//        icon.setFactory(new ViewSwitcher.ViewFactory() {
+//            public View makeView() {
+//                ImageView t = new ImageView(context);
+//                t.setImageResource(R.drawable.android_robot_icon_2);
+//                t.setAlpha(.5f);
+//                //image_view.requestLayout()
+//                return t;
+//            }
+//        });
+//
+//
+//        // animation
+////        icon.setInAnimation(context, R.anim.slidein_left);
+////        icon.setOutAnimation(context, R.anim.slideout_right);
+//
+//        icon.setInAnimation(getContext(), R.anim.slidein_up);
+//        icon.setOutAnimation(getContext(), R.anim.slideout_up);
 
         //mini player uses only simple click. for now.
+
 
             icon.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -313,6 +321,7 @@ public class NowFragment extends ControlFragment {
         log("Now fragment updating song info.");
         //avoid doing this every second, it doesn't change
 
+        final boolean isMini = getArguments().getBoolean("ISMINI");
         log("Now Playing: "+ s.getTitle() + " : " + s.getArtist());
 
         line1.setText(s.getTitle());
@@ -332,8 +341,12 @@ public class NowFragment extends ControlFragment {
                 log("Bitmap created.");
                 d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, 600, 600, true));
                 log("Bitmap scaled");
-                icon.setImageDrawable(d);
-            } else icon.setImageResource(R.drawable.android_robot_icon_2);
+
+                if(isMini) icon.setImageDrawable(d);
+                else bg.setBackground(d);
+
+            } else if(isMini) icon.setImageResource(R.drawable.android_robot_icon_2);
+                    else bg.setBackgroundResource(R.drawable.android_robot_icon_2);
         }
     }
 

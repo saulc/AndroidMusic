@@ -2,38 +2,27 @@ package music.app.my.music.ui.popup;
 
 
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.SurfaceTexture;
-import android.graphics.drawable.Drawable;
-import android.hardware.Camera;
 import android.media.audiofx.Visualizer;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import java.io.IOException;
-
 import music.app.my.music.DrawerActivity;
 import music.app.my.music.R;
-import music.app.my.music.player.MusicPlayer;
 
-public  class VisualizerDialogFragment extends DialogFragment implements Visualizer.OnDataCaptureListener {
+public  class VisualizerDialogFragment extends Fragment implements Visualizer.OnDataCaptureListener {
 
     public static VisualizerDialogFragment newInstance() {
         VisualizerDialogFragment fragment = new VisualizerDialogFragment();
-//        Bundle b = new Bundle();
-//        b.putStringArrayList("PRESETS", presents);
-//        fragment.setArguments(b);
         return fragment;
     }
 
@@ -47,22 +36,117 @@ public  class VisualizerDialogFragment extends DialogFragment implements Visuali
     }
 
 
-    public VisualizerDialogFragment(){
+    public VisualizerDialogFragment(){ }
+
+
+    @Override
+    public void onStop(){
+
+        log("Visualizer stopped.");
+//        try {
+//            vis.setEnabled(false);
+//            vis.release();
+//            vis = null;
+//        } catch (IllegalStateException e) {
+//            e.printStackTrace();
+//        }
+
+
+        super.onStop();
 
     }
-    private  final String TAG = getClass().getSimpleName();
 
+    /*
+    Fragment stuff ----------------.....................--------------------
+     */
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        ((DrawerActivity) getActivity()).visualizerCreated();
+        if (getArguments() != null) {
+
+        }
+    }
+
+    public void setImageView(ImageView i){ iv = i; }
+
+//    @Override
+//    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+//                             Bundle savedInstanceState) {
+//        // Inflate the layout for this fragment
+//        View v = inflater.inflate(R.layout.visualizer_dialog, container, false);
+//
+//
+//        iv = v.findViewById(R.id.visImage);
+//        //iv.setAlpha(.5f);
+//        iv2 = v.findViewById(R.id.visImage2); //not  used....
+//
+//        iv2.setAlpha(.5f);
+//        iv2.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                clicked();
+//            }
+//        });
+//
+//        iv2.setOnLongClickListener(new View.OnLongClickListener() {
+//            @Override
+//            public boolean onLongClick(View view) {
+//                longClick();
+//                return true;
+//            }
+//        });
+//
+//        ((DrawerActivity) getActivity()).visualizerCreated();
+//        return v;
+//
+//    }
+
+
+    private  void longClick(){
+        log("Visualizer long clicked");
+
+        ((DrawerActivity) getActivity()).visualizerLongClicked();
+    }
+
+
+
+
+
+    private  final String TAG = getClass().getSimpleName();
     private void log(String s){
         Log.d(TAG, s);
     }
 
     private int aid;
     private  boolean enabled = true;
-
     private Visualizer vis = null;
 
     private ImageView iv, iv2;
+    public void setWidth(int w){ width = w; }
+    public int getWidth(){ return width; }
+    public void setHeight(int h){ height = h; }
+    public int getHeight(){ return height; }
+    private int width, height;
+    private Bitmap oldbit;
+    private  int mode = 0, modes = 6;
 
+    public void clicked(){
+        if(++mode >= modes) mode = 0;
+        log("VIs clicked. mode: " + mode);
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+
+        vis.setEnabled(enabled);
+    }
 
     public void setAid(int id){
         log("Set Vis aid: " + id + " aid: " + aid);
@@ -79,15 +163,6 @@ public  class VisualizerDialogFragment extends DialogFragment implements Visuali
          }
     }
 
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-
-         vis.setEnabled(enabled);
-    }
 
     private void iniVis() {
         log("ini Vis");
@@ -116,22 +191,7 @@ public  class VisualizerDialogFragment extends DialogFragment implements Visuali
         log("Starting Vis! width: " + width + " height: " + height);
     }
 
-    public void setWidth(int w){ width = w;
-    }
-    public int getWidth(){ return width; }
-    public void setHeight(int h){ height = h;
-    }
-    public int getHeight(){ return height; }
 
-
-    private int width, height;
-    private Bitmap oldbit;
-    private  int mode = 0, modes = 6;
-
-    private void clicked(){
-    if(++mode >= modes) mode = 0;
-    log("VIs clicked. mode: " + mode);
-    }
 
     private void updateIV(byte[] waves){
      //   log("Updating waves...");
@@ -174,35 +234,35 @@ public  class VisualizerDialogFragment extends DialogFragment implements Visuali
                 case 5:
                     cc.drawLine(width / 2 + x * amp, height / 2 + y * amp,
                             width / 2 + x * w * af, height / 2 + y * w * af, p);
-
                     break;
 
-
-                case 4:  p.setAlpha(150);
-                cc.drawCircle( j*space, height / 2  , w , p);
+                case 4:
+                    p.setAlpha(150);
+                    cc.drawCircle(j * space, height / 2, w, p);
 
 //                    p.setColor(Color.WHITE);
 //                    cc.drawCircle( j*space, height / 2  , w-5 , p);
                     break;
 
                 case 3:
-                cc.drawLine(width / 2 + x * amp, height / 2 + y * amp, width / 2 + x * w * af, height / 2 + y * w * af, p);
-                case 2: cc.drawCircle(width / 2 + x * w * af, height / 2 + y * w * af, w / 3, p);
-                p.setColor(Color.BLACK);
-                cc.drawCircle(width / 2 + x * w * af, height / 2 + y * w * af, w / 3 - 3, p);
-                break;
+                    cc.drawLine(width / 2 + x * amp, height / 2 + y * amp,
+                            width / 2 + x * w * af, height / 2 + y * w * af, p);
+                case 2:
+                    cc.drawCircle(width / 2 + x * w * af, height / 2 + y * w * af, w / 3, p);
+                    p.setColor(Color.BLACK);
+                    cc.drawCircle(width / 2 + x * w * af, height / 2 + y * w * af, w / 3 - 3, p);
+                    break;
 
-                case 1: cc.drawLine(j*space, height/2, j*space, height/2+w, p);
-                break;
+                case 1:
+                    cc.drawLine(j * space, height / 2, j * space, height / 2 + w, p);
+                    break;
 
 
                 case 0:
-                    cc.drawLine(width / 2 *(1 + x) , height / 2 *(1 + y) ,
-                            width / 2 + x * w *af, height / 2 + y * w *af, p);
+                    cc.drawLine(width / 2 * (1 + x), height / 2 * (1 + y),
+                            width / 2 + x * w * af, height / 2 + y * w * af, p);
                     break;
-
             }
-
 
         }
 //        iv2.setImageBitmap(oldbit);
@@ -218,7 +278,7 @@ public  class VisualizerDialogFragment extends DialogFragment implements Visuali
     @Override
     public void onWaveFormDataCapture(Visualizer visualizer, byte[] bytes, int i) {
 
-        log("Visualizer Data capture Wave: " + bytes.length);
+       // log("Visualizer Data capture Wave: " + bytes.length);
         updateIV(bytes);
 
 
@@ -260,71 +320,6 @@ public  class VisualizerDialogFragment extends DialogFragment implements Visuali
 
     }
 
-
-    @Override
-    public void onStop(){
-
-        log("Visualizer stopped.");
-//        try {
-//            vis.setEnabled(false);
-//            vis.release();
-//            vis = null;
-//        } catch (IllegalStateException e) {
-//            e.printStackTrace();
-//        }
-
-
-        super.onStop();
-
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        if (getArguments() != null) {
-
-        }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.visualizer_dialog, container, false);
-
-
-        iv = v.findViewById(R.id.visImage);
-        //iv.setAlpha(.5f);
-        iv2 = v.findViewById(R.id.visImage2);
-
-        iv2.setAlpha(.5f);
-        iv2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                clicked();
-            }
-        });
-
-        iv2.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                longClick();
-                return true;
-            }
-        });
-
-        ((DrawerActivity) getActivity()).visualizerCreated();
-        return v;
-
-    }
-
-
-    private  void longClick(){
-        log("Visualizer long clicked");
-
-        ((DrawerActivity) getActivity()).visualizerLongClicked();
-    }
 
 
 }
