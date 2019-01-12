@@ -195,6 +195,8 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 		//aux player should have been siting for one song
 		//or at least a few seconds
 		currentPlayer = auxPlayer;
+
+		player.get(currentPlayer).stop();  //stop incase its not?
 		player.get(currentPlayer).reset();
 
 		auxPlayer = temp;

@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -127,11 +128,12 @@ public class NowFragment extends ControlFragment {
         //mini player uses only simple click. for now.
 
 
+        icon.setAlpha(.6f);
             icon.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (isMini) mListener.controlIconClicked();
-                    else mListener.nowIconClicked(true); //show q only?
+                    else mListener.nowIconClicked(false, true); //show q only?
                 }
             });
 
@@ -269,7 +271,7 @@ public class NowFragment extends ControlFragment {
     }
 
     private  void iconClicked(boolean close){
-        if(mListener != null) mListener.nowIconClicked(close);
+        if(mListener != null) mListener.nowIconClicked(true, close);
     }
     private void playPressed(){
         if (null != mListener) {
@@ -343,11 +345,27 @@ public class NowFragment extends ControlFragment {
                 log("Bitmap scaled");
 
                 if(isMini) icon.setImageDrawable(d);
-                else bg.setBackground(d);
+                else setBg(d);
 
             } else if(isMini) icon.setImageResource(R.drawable.android_robot_icon_2);
-                    else bg.setBackgroundResource(R.drawable.android_robot_icon_2);
+                    else setBg(R.drawable.android_robot_icon_2);
         }
+    }
+
+    private void setBg(int r ) {
+
+        setBg( getResources().getDrawable(r) );
+
+    }
+        private void setBg(Drawable d ){
+
+        int transitionTime = 1000, tt = 333;
+        Drawable[] layers = { bg.getBackground() , d };
+        TransitionDrawable transition = new TransitionDrawable( layers );
+
+        transition.startTransition(transitionTime);
+        bg.setBackground(transition);
+
     }
 
     @Override
@@ -394,28 +412,29 @@ public class NowFragment extends ControlFragment {
                 if ( e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY){
                     log("Swiped up?!");
                     iconClicked(true);
-                    return true;
-
+//                    return true;
+//
 
                 }else if(Math.abs( e1.getY() - e2.getY() ) > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY){
                     log("Swiped down!");
                    iconClicked(false);
-                    return true;
+//                    return true;
 
 
                 }else if (e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
                     log("Swiped left!");
                     // right to left swipe
                        prevPressed();
-                       return true;
+//                       return true;
 
                 }else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
                     log("Swiped right!");
                     nextPressed();
 
-                    return true;
+//                    return true;
                 }
 
+                return false;
             } catch (Exception e) {
                 // nothing
             }

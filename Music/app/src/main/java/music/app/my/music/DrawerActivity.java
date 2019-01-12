@@ -918,20 +918,21 @@ public class DrawerActivity extends AppCompatActivity
 
 
     @Override
-    public void nowIconClicked(boolean close) {
-
+    public void nowIconClicked(boolean isSwipe, boolean close) {
         Log.d(TAG, "Now icon clicked " + close);
+        if(!isSwipe) {
+            if (vf != null) vf.clicked();
+            return;
+        }
+        //else
+        if(close) {
+            showq = 3; //reset
+            hideFM();
 
-        if(vf!=null) vf.clicked();
+        } else showq=2; //open full
 
-//        if(close) {
-//            showq = 3; //reset
-//            hideFM();
-//
-//        } else showq=2; //open full
-//
-//
-//            showQ();
+            showQ();
+
     }
 
     @Override

@@ -49,7 +49,7 @@ public class ControlFragment extends Fragment {
 
         void controlIconClicked();
 
-        void nowIconClicked(boolean close);
+        void nowIconClicked(boolean isSwipe, boolean close);
         void nowIconLongClicked();
 
         void lineClicked(int i);

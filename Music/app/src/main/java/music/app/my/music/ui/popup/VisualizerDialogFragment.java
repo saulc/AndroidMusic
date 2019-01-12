@@ -112,9 +112,6 @@ public  class VisualizerDialogFragment extends Fragment implements Visualizer.On
     }
 
 
-
-
-
     private  final String TAG = getClass().getSimpleName();
     private void log(String s){
         Log.d(TAG, s);
@@ -150,6 +147,8 @@ public  class VisualizerDialogFragment extends Fragment implements Visualizer.On
 
     public void setAid(int id){
         log("Set Vis aid: " + id + " aid: " + aid);
+        if(iv == null) return;
+
         if(id != aid){
             if (vis != null)
             setEnabled(false);
@@ -195,6 +194,7 @@ public  class VisualizerDialogFragment extends Fragment implements Visualizer.On
 
     private void updateIV(byte[] waves){
      //   log("Updating waves...");
+
 
 
        // log("Updating waves..." + width + " " + height);
@@ -268,9 +268,10 @@ public  class VisualizerDialogFragment extends Fragment implements Visualizer.On
 //        iv2.setImageBitmap(oldbit);
 //        oldbit = rc;
         p.setAlpha(150);
-        if(oldbit != null)
-        cc.drawBitmap(oldbit, 0, 0, p);
-        oldbit = rc;
+        if(oldbit != null) {
+            cc.drawBitmap(oldbit, 0, 0, p);
+            oldbit = rc;
+        }
         iv.setImageBitmap(rc);
 
     }
