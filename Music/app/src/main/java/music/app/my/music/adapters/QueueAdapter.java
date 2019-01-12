@@ -81,11 +81,14 @@ public class QueueAdapter extends BaseAdapter implements UndoAdapter , Swappable
             mContentView = (TextView) view.findViewById(R.id.content);
             mIView = (TextView) view.findViewById(R.id.i);
 
-        String t = "    ";
-        if( position == current) t =  "--> ";
+        //String t = "    ";
+        if( position == current) //t =  "--> ";
+            mView.setBackgroundResource(R.drawable.gradientbox);
+        else mView.setBackgroundResource(android.R.color.transparent);   //mView.setBackgroundColor(R.color.colorPrimaryDark);
 
         //         Log.d("QADAPTER", "onBindViewHolder: " + current + t + position);
-        mIView.setText(t + (position + 1) + " ");
+       // mIView.setText(t + (position + 1) + " ");
+        mIView.setText((position+1) + " ");
         mContentView.setText(mItem.getArtist());
         mIdView.setText(mItem.getTitle());
 

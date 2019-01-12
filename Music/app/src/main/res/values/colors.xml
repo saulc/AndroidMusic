@@ -6,9 +6,9 @@
     <color name="background_material_dark">#49484a</color>
     <color name="primary_material_light">#d0d0d0</color>
     <color name="primary_dark_material_light">#4e4e4e</color>
-    <color name="accent_material_dark">#7e7e7e</color>
+    <color name="accent_material_dark">#00ff40</color>
     <color name="primary_dark_material_dark">#a0000000</color>
-    <color name="primary_material_dark">#373737</color>
+    <color name="primary_material_dark">#5e645d</color>
     <color name="darksidecp">#000000</color>
     <color name="darksidecd">#af9c1111</color>
     <color name="darksideca">#ffffffff</color>

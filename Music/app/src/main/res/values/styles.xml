@@ -21,7 +21,7 @@
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <style name="SplashTheme"  parent="AppTheme">
-        <item name="android:windowBackground">?colorPrimary</item>
+        <item name="android:windowBackground">@drawable/splash</item>
     </style>
 
     <!-- Divider -->
@@ -39,12 +39,15 @@
         <item name="colorAccent">@color/darksideca</item>
     </style>
 
-    <style name="AppThemeNior" parent="Theme.AppCompat.NoActionBar" />
+    <style name="AppThemeNior" parent="Theme.AppCompat.NoActionBar" >
+        <item name="android:colorBackground">?colorPrimaryDark</item>
+    </style>
 
     <style name="AppThemeColors" parent="Theme.AppCompat.NoActionBar" >
         <item name="colorPrimary">@color/colorscp</item>
         <item name="colorPrimaryDark">@color/colorscd</item>
         <item name="colorAccent">@color/colorsca</item>
+        <item name="android:colorBackground">?colorPrimaryDark</item>
     </style>
 
     <style name="AppThemeJarvis" parent="Theme.AppCompat.Light.NoActionBar" >

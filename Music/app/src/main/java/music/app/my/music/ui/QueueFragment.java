@@ -13,7 +13,9 @@ import android.widget.TextSwitcher;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
 
+import com.nhaarman.listviewanimations.appearance.simple.AlphaInAnimationAdapter;
 import com.nhaarman.listviewanimations.appearance.simple.SwingBottomInAnimationAdapter;
+import com.nhaarman.listviewanimations.appearance.simple.SwingLeftInAnimationAdapter;
 import com.nhaarman.listviewanimations.itemmanipulation.DynamicListView;
 import com.nhaarman.listviewanimations.itemmanipulation.dragdrop.TouchViewDraggableManager;
 import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.OnDismissCallback;
@@ -131,7 +133,8 @@ public class QueueFragment extends baseListFragment {
         mAdapter = new QueueAdapter(items, (QueueListener) getActivity());
 
         SwingBottomInAnimationAdapter animationAdapter = new SwingBottomInAnimationAdapter(mAdapter);
-
+        SwingLeftInAnimationAdapter swingLeft = new SwingLeftInAnimationAdapter(animationAdapter);
+        AlphaInAnimationAdapter alphaAdapter = new AlphaInAnimationAdapter(swingLeft);
        // mListView.insert(0, myItem); // myItem is of the type the adapter represents.
 
     //    animationAdapter.setAbsListView(mListView);
@@ -139,7 +142,7 @@ public class QueueFragment extends baseListFragment {
         mListView.enableDragAndDrop();
         mListView.setDraggableManager(new TouchViewDraggableManager(R.id.content));
 
-        SimpleSwipeUndoAdapter swipeUndoAdapter = new SimpleSwipeUndoAdapter(animationAdapter, getContext(),
+        SimpleSwipeUndoAdapter swipeUndoAdapter = new SimpleSwipeUndoAdapter(alphaAdapter, getContext(),
                 new OnDismissCallback() {
                     @Override
                     public void onDismiss(@NonNull final ViewGroup listView, @NonNull final int[] reverseSortedPositions) {

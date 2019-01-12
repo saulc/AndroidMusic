@@ -8,9 +8,8 @@
         android:id="@+id/i"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-
-        android:layout_marginLeft="@dimen/text_margin"
-        android:layout_marginRight="@dimen/text_margin"
+        android:layout_marginLeft="@dimen/top_text_margin"
+        android:layout_marginRight="@dimen/top_text_margin"
         android:layout_marginTop="@dimen/top_text_margin"
         android:fontFamily="casual"
         android:textAppearance="?attr/textAppearanceListItem"
@@ -21,11 +20,11 @@
         android:id="@+id/id"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/text_margin"
-        android:layout_marginRight="@dimen/text_margin"
         android:layout_marginTop="@dimen/top_text_margin"
+        android:layout_marginRight="@dimen/top_text_margin"
         android:layout_weight="3"
         android:fontFamily="cursive"
+        android:gravity="center_horizontal"
         android:lines="1"
         android:textAppearance="?attr/textAppearanceListItem" />
 
@@ -33,12 +32,11 @@
         android:id="@+id/content"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-
-        android:layout_marginLeft="@dimen/text_margin"
-        android:layout_marginRight="@dimen/text_margin"
         android:layout_marginTop="@dimen/top_text_margin"
+        android:layout_marginRight="@dimen/top_text_margin"
         android:layout_weight="2"
         android:fontFamily="casual"
+        android:gravity="left"
         android:lines="1"
         android:textAppearance="?attr/textAppearanceListItem" />
 
