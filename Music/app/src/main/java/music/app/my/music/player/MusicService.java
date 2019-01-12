@@ -235,7 +235,10 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 
 	@Override
 	public void onDestroy(){
-		saveQueue();
+
+		log("Music Service is Destroying.");
+		removeFromForeground();  //remove notification
+		//saveQueue();
 		unregisterReceiver(mediaReceiver);
 		audioFocus.abandonFocus();
 		mHandler.removeCallbacks(updateUi);
@@ -386,6 +389,33 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 
    }
 
+   public void removeFromForeground(){
+   		log("Removing Service from foreground.");
+   		mNotificationManager.cancelAll();
+   		stopForeground(true);
+   }
+
+	@Override
+	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
+										  String key) {
+		Log.i("Music Service", "Preferences changed");
+//		   if (key.equals("pref_crossfade_in")) {
+//			   fadeInDuration = Integer.parseInt(sharedPreferences.getString(key, "1"));
+//			   player.setFadeInDuration(fadeInDuration);
+//			   Log.i("Music Service", "Fade in duration set to: " + fadeInDuration);
+//	        }
+//		   else if (key.equals("pref_crossfade_out")) {
+//			   fadeOutDuration =  Integer.parseInt(sharedPreferences.getString(key, "2"));
+//			   player.setFadeOutDuration(fadeOutDuration);
+//	        }
+//		   else if (key.equals("pref_crossfade_out_gap")) {
+//			   fadeOutGap =  Integer.parseInt(sharedPreferences.getString(key, "4"));
+//			   player.setFadeOutGap(fadeOutGap);
+//	        }
+
+	}
+
+
 
 /*
 * Sending info to ui
@@ -474,26 +504,6 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 
 		}
 	};
-
-	@Override
-	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
-			String key) {
-		Log.i("Music Service", "Preferences changed");
-//		   if (key.equals("pref_crossfade_in")) {
-//			   fadeInDuration = Integer.parseInt(sharedPreferences.getString(key, "1"));
-//			   player.setFadeInDuration(fadeInDuration);
-//			   Log.i("Music Service", "Fade in duration set to: " + fadeInDuration);
-//	        }
-//		   else if (key.equals("pref_crossfade_out")) {
-//			   fadeOutDuration =  Integer.parseInt(sharedPreferences.getString(key, "2"));
-//			   player.setFadeOutDuration(fadeOutDuration);
-//	        }
-//		   else if (key.equals("pref_crossfade_out_gap")) {
-//			   fadeOutGap =  Integer.parseInt(sharedPreferences.getString(key, "4"));
-//			   player.setFadeOutGap(fadeOutGap);
-//	        }
-
-	}
 
 
 /*

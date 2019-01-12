@@ -426,8 +426,11 @@ public class DrawerActivity extends AppCompatActivity
     @Override
     public void finish(){
         //startService(new Intent(MusicService.ACTION_STOP));
+        log("Finishing.");
         if (mBound) {
-            unbindService(mConnection);
+            log("Unbinding service.");
+            stopService(new Intent(getApplicationContext(), MusicService.class));
+//            unbindService(mConnection);
             mBound = false;
         }
 
@@ -1040,6 +1043,7 @@ public class DrawerActivity extends AppCompatActivity
         } else if( id == R.id.exit) {
             log("Nav exit clicked!");
             mService.pauseRequest();
+            mService.removeFromForeground();
             finish();
 
 
@@ -1501,17 +1505,13 @@ public class DrawerActivity extends AppCompatActivity
             mService = binder.getService();
             mBound = true;
             log("Music service bound!");
-            //	loadQueue();
-            //System.out.println("Service Binded");
-           // updateQueueFrag();
 
             binder.setListener(new MusicService.BoundServiceListener() {
 
                 @Override
                 public void sendProgress(MusicPlayer player) {
                     //this happens at 1hz, don't leave active
-                  //  log("Activty got progress info. updating ui...");
-
+//                    log("Activty got progress info. updating ui...");
                     //update seekbar.
                     if(player != null)
                     updateProgress(player);
@@ -1532,8 +1532,6 @@ public class DrawerActivity extends AppCompatActivity
                 public void setAudioId(int aid) {
 
                 }
-
-
 
             });
         }
