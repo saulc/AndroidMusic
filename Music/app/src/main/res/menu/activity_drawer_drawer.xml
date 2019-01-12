@@ -5,11 +5,11 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_now"
-            android:icon="@drawable/ic_menu_slideshow"
+            android:icon="@android:drawable/ic_menu_more"
             android:title="Now Playing" />
         <item
             android:id="@+id/nav_bubble"
-            android:icon="@drawable/ic_menu_slideshow"
+            android:icon="@android:drawable/ic_menu_add"
             android:title="Bubbles!" />
         <item
             android:id="@+id/nav_playlists"
@@ -17,7 +17,7 @@
             android:title="PlayLists" />
         <item
             android:id="@+id/nav_artists"
-            android:icon="@drawable/ic_menu_gallery"
+            android:icon="@android:drawable/ic_menu_gallery"
             android:title="Artists" />
 
         <item

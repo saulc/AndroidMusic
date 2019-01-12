@@ -28,7 +28,7 @@
             android:layout_centerVertical="true"
             android:clickable="true"
             android:focusable="true"
-            android:src="@drawable/ic_menu_slideshow"
+            android:src="@android:drawable/ic_menu_add"
             app:fabSize="normal"
             app:useCompatPadding="false" />
     </RelativeLayout>

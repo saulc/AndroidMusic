@@ -113,7 +113,7 @@ public class DrawerActivity extends AppCompatActivity
     nextIntent, previousIntent;
 
     private String actionSetTheme = "ACTION_SET_THEME";
-    private int currentTheme = R.style.AppTheme_NoActionBar;
+    private int currentTheme = R.style.DarkSide;    //R.style.AppTheme_NoActionBar;
 
     private boolean controlsVisible = false;
     @Override
@@ -238,11 +238,17 @@ public class DrawerActivity extends AppCompatActivity
         log("Theme Got intent! action: " + action);
         if(actionSetTheme.equals(action)) {
             int r = intent.getIntExtra("THEME", -22);
-            if( r == -22){
+            if( r == -22){  //if there was no extra,
                 log("Error: no valid theme extra in intent.");
                 return;
             }
+            log("Found theme in extra: " + r);
             setTheme(r);
+            currentTheme = r;
+        } else if(Intent.ACTION_MAIN.equals(action)){
+            //regular start.
+            log("Setting default Theme.");
+            setTheme(currentTheme);
         }
     }
 
@@ -255,6 +261,7 @@ public class DrawerActivity extends AppCompatActivity
         i.setAction(actionSetTheme);
         i.putExtra("THEME", theme);
         startActivity(i);
+        finish();
     }
 
     private void iniFM(){

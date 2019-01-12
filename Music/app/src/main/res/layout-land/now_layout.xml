@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/qbg"
     android:animateLayoutChanges="true"
+    android:background="@drawable/android_robot_icon_2"
     android:id="@+id/llnow"
     android:gravity="center_vertical|center_horizontal"
     android:orientation="vertical">
@@ -28,7 +28,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@drawable/textalpha"
+            android:background="@android:drawable/alert_dark_frame"
             android:gravity="center_horizontal"
             android:orientation="vertical">
 

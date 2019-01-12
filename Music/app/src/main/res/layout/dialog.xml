@@ -41,18 +41,18 @@
         android:id="@+id/go"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/qbg"
+        android:background="?colorPrimary"
         android:padding="@dimen/text_margin"
         android:text="Create Playlist!"
-        android:textColor="@android:color/background_light" />
+        android:textColor="?colorAccent" />
 
     <Button
         android:id="@+id/cancel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/qbg"
+        android:background="?colorPrimary"
         android:padding="@dimen/text_margin"
         android:text="Cancel"
-        android:textColor="@android:color/white" />
+        android:textColor="?colorAccent" />
 
 </LinearLayout>

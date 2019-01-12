@@ -18,4 +18,5 @@
     <color name="jarvisca">#ef4001</color>
     <color name="jarviscd">#0a6796</color>
     <color name="jarviscp">#ffffff</color>
+    <color name="secondary_text_material_light">?colorPrimaryDark</color>
 </resources>

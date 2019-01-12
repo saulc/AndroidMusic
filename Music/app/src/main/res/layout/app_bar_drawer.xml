@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    android:background="@drawable/qbg"
     tools:context="music.app.my.music.DrawerActivity">
 
     <android.support.design.widget.AppBarLayout
@@ -31,6 +30,7 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
         android:layout_marginBottom="@dimen/fab_marginvert"
+        android:foregroundTint="?colorAccent"
         app:fabSize="normal"
         app:srcCompat="@android:drawable/ic_media_previous" />
 
@@ -63,7 +63,6 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
         android:layout_marginBottom="@dimen/fab_marginvert"
-        android:background="?colorPrimaryDark"
         android:src="@android:drawable/ic_menu_compass"
         app:borderWidth="3dp"
         app:fabSize="normal" />
