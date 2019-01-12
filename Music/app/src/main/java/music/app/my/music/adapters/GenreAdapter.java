@@ -39,11 +39,9 @@ public class GenreAdapter extends  RecyclerView.Adapter<GenreAdapter.ViewHolder>
         holder.mContentView.setText(mValues.get(position).getGenre());
 
         Genre temp = mValues.get(position);
-//        String t = temp.ge + " song";
-//        if(temp.getSongs() > 1) t += "s";
+        String t = "";  //mValues.size() + " song" + ( (mValues.size() == 1) ? "" : "s");
+        holder.mLine2.setText(t);
 
-
-    //    holder.mLine2.setText(t);
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

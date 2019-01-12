@@ -45,6 +45,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
         holder.mIdView.setText(mValues.get(position).getId());
         holder.mContentView.setText(mValues.get(position).getName());
 
+        holder.line2.setText("");
         holder.opbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -79,6 +80,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
         public final View mView;
         public final TextView mIdView;
         public final TextView mContentView;
+        public final TextView line2;
         public final ImageButton opbtn, nextbtn;
         public Playlist mItem;
 
@@ -89,6 +91,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
             mContentView = (TextView) view.findViewById(R.id.content);
             opbtn = (ImageButton) view.findViewById(R.id.optionbtn);
             nextbtn = (ImageButton) view.findViewById(R.id.nextupbtn);
+            line2 = (TextView) view.findViewById(R.id.line2);
         }
 
         @Override

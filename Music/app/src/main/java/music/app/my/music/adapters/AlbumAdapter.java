@@ -20,7 +20,7 @@ public class AlbumAdapter   extends  RecyclerView.Adapter<AlbumAdapter.ViewHolde
     private final List<Album> mValues;
     private final baseListFragment.OnListFragmentInteractionListener mListener;
 
-    public AlbumAdapter(ArrayList<Album> items, baseListFragment.OnListFragmentInteractionListener activity) {
+    public  AlbumAdapter(ArrayList<Album> items, baseListFragment.OnListFragmentInteractionListener activity) {
 
         mValues = items;
         mListener = activity;

@@ -30,6 +30,7 @@ public class PlayListFragment extends baseListFragment {
         Log.d(TAG, s);
     }
 
+    private TextView countline;
     //private MediaStoreHelper msHelper;
     //private RecyclerView.Adapter mAdapter;
    // private ArrayList<Playlist> items;
@@ -72,7 +73,10 @@ public class PlayListFragment extends baseListFragment {
              recyclerView.setLayoutManager(new LinearLayoutManager(context));
             View header =  view.findViewById(R.id.header);
             TextView t = (TextView) header.findViewById(R.id.content);
-            t.setText("Header");
+            t.setText("   + Add Playlist + ");
+            countline = (TextView) header.findViewById(R.id.line2);
+            String sl = items.size() + " playlist" +  ( (items.size()==1) ? "" : "s");
+            countline.setText(sl);
 
             ImageButton next = (ImageButton) view.findViewById(R.id.nextupbtn);
             ImageButton op = (ImageButton) view.findViewById(R.id.optionbtn);
@@ -119,7 +123,8 @@ public class PlayListFragment extends baseListFragment {
         log("Updating adapter");
         mAdapter.notifyDataSetChanged();
         log("items:" + items.size());
-
+        String sl = items.size() + " song" +  ( (items.size()==1) ? "" : "s");
+        countline.setText(sl);
     }
 
 

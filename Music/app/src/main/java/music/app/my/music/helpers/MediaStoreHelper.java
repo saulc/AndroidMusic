@@ -30,7 +30,7 @@ import static java.lang.Long.parseLong;
 	Media store helper handles query and loader response to android mediastore db.
  */
 
-public class MediaStoreHelper extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 	private static final int mLOADER = -12;
 
 
