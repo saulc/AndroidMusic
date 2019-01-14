@@ -260,6 +260,7 @@ public class DrawerActivity extends AppCompatActivity
             SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
             int defaultValue = R.style.AppTheme;
             int currentTheme = sharedPref.getInt(getString(R.string.saved_theme), defaultValue);
+
             setTheme(currentTheme);
         }
     }

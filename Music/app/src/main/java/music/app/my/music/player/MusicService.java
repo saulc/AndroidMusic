@@ -482,11 +482,16 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 		            mListener.sendProgress(getUiInfo());		//send call to begin updating UI
 			 }
 
-			if( (getDuration() - (player.getCurrentPosition()/1000) )
-					<= ( player.getFadeOutDuration()/1000 + player.getFadeOutGap()/1000) ) {
+			 long remainingTime = ( getDuration() - (player.getCurrentPosition()/1000) );
+			 long endSpace = ( player.getFadeOutDuration()/1000 );
+			 long gap =  (player.getmPlayers().get(player.getCurrentPlayer()).getFadeOutGap()/1000 );
+
+			// log("Fade out needs at least: " + endSpace + " seconds. + gap: " + gap + " remainingTime: " + remainingTime);
+			 endSpace += gap;
+
+			if( remainingTime <= endSpace ) {
 
 				Log.i("Music Service", "Playing next song based on progress...");
-				//mHandler.removeCallbacks(updateUi);  //must stop updating or well try to call on a dead player
 				nextRequest();
 
 				//if its the last song, wait till the end.
@@ -608,6 +613,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 			mListener.setPlayPause(true);
 			mListener.setCurrentInfo(player.getCurrentSong());
 			mListener.setAudioId(player.getAID());
+			updateFadeSettings();
 			mHandler.postDelayed(updateUi, 1000);
 
 			setUpAsForeground("Playing");;
@@ -667,6 +673,16 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 		return s;
 	}
 
+
+	private void updateFadeSettings(){
+		log("Updating Fader settings.");
+
+		int g = 11; //player.getQueue().getCurrentSong().getDuration() - 12;
+		log("Setting Fade out to 67% = -" + g + " seconds remaining.");
+		if(g > 10) player.setFadeOutGap(g);
+
+
+	}
 }
 
 

@@ -10,7 +10,7 @@ public class myPlayer extends MediaPlayer
 	private Handler mHandler = new Handler();
 	private float volumeValue = 0f;
 	private boolean paused = true;
-	public int fadeInDuration = 1000, fadeOutDuration = 2000, fadeOutGap = 4000;
+	private int fadeInDuration = 1000, fadeOutDuration = 2000, fadeOutGap = 4000;
 	private int mCurrentStep = 1;
     private float duckVolume = .1f;
     private boolean isPrepared = false;
@@ -183,23 +183,27 @@ public class myPlayer extends MediaPlayer
 				setVol(1f);
 		}
 		
-		 public int getFadeInDuration() {
+		 	public int getFadeInDuration() {
 				return fadeInDuration;
 			}
-			public void setFadeInDuration(int fadeInDuration) {
-				this.fadeInDuration = fadeInDuration *1000;
+
+			public void setFadeInDuration(int fadeInDurationSecs) {
+				this.fadeInDuration = fadeInDurationSecs *1000;
 			}
+
 			public int getFadeOutDuration() {
-				return fadeOutDuration*1000;
+				return fadeOutDuration;
 			}
-			public void setFadeOutDuration(int fadeOutDuration) {
-				this.fadeOutDuration = fadeOutDuration*1000;
+			public void setFadeOutDuration(int fadeOutDurationSecs) {
+				this.fadeOutDuration = fadeOutDurationSecs*1000;
 			}
+
 			public int getFadeOutGap() {
 				return fadeOutGap;
 			}
-			public void setFadeOutGap(int fadeOutGap) {
-				this.fadeOutGap = fadeOutGap;
+
+			public void setFadeOutGap(int fadeOutGapSecs) {
+				this.fadeOutGap = fadeOutGapSecs * 1000;
 			}
 
 

@@ -77,7 +77,13 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 		}
 
 	}
-	
+
+	public void setFadeOutGap(int g){
+		for(myPlayer p: player)
+			//myPlayer p = player.get(currentPlayer);
+			p.setFadeOutGap(g);
+	}
+
 	private void setState(MUSICPLAYER_STATE s){
 		mState = s;
 		sListener.onStateChanged(mState); //update gui, remotes, ...
@@ -247,6 +253,7 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 	            // If we're paused, just continue playback and restore the 'foreground service' state.
 	    	player.get(currentPlayer).playAndFadeIn();
 	    	setState(MUSICPLAYER_STATE.PLAYING);
+
 	    }
 	
 	}
@@ -300,6 +307,7 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 		setState(MUSICPLAYER_STATE.PREPARED);
 		player.get(currentPlayer).prepared();
 		iniAFX(player.get(currentPlayer).getAudioSessionId());
+
 		//mListener.setAudioId(player);
 		if(seekMe != 0) {
 			player.get(currentPlayer).seekTo(seekMe);
@@ -337,8 +345,8 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 			}
 		}
 	}
-	public int getFadeOutDuration(){ return player.get(currentPlayer).fadeOutDuration; }
-	public int getFadeOutGap(){ return player.get(currentPlayer).fadeOutGap; }
+	public int getFadeOutDuration(){ return player.get(currentPlayer).getFadeOutDuration(); }
+	public int getFadeOutGap(){ return player.get(currentPlayer).getFadeOutGap(); }
 
 	public int getCurrentPosition(){
 		if(!isPlaying()) return 0;
