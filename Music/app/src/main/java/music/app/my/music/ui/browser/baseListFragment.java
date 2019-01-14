@@ -258,5 +258,7 @@ public  class baseListFragment extends Fragment  implements MediaHelperListener 
         void onPlaylistSongLongClicked(Song s, String pid, String pname, int pos);
 
         void onBubblesReady();
+
+        void onSearchDestroyed();
     }
 }

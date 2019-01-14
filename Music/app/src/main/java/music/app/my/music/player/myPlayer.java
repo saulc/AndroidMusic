@@ -48,11 +48,17 @@ public class myPlayer extends MediaPlayer
 		pausePlayback();
 	}
 	public void pausePlayback(){
+    	if(paused) return;
 		mHandler.post(fadeOutVolume);
 		mHandler.postDelayed(pause, fadeOutDuration + 1000);
 		paused = true;
 	}
-	
+
+	public void pausePlaybackNow(){
+		if(paused) return;
+		mHandler.post(fadeOutVolume);
+		paused = true;
+	}
 	
 	public void resumePlayback(){
 		if(paused){
@@ -71,7 +77,10 @@ public class myPlayer extends MediaPlayer
     public boolean isPrepared(){
     	return isPrepared;
     }
-  
+
+    public float getVolumeValue(){ return volumeValue; }
+
+
     private void setVol(float v ){
     	try {
 
@@ -126,7 +135,7 @@ public class myPlayer extends MediaPlayer
 	    		mCurrentStep++;
 	    //    if (mCurrentStep++ > (fadeOutDuration/20)) {  || (getCurrentPosition() >= getDuration()) 
 	    		if((volumeValue <= 0.05) ){
-	        	setVol(0);
+	        	setVol(0f);
 	        	mHandler.removeCallbacks(fadeOutVolume);
 	        	mCurrentStep = 1;
 	        }

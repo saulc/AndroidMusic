@@ -144,6 +144,12 @@ public class SongFragment extends baseListFragment implements MediaHelperListene
         mListener.addSongsToQueue(items, false);
     }
 
+    @Override
+    public void onDestroy(){
+        log("Song frag destroy");
+        if(myType == SF_TYPE.QUERY)  mListener.onSearchDestroyed();
+        super.onDestroy();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -162,6 +168,7 @@ public class SongFragment extends baseListFragment implements MediaHelperListene
             recyclerView = (RecyclerView) v;
             recyclerView.setLayoutManager(new GridLayoutManager(context, 1));
 
+            recyclerView.setVerticalScrollBarEnabled(true);
             songbar = view.findViewById(R.id.songbar);
             songbar.setProgress(songprogress);
             songbar.setMax(100);

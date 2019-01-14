@@ -446,8 +446,8 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
             MediaStore.Audio.Media._ID,
             MediaStore.Audio.Media.ALBUM_ID,
 			MediaStore.Audio.Media.ARTIST_ID
-            
-    };
+
+	};
 
 	   private String[] albumProjection = {
 	            MediaStore.Audio.Albums.ALBUM,
@@ -496,6 +496,7 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
 			MediaStore.Audio.Playlists.Members.ALBUM_ID,
 			MediaStore.Audio.Playlists.Members.PLAY_ORDER,
 			MediaStore.Audio.Playlists.Members.ARTIST_ID
+
 
 	};
 

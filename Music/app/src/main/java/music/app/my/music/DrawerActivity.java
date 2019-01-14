@@ -7,6 +7,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.database.Cursor;
@@ -54,6 +55,7 @@ import music.app.my.music.types.plist;
 import music.app.my.music.types.Playlist;
 import music.app.my.music.types.Song;
 import music.app.my.music.ui.MixFragment;
+import music.app.my.music.ui.MixxerFragment;
 import music.app.my.music.ui.browser.AlbumFragment;
 import music.app.my.music.ui.browser.ArtistFragment;
 import music.app.my.music.ui.browser.BubbleFragment;
@@ -81,18 +83,20 @@ public class DrawerActivity extends AppCompatActivity
         QueueListener, MixListener,
         ControlFragment.ControlFragmentListener,
         NewPlaylistDialog.OnDialogInteractionListener ,
+        MixxerFragment.MixxerListener,
         Toolbar.OnMenuItemClickListener{
 
 
     private VisualizerDialogFragment vf = null;
 
-    private MixFragment mf = null;
+    private MixxerFragment mf = null;
     private NowFragment nf = null;
     private QueueFragment qf = null;
     private ControlFragment cf = null;
     private PlaceholderFragment pf = null;
     private SongFragment sf = null; //search fragment
 
+    private boolean searchActive = false;
     private FloatingActionButton fab3;
     private FloatingActionButton fab2;
     private FloatingActionButton fab1;
@@ -245,9 +249,17 @@ public class DrawerActivity extends AppCompatActivity
             log("Found theme in extra: " + r);
             setTheme(r);
             currentTheme = r;
+            SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putInt(getString(R.string.saved_theme), currentTheme);
+            editor.commit();
+
         } else if(Intent.ACTION_MAIN.equals(action)){
             //regular start.
             log("Setting default Theme.");
+            SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+            int defaultValue = R.style.AppTheme;
+            int currentTheme = sharedPref.getInt(getString(R.string.saved_theme), defaultValue);
             setTheme(currentTheme);
         }
     }
@@ -518,6 +530,16 @@ public class DrawerActivity extends AppCompatActivity
         //searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         //searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
 
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+
+                log("SV closed");
+                searchActive = false;
+                return true;
+            }
+        });
+
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -528,6 +550,7 @@ public class DrawerActivity extends AppCompatActivity
                  MenuItem m =   menu.findItem(R.id.menu_search);
                  m.collapseActionView();    //minimize search bar
 
+                searchActive = false;  //reset the song fragment//
                 return true;
             }
 
@@ -646,19 +669,26 @@ public class DrawerActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onSearchDestroyed(){
+        log("Search Done.");
+        searchActive = false;
+    }
 
     private void doMySearch(String q){
         log("Searching for: " + q);
 
-        if(sf == null)
-        sf =  (SongFragment) SongFragment.newInstance();
+        if(!searchActive) {
+            searchActive = true;
+            sf = (SongFragment) SongFragment.newInstance();
 
-        Bundle b = new Bundle();
-        b.putString("SFTYPE", SongFragment.SF_TYPE.QUERY.toString());
-        b.putString("QueryID", "0" );
-        b.putString("Query", q);
-        sf.setArguments(b);
-        showFragment(R.id.frame, sf, true);
+            Bundle b = new Bundle();
+            b.putString("SFTYPE", SongFragment.SF_TYPE.QUERY.toString());
+            b.putString("QueryID", "0");
+            b.putString("Query", q);
+            sf.setArguments(b);
+            showFragment(R.id.frame, sf, true);
+        }
 
     }
 
@@ -977,6 +1007,7 @@ public class DrawerActivity extends AppCompatActivity
              h.postDelayed(new Runnable() {
                  @Override
                  public void run() {
+                     if(mService != null)
                      if (nf.isVisible() || cf.isVisible())
                          if (mService.getQueue().getSize() > 0)
                              updateCurrentInfo(mService.getCurrentSong());
@@ -995,7 +1026,7 @@ public class DrawerActivity extends AppCompatActivity
 
         if(mf != null && mf.isVisible() ) return;
 
-        mf =  MixFragment.newInstance();
+        mf =  MixxerFragment.newInstance();
 
         showFragment(R.id.frame, mf, true);
 
@@ -1490,8 +1521,13 @@ public class DrawerActivity extends AppCompatActivity
         fab2.setImageResource(r);
     }
 
+    @Override
+    public void onMixxerDestroyed() {
+        mixxerReadyForUpdates = false;
+    }
+
     public void updateProgress(MusicPlayer player){
-        if(mf != null && mf.isVisible()) mf.updateProgressBar(player);
+        if(mixxerReadyForUpdates) mf.updateMixxerPlayer(player);
         if(nf != null && nf.isVisible()) nf.updateProgressBar(player);
         if(controlsVisible)
         {
@@ -1501,6 +1537,8 @@ public class DrawerActivity extends AppCompatActivity
     }
 
     public void updateCurrentInfo(Song s){
+
+        if(mixxerReadyForUpdates) mf.updateMP(mService.getPlayer());
 
         if(vf != null) vf.setAid(mService.getPlayer().getAID());
         if(nf != null) nf.updateSongInfo(s);
@@ -1846,7 +1884,7 @@ public class DrawerActivity extends AppCompatActivity
         if(position < p.size()){
             if(p.get(position).isPlaying() || !p.get(position).isPaused()) p.get(position).pausePlayback();
             else  p.get(position).resumePlayback();
-            mf.updateProgressBar(mService.getPlayer());
+           // mf.updateProgressBar(mService.getPlayer());
         }
     }
 
@@ -1860,25 +1898,33 @@ public class DrawerActivity extends AppCompatActivity
     public void onMixViewCreated() {
         log("Mix Fragment created");
 
-        if(mf != null && mf.isVisible()) {
-            log("Mix Fragment setting updater");
-
-            final Handler h = new Handler();
-            h.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    if (mf.isVisible()) {
-                        if (mService != null)
-                            updateProgress(mService.getPlayer());
-
-                        mf.updateAdapter();
-                        Log.d(TAG, "Mix updating..");
-                        h.removeCallbacks(this);
-                    }
-                }
-            }, 1000);
-        }
+//        if(mf != null && mf.isVisible()) {
+//            log("Mix Fragment setting updater");
+//
+//            final Handler h = new Handler();
+//            h.postDelayed(new Runnable() {
+//                @Override
+//                public void run() {
+//                    if (mf.isVisible()) {
+//                        if (mService != null)
+//                            updateProgress(mService.getPlayer());
+//
+//                        mf.updateAdapter();
+//                        Log.d(TAG, "Mix updating..");
+//                        h.removeCallbacks(this);
+//                    }
+//                }
+//            }, 1000);
+//        }
 
     }
 
+    private boolean mixxerReadyForUpdates = false;
+
+
+    @Override
+    public void onMixxerCreated() {
+        log("Mixxer Created.");
+        mixxerReadyForUpdates = true;
+    }
 }

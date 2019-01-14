@@ -49,11 +49,14 @@ public class NowFragment extends ControlFragment {
     private SeekBar sbar;
     private ImageButton pp;
     private TextSwitcher line1, line2, line3;
+    private TextView pos, time;
     private ImageView icon;
     private LinearLayout bg;
     private GestureDetector gestureDetector;
     private View.OnTouchListener gestureListener;
 
+
+    private boolean isMini = false;
 
     private final String TAG = getClass().getSimpleName();
 
@@ -89,7 +92,7 @@ public class NowFragment extends ControlFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        final boolean isMini = getArguments().getBoolean("ISMINI");
+        isMini = getArguments().getBoolean("ISMINI");
         View view;
         if (isMini) view = inflater.inflate(R.layout.nowmini_layout, container, false);
         else view = inflater.inflate(R.layout.now_layout, container, false);
@@ -107,6 +110,9 @@ public class NowFragment extends ControlFragment {
         line1 = (TextSwitcher) view.findViewById(R.id.currentText);
         line2 = (TextSwitcher) view.findViewById(R.id.currentSubText);
         line3 = (TextSwitcher) view.findViewById(R.id.currentSubText2);
+        pos = (TextView) view.findViewById(R.id.postText);
+        time = (TextView) view.findViewById(R.id.timeText);
+
 //        icon.setFactory(new ViewSwitcher.ViewFactory() {
 //            public View makeView() {
 //                ImageView t = new ImageView(context);
@@ -311,7 +317,13 @@ public class NowFragment extends ControlFragment {
         if (sbar != null)
             if (player.isPlaying()) {
                 sbar.setProgress(player.getProgress());
+                if(!isMini){
+                    int a = player.getCurrentPosition() / 1000;
+                    int d = player.getDuration();  //already in seconds
 
+                    pos.setText(a+"");
+                    time.setText( (d-a) + "");
+                }
             }
 
         // log("Control fragment updating");
@@ -323,8 +335,8 @@ public class NowFragment extends ControlFragment {
         log("Now fragment updating song info.");
         //avoid doing this every second, it doesn't change
 
-        final boolean isMini = getArguments().getBoolean("ISMINI");
         log("Now Playing: "+ s.getTitle() + " : " + s.getArtist());
+
 
         line1.setText(s.getTitle());
         line2.setText(s.getArtist());

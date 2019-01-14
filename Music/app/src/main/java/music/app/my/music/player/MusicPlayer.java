@@ -21,7 +21,7 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 	
 	private ArrayList<myPlayer> player;
 	private int currentPlayer = 0;	//the one actually palying
-	private int oldPlayer = -1;	//fade out
+	private int nextPlayer = -1;	//fade out
 	private int auxPlayer = -1;	//fade out fast skip?
 
 	private MusicPlayerStateListener sListener;
@@ -65,7 +65,7 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 			player = new ArrayList<myPlayer>();
 			currentPlayer = 0;
 			auxPlayer = 1;
-			oldPlayer = 2;
+			nextPlayer = 2;
 
 			myPlayer temp = new myPlayer();
 			player.add(temp);
@@ -162,6 +162,9 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 		return !player.get(currentPlayer).isPaused();
 	}
 
+	public int getCurrentPlayer(){ return currentPlayer; }
+	public int getNextPlayer(){ return nextPlayer; }
+	public int getAuxPlayer(){ return auxPlayer; }
 
 	//fade out whats playing
 	//get the player (LIST) ready to play the next song.
@@ -179,18 +182,18 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 	 */
 	private void fadeOutOldPlayer(){
 
-		log("Fadeout Old: old: " + oldPlayer + " cp: " + currentPlayer + " aux: " + auxPlayer);
+		log("Fadeout Old: old: " + nextPlayer + " cp: " + currentPlayer + " aux: " + auxPlayer);
 
 		if(!isPlaying()) return; //if not playing no need to fade it out.
 
 		//other wise stop the ui updates.
 		sListener.stopUiCallbacks();
 
-		int temp = oldPlayer;		//save
+		int temp = nextPlayer;		//save
 
-		oldPlayer = currentPlayer;
-		player.get(oldPlayer).pausePlayback(); //fade out.
-//		player.get(oldPlayer).stopAndFadeOut();
+		nextPlayer = currentPlayer;
+		player.get(nextPlayer).pausePlayback(); //fade out.
+//		player.get(nextPlayer).stopAndFadeOut();
 
 		//aux player should have been siting for one song
 		//or at least a few seconds
@@ -200,7 +203,7 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 		player.get(currentPlayer).reset();
 
 		auxPlayer = temp;
-		log("Fadeout Old end: " + oldPlayer + " cp: " + currentPlayer + " aux: " + auxPlayer);
+		log("Fadeout Old end: " + nextPlayer + " cp: " + currentPlayer + " aux: " + auxPlayer);
 
 	}
 

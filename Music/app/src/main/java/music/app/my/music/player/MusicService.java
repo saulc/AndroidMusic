@@ -366,7 +366,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 
 	   Bitmap li = BitmapFactory.decodeResource(getResources(), R.drawable.android_robot_icon_2128);
 	    mBuilder.setSmallIcon(R.drawable.android_robot_icon_2128)
-				.setLargeIcon(li)
+			//	.setLargeIcon(li)
 						//.setStyle(new NotificationCompat.DecoratedCustomViewStyle())
 				.setColor(Color.argb(100, 50, 0 , 30))
 						.setOngoing(true)
@@ -377,7 +377,8 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
    		        .setContentTitle(s.getTitle() + " (" + text + ") ")
    		        .setContentText( s.getArtist())
 				.setSubText(s.getAlbum())
-				.setStyle(new NotificationCompat.BigTextStyle().bigText(s.getArtist()));
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+				//.setStyle(new NotificationCompat.BigTextStyle().bigText(s.getArtist()));
 
 
 
