@@ -3,6 +3,8 @@ package music.app.my.music.ui;
 import android.animation.LayoutTransition;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -104,6 +106,7 @@ public class NowFragment extends ControlFragment {
 
         log("Now fragment view created; mini: " + isMini);
         final Context context = view.getContext();
+
 
         bg = (LinearLayout) view.findViewById(R.id.llnow);
         icon = (ImageView) view.findViewById(R.id.currentIcon);
@@ -351,9 +354,15 @@ public class NowFragment extends ControlFragment {
             if (d != null) {
                 log("Drawable created.");
                 Bitmap bitmap = ((BitmapDrawable) d).getBitmap();
+                bitmap = Bitmap.createScaledBitmap(bitmap, 600, 600, true);
+                final Bitmap rc = Bitmap.createBitmap(600  , 600, Bitmap.Config.ARGB_8888);
+                Canvas cc = new Canvas((rc));
+                Paint pt = new Paint();
+                pt.setAlpha(100);
+                cc.drawBitmap(bitmap, 0, 0, pt);
                 // Scale it to 50 x 50
                 log("Bitmap created.");
-                d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, 600, 600, true));
+                d = new BitmapDrawable(getResources(), rc);
                 log("Bitmap scaled");
 
                 if(isMini) icon.setImageDrawable(d);
@@ -371,12 +380,18 @@ public class NowFragment extends ControlFragment {
     }
         private void setBg(Drawable d ){
 
-        int transitionTime = 1000, tt = 333;
+        d.setAlpha(100);
+        bg.getBackground().setAlpha(100);
+        int transitionTime = 1500, tt = 333;
         Drawable[] layers = { bg.getBackground() , d };
         TransitionDrawable transition = new TransitionDrawable( layers );
-
-        transition.startTransition(transitionTime);
+        transition.setCrossFadeEnabled(true);
+        transition.setAlpha(150);
         bg.setBackground(transition);
+        transition.startTransition(transitionTime);
+//        getActivity().getWindow().setBackgroundDrawable(transition);
+
+
 
     }
 

@@ -6,7 +6,7 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:colorBackground">?colorPrimary</item>
+        <item name="android:colorBackground">@android:color/transparent</item>
         <item name="windowNoTitle">true</item>
         <item name="android:textColorSecondaryInverse">@color/secondary_text_material_light</item>
     </style>
@@ -38,6 +38,7 @@
         <item name="colorPrimary">@color/darksidecp</item>
         <item name="colorPrimaryDark">@color/darksidecd</item>
         <item name="colorAccent">@color/darksideca</item>
+        <item name="android:colorBackground">?attr/colorPrimary</item>
     </style>
 
     <style name="AppThemeNior" parent="Theme.AppCompat.NoActionBar" >
@@ -55,6 +56,8 @@
         <item name="colorPrimary">@color/jarviscp</item>
         <item name="colorPrimaryDark">@color/jarviscd</item>
         <item name="colorAccent">@color/jarvisca</item>
+        <item name="android:colorBackground">?attr/colorPrimaryDark</item>
+        <item name="android:colorForeground">?attr/colorPrimary</item>
     </style>
 
 

@@ -11,7 +11,9 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.database.Cursor;
+import android.graphics.SurfaceTexture;
 import android.graphics.Typeface;
+import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -24,6 +26,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.MenuInflater;
+import android.view.TextureView;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -34,6 +37,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SearchView;
 import android.widget.TextSwitcher;
@@ -41,6 +45,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import music.app.my.music.helpers.MixListener;
@@ -84,11 +89,13 @@ public class DrawerActivity extends AppCompatActivity
         ControlFragment.ControlFragmentListener,
         NewPlaylistDialog.OnDialogInteractionListener ,
         MixxerFragment.MixxerListener,
+        FadeFragment.FaderListener,
         Toolbar.OnMenuItemClickListener{
 
 
     private VisualizerDialogFragment vf = null;
 
+    private FadeFragment fader = null;
     private MixxerFragment mf = null;
     private NowFragment nf = null;
     private QueueFragment qf = null;
@@ -115,11 +122,13 @@ public class DrawerActivity extends AppCompatActivity
     private TextSwitcher nextText;
     private Intent startIntent, toggleIntent, pauseIntent, playIntent,
     nextIntent, previousIntent;
+    private ImageView navIcon;
 
     private String actionSetTheme = "ACTION_SET_THEME";
     private int currentTheme = R.style.DarkSide;    //R.style.AppTheme_NoActionBar;
 
     private boolean controlsVisible = false;
+    private TextureView bgTexture;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -141,6 +150,9 @@ public class DrawerActivity extends AppCompatActivity
                 .enableTransitionType(LayoutTransition.CHANGING);
 
 
+        bgTexture = findViewById(R.id.bgTexture);
+
+
         //dim the systems  status and control bars
         // 0 == show
 //        View decorView =  toolbar;
@@ -151,6 +163,8 @@ public class DrawerActivity extends AppCompatActivity
 //        decorView.setSystemUiVisibility(0);
 
         toolbar.setOnMenuItemClickListener((Toolbar.OnMenuItemClickListener) this);
+
+     //   navIcon = (ImageView) findViewById(R.id.navHeaderIcon);
 
         nextText = (TextSwitcher) findViewById(R.id.nextText);
         if(nextText!=null) {
@@ -217,6 +231,7 @@ public class DrawerActivity extends AppCompatActivity
         previousIntent = new Intent(getApplicationContext(), MusicService.class);
         previousIntent.setAction(MusicService.ACTION_PREVIOUS);
 
+        iniStark();
         log("Starting service");
         startService(startIntent);
 //        if(controlsVisible)
@@ -229,6 +244,29 @@ public class DrawerActivity extends AppCompatActivity
 
     }
 
+
+    /* -----------------------------------   onCreate over.   ----------------------------------- */
+
+
+    private boolean faderActive = false;
+
+    public void showFadeFrag(View v){
+            log("Nav icon clicked! secret shit going down! ^_- ");
+            Toast.makeText(DrawerActivity.this,
+                    " -->  ^_^  <-- ", Toast.LENGTH_LONG).show();
+
+            if(!faderActive) {
+                log("Showing fadefragment.");
+                fader = FadeFragment.newInstance();
+                showFragment(R.id.frame, fader, false);
+                faderActive = true;
+            }else{
+                log("Hiding Fader");
+                faderActive = false;
+                if(fader != null)
+                getSupportFragmentManager().beginTransaction().remove(fader).commit();
+            }
+    }
     private void showThemeDialog(){
 
         log("Showing Theme picker.");
@@ -387,8 +425,59 @@ public class DrawerActivity extends AppCompatActivity
 
    }
 
+   //enable stark mode when showimg Fab menu.
+
+    private void iniStark(){
+        log("Initializing Stark Mode.");
+        bgTexture.setTag("cam");
+        bgTexture.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
+            @Override
+            public void onSurfaceTextureAvailable(SurfaceTexture surface, int i, int i1) {
+                log("Camera surface Available!");
+
+            mCamera = Camera.open();
+            try {
+                mCamera.setDisplayOrientation(90);
+                //setCameraDisplayOrientation(1, mCamera);
+                mCamera.setPreviewTexture(surface);
+                mCamera.startPreview();
+            } catch (IOException ioe) {
+                // Something bad happened
+            }
+            }
+
+            @Override
+            public void onSurfaceTextureSizeChanged(SurfaceTexture surfaceTexture, int i, int i1) {
+
+            }
+
+            @Override
+            public boolean onSurfaceTextureDestroyed(SurfaceTexture surfaceTexture) {
+                mCamera.stopPreview();
+                mCamera.release();
+                return true;
+            }
+
+            @Override
+            public void onSurfaceTextureUpdated(SurfaceTexture surfaceTexture) {
+
+            }
+        });
+        log("Initialization complete.");
+        // mTextureView.setAlpha(.5f);
+
+    }
+    private Camera mCamera;
+
+    private void starkMode(boolean enable){
+
+//        if(enable) iniStark();
+
+         bgTexture.setEnabled(enable);
+    }
     private void showFM(){
         showfmenu = true;
+        starkMode(showfmenu);
         moveFab(false);
         //if r == c its a square.
         float r = -getResources().getDimension(R.dimen.fd);
@@ -402,6 +491,7 @@ public class DrawerActivity extends AppCompatActivity
     }
     private void hideFM(){
         showfmenu = false;
+        starkMode(showfmenu);
         fab1.animate().translationY(0);
         fab2.animate().translationY(0);
         fab2.animate().translationX(0);
@@ -862,6 +952,12 @@ public class DrawerActivity extends AppCompatActivity
         else if(f instanceof VisualizerDialogFragment)
             transaction.setCustomAnimations(R.anim.anim_in, R.anim.slideout_up, R.anim.slidein_up, R.anim.slideout_down);
 
+        else if(f instanceof FadeFragment) {
+            //fade fragment is special.
+            transaction.add(r, f, "Fader");
+            transaction.commit();
+            return;
+        }
         // Replace whatever is in the fragment_container view with this fragment,
         // and add the transaction to the back stack
         transaction.replace(r, f);

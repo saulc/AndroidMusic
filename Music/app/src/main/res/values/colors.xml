@@ -4,8 +4,8 @@
     <color name="colorPrimaryDark">#000000</color>
     <color name="colorAccent">#dcfd22</color>
     <color name="background_material_dark">#49484a</color>
-    <color name="primary_material_light">#d0d0d0</color>
-    <color name="primary_dark_material_light">#4e4e4e</color>
+    <color name="primary_material_light">#01e017</color>
+    <color name="primary_dark_material_light">#00451f</color>
     <color name="accent_material_dark">#00ff40</color>
     <color name="primary_dark_material_dark">#a0000000</color>
     <color name="primary_material_dark">#5e645d</color>
@@ -13,10 +13,10 @@
     <color name="darksidecd">#af9c1111</color>
     <color name="darksideca">#ffffffff</color>
     <color name="colorsca">#aa01ff</color>
-    <color name="colorscd">#a00046b7</color>
+    <color name="colorscd">#a001d3de</color>
     <color name="colorscp">#e91e63</color>
     <color name="jarvisca">#ef4001</color>
     <color name="jarviscd">#0a6796</color>
-    <color name="jarviscp">#ffffff</color>
+    <color name="jarviscp">#e91e63</color>
     <color name="secondary_text_material_light">?colorPrimaryDark</color>
 </resources>

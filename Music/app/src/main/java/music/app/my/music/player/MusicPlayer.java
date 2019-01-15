@@ -205,7 +205,7 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 
 		incrementPlayers(); //move each player role to the next step. cur -> next - > aux -> cur *
 
-		//first try 3 player loop.
+		//first try 3 player loop. wtf was i thinking? lol
 //		int temp = nextPlayer;		//save
 //
 //		nextPlayer = currentPlayer;
