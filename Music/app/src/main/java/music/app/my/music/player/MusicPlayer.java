@@ -21,8 +21,8 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 	
 	private ArrayList<myPlayer> player;
 	private int currentPlayer = 0;	//the one actually palying
-	private int nextPlayer = -1;	//fade out
-	private int auxPlayer = -1;	//fade out fast skip?
+	private int nextPlayer = 1;	//fade out
+	private int auxPlayer = 2;	//fade out fast skip?
 
 	private MusicPlayerStateListener sListener;
 	public enum MUSICPLAYER_STATE {PLAYING, PAUSED_USER, PAUSED, PREPARING, PREPARED, STOPPED, PLAYING_DUCKING};
@@ -189,28 +189,45 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 	private void fadeOutOldPlayer(){
 
 		log("Fadeout Old: old: " + nextPlayer + " cp: " + currentPlayer + " aux: " + auxPlayer);
-
-		if(!isPlaying()) return; //if not playing no need to fade it out.
+	//	if(!isPlaying()) return; //if not playing no need to fade it out.
 
 		//other wise stop the ui updates.
 		sListener.stopUiCallbacks();
 
-		int temp = nextPlayer;		//save
+		//new 3 player loop. simple.
+		player.get(currentPlayer).pausePlayback();  //pause and fade out current.
 
-		nextPlayer = currentPlayer;
-		player.get(nextPlayer).pausePlayback(); //fade out.
-//		player.get(nextPlayer).stopAndFadeOut();
+		//setup the new player, aux should be 2 songs previous. already faded out and done with.
+		//aux represents the player after next.
+		//we reset now. the next player will be reset when it becomes aux ie. after it has faded out.
+		player.get(auxPlayer).stop();
+		player.get(auxPlayer).reset();
 
-		//aux player should have been siting for one song
-		//or at least a few seconds
-		currentPlayer = auxPlayer;
+		incrementPlayers(); //move each player role to the next step. cur -> next - > aux -> cur *
 
-		player.get(currentPlayer).stop();  //stop incase its not?
-		player.get(currentPlayer).reset();
-
-		auxPlayer = temp;
+		//first try 3 player loop.
+//		int temp = nextPlayer;		//save
+//
+//		nextPlayer = currentPlayer;
+//		player.get(nextPlayer).pausePlayback(); //fade out.
+////		player.get(nextPlayer).stopAndFadeOut();
+//
+//		//aux player should have been siting for one song
+//		//or at least a few seconds
+//		currentPlayer = auxPlayer;
+//
+//		player.get(currentPlayer).stop();  //stop incase its not?
+//		player.get(currentPlayer).reset();
+//
+//		auxPlayer = temp;
 		log("Fadeout Old end: " + nextPlayer + " cp: " + currentPlayer + " aux: " + auxPlayer);
 
+	}
+
+	private void incrementPlayers(){
+		if(++currentPlayer >= player.size()) currentPlayer = 0;
+		if(++nextPlayer >= player.size()) nextPlayer = 0;
+		if(++auxPlayer >= player.size()) auxPlayer = 0;
 	}
 
 
