@@ -125,17 +125,11 @@ public class NowFragment extends ControlFragment {
 //                return t;
 //            }
 //        });
-//
-//
+
 //        // animation
 ////        icon.setInAnimation(context, R.anim.slidein_left);
 ////        icon.setOutAnimation(context, R.anim.slideout_right);
 //
-//        icon.setInAnimation(getContext(), R.anim.slidein_up);
-//        icon.setOutAnimation(getContext(), R.anim.slideout_up);
-
-        //mini player uses only simple click. for now.
-
 
         icon.setAlpha(.6f);
             icon.setOnClickListener(new View.OnClickListener() {
@@ -151,7 +145,6 @@ public class NowFragment extends ControlFragment {
                 public boolean onLongClick(View view) {
                     mListener.nowIconLongClicked();
                     return true;
-
                 }
             });
 
@@ -213,7 +206,6 @@ public class NowFragment extends ControlFragment {
         line3.setInAnimation(context, android.R.anim.slide_in_left);
         line3.setOutAnimation(context, android.R.anim.slide_out_right);
 
-
         line1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -272,7 +264,6 @@ public class NowFragment extends ControlFragment {
                prevPressed();
             }
         });
-
 
 
         mListener.onNowViewCreated();
@@ -403,6 +394,11 @@ public class NowFragment extends ControlFragment {
     }
 
 
+    public void doubleTap(){
+        mListener.nowIconDoubleClicked();
+
+    }
+
     class MyGestureDetector extends GestureDetector.SimpleOnGestureListener {
         /**
          * Swipe min distance.
@@ -416,6 +412,14 @@ public class NowFragment extends ControlFragment {
          * Swipe threshold velocity.
          */
         private static final int SWIPE_THRESHOLD_VELOCITY = 100;
+
+        @Override
+        public boolean onDoubleTap(MotionEvent e){
+            log("Double tap!");
+            doubleTap();
+            return super.onDoubleTap(e);
+        }
+
 
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {

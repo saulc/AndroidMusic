@@ -25,7 +25,9 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.MenuInflater;
+import android.view.MotionEvent;
 import android.view.TextureView;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -48,6 +50,7 @@ import android.widget.ViewSwitcher;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import music.app.my.music.helpers.FabDoubleTapGS;
 import music.app.my.music.helpers.MixListener;
 import music.app.my.music.helpers.QueueListener;
 import music.app.my.music.player.MusicPlayer;
@@ -90,6 +93,8 @@ public class DrawerActivity extends AppCompatActivity
         NewPlaylistDialog.OnDialogInteractionListener ,
         MixxerFragment.MixxerListener,
         FadeFragment.FaderListener,
+        SecretFragment.SecretListener,
+        FabDoubleTapGS.DoubleTapListener,
         Toolbar.OnMenuItemClickListener{
 
 
@@ -150,7 +155,7 @@ public class DrawerActivity extends AppCompatActivity
                 .enableTransitionType(LayoutTransition.CHANGING);
 
 
-        bgTexture = findViewById(R.id.bgTexture);
+//        bgTexture = findViewById(R.id.bgTexture);
 
 
         //dim the systems  status and control bars
@@ -204,8 +209,22 @@ public class DrawerActivity extends AppCompatActivity
             public void onClick(View view) {
                 Log.d(TAG, "Fab Clicked: " + showq);
                     showQ();
-     }
-        });
+            }
+                   });
+
+        FabDoubleTapGS dt =  new FabDoubleTapGS();
+        dt.setDoubleTapListener(this);
+        final GestureDetector gestureDetector = new GestureDetector( dt );
+        View.OnTouchListener gestureListener = new View.OnTouchListener() {
+            public boolean onTouch(View v, MotionEvent event) {
+                if (gestureDetector.onTouchEvent(event)) {
+                    log("Touch event!!");
+                    return true;
+                }
+                return false;
+            }
+        };
+        fab.setOnTouchListener(gestureListener);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -231,7 +250,6 @@ public class DrawerActivity extends AppCompatActivity
         previousIntent = new Intent(getApplicationContext(), MusicService.class);
         previousIntent.setAction(MusicService.ACTION_PREVIOUS);
 
-        iniStark();
         log("Starting service");
         startService(startIntent);
 //        if(controlsVisible)
@@ -246,6 +264,10 @@ public class DrawerActivity extends AppCompatActivity
 
 
     /* -----------------------------------   onCreate over.   ----------------------------------- */
+
+
+
+
 
 
     private boolean faderActive = false;
@@ -406,7 +428,6 @@ public class DrawerActivity extends AppCompatActivity
    // circle?
    private void moveFab(boolean up){
 
-
        if(up) {
            float r = -getResources().getDimension(R.dimen.fab_marginvert);
            fab1.animate().translationY(r);
@@ -425,59 +446,53 @@ public class DrawerActivity extends AppCompatActivity
 
    }
 
+
+        @Override
+        public void secretFragmentCreated(){
+        log("Secret mode on");
+       // secret.setTexture(bgTexture);
+
+
+        }
+
+        @Override
+        public void secretFragmentDestroyed(){
+
+        log("Secrets kill.");
+        }
+
+        @Override
+        public void onDoubleTap(){
+            log("Fab Double tap!");
+            starkMode(!stark);
+        }
+
+    @Override
+    public void nowIconDoubleClicked(){
+        log("Now icon double tapped.");
+
+
+    }
+
+    private boolean stark = false;
+    private SecretFragment secret = null;
    //enable stark mode when showimg Fab menu.
+    private void starkMode(boolean enable) {
 
-    private void iniStark(){
-        log("Initializing Stark Mode.");
-        bgTexture.setTag("cam");
-        bgTexture.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
-            @Override
-            public void onSurfaceTextureAvailable(SurfaceTexture surface, int i, int i1) {
-                log("Camera surface Available!");
+        if(stark && secret != null){
+            getSupportFragmentManager().beginTransaction().remove(secret).commit();
+            stark = false;
+        }else if(!stark){
+            secret = SecretFragment.newInstance();
+            getSupportFragmentManager().beginTransaction().add(R.id.bgTexture, secret, "Itsasecret").commit();
+            stark = true;
 
-            mCamera = Camera.open();
-            try {
-                mCamera.setDisplayOrientation(90);
-                //setCameraDisplayOrientation(1, mCamera);
-                mCamera.setPreviewTexture(surface);
-                mCamera.startPreview();
-            } catch (IOException ioe) {
-                // Something bad happened
-            }
-            }
-
-            @Override
-            public void onSurfaceTextureSizeChanged(SurfaceTexture surfaceTexture, int i, int i1) {
-
-            }
-
-            @Override
-            public boolean onSurfaceTextureDestroyed(SurfaceTexture surfaceTexture) {
-                mCamera.stopPreview();
-                mCamera.release();
-                return true;
-            }
-
-            @Override
-            public void onSurfaceTextureUpdated(SurfaceTexture surfaceTexture) {
-
-            }
-        });
-        log("Initialization complete.");
-        // mTextureView.setAlpha(.5f);
-
+        }
     }
-    private Camera mCamera;
 
-    private void starkMode(boolean enable){
 
-//        if(enable) iniStark();
-
-         bgTexture.setEnabled(enable);
-    }
     private void showFM(){
         showfmenu = true;
-        starkMode(showfmenu);
         moveFab(false);
         //if r == c its a square.
         float r = -getResources().getDimension(R.dimen.fd);
@@ -491,7 +506,6 @@ public class DrawerActivity extends AppCompatActivity
     }
     private void hideFM(){
         showfmenu = false;
-        starkMode(showfmenu);
         fab1.animate().translationY(0);
         fab2.animate().translationY(0);
         fab2.animate().translationX(0);
