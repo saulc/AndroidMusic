@@ -10,23 +10,33 @@ public class myPlayer extends MediaPlayer
 	private Handler mHandler = new Handler();
 	private float volumeValue = 0f;
 	private boolean paused = true;
-	private int fadeInDuration = 1000, fadeOutDuration = 2000, fadeOutGap = 4000;
+	private int fadeInDuration = 1000, fadeOutDuration = 2000, fadeOutGap = 4000, startGap = 0;
 	private int mCurrentStep = 1;
     private float duckVolume = .1f;
     private boolean isPrepared = false;
-	
+	private int id = -1;
+
     public myPlayer(){
     	super();
     	
     }
  
-    public myPlayer(int in, int out, int outg){
+    public myPlayer(int in, int out, int outg, int startg){
     	super();
     	fadeInDuration = in;
     	fadeOutDuration =out;
     	fadeOutGap = outg;
+    	startGap = startg;
     }
-    
+
+    public void setId(int i){
+    	id = i;
+	}
+
+	public int getId(){
+    	return id;
+	}
+
 	public void playAndFadeIn(){
 		paused = false;
 		start();
@@ -57,6 +67,7 @@ public class myPlayer extends MediaPlayer
 	public void pausePlaybackNow(){
 		if(paused) return;
 		mHandler.post(fadeOutVolume);
+		mHandler.postDelayed(pause, 200);
 		paused = true;
 	}
 	
@@ -108,14 +119,14 @@ public class myPlayer extends MediaPlayer
 	    		setVol( (float) ( Math.pow(mCurrentStep, 2) / Math.pow((fadeInDuration / 50), 2) ) );
 	    		//Log.d("Myplayer", mCurrentStep + " fading in: " + volumeValue);
 	    		//setVol( (float) ( Math.pow( ( mCurrentStep - (fadeOutDuration/20)), 2) / Math.pow( mCurrentStep + (fadeOutDuration/20), 2) ) );
-	    		mHandler.postDelayed(fadeInVolume, 50);
+
 	    		mCurrentStep++;
 	      // if (mCurrentStep++ > (fadeInDuration/20)) {
 	    		if(volumeValue >= .98){
 	        	setVol(1);
 	        	mHandler.removeCallbacks(fadeInVolume);
 	        	mCurrentStep = 1;
-	        }
+	        } else mHandler.postDelayed(fadeInVolume, 50);
 	    }
 	    };
 	    
@@ -131,14 +142,14 @@ public class myPlayer extends MediaPlayer
 //	    				/( (fadeOutDuration/50) * (fadeOutDuration/50) ) ) );
 	    		setVol( (float) ( Math.pow((fadeOutDuration / 50) - mCurrentStep, 2) / Math.pow(fadeOutDuration / 50, 2) ) );
 	    		//Log.d("Myplayer", mCurrentStep + " fading out: " + volumeValue);
-	    		mHandler.postDelayed(fadeOutVolume, 50);
+
 	    		mCurrentStep++;
 	    //    if (mCurrentStep++ > (fadeOutDuration/20)) {  || (getCurrentPosition() >= getDuration()) 
-	    		if((volumeValue <= 0.05) ){
+	    		if((volumeValue <= 0.15) ){
 	        	setVol(0f);
 	        	mHandler.removeCallbacks(fadeOutVolume);
 	        	mCurrentStep = 1;
-	        }
+	        } else 	mHandler.postDelayed(fadeOutVolume, 50);
 	    }
 	    };
 	    
@@ -159,7 +170,7 @@ public class myPlayer extends MediaPlayer
 	    	public void run(){
 	    		pause();
 	    		paused = true;
-	    		seekTo(getCurrentPosition() - fadeOutDuration - 1);
+	    		//seekTo(getCurrentPosition() - fadeOutDuration - 1);
 	    	//	reset();
 	    		//release();
 	    	}
@@ -206,10 +217,9 @@ public class myPlayer extends MediaPlayer
 				this.fadeOutGap = fadeOutGapSecs * 1000;
 			}
 
+			public int getStartGap() { return  startGap; }
 
-			public void idk(){
-
-			}
+			public void setStartGap(int s){ startGap = s*1000; }
 
 	/*
     boolean	True if the method handled the error, false if it didn't.

@@ -20,9 +20,9 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 	private Equalizer eq;
 	
 	private ArrayList<myPlayer> player;
-	private int currentPlayer = 0;	//the one actually palying
-	private int nextPlayer = 1;	//fade out
-	private int auxPlayer = 2;	//fade out fast skip?
+	 private int currentPlayer = 0;	//the one actually palying
+	 private int nextPlayer = 1;	//fade out
+	 private int auxPlayer = 2;	//fade out fast skip?
 
 	private MusicPlayerStateListener sListener;
 	public enum MUSICPLAYER_STATE {PLAYING, PAUSED_USER, PAUSED, PREPARING, PREPARED, STOPPED, PLAYING_DUCKING};
@@ -64,14 +64,17 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 		if(player == null){
 			player = new ArrayList<myPlayer>();
 			currentPlayer = 0;
-			auxPlayer = 1;
-			nextPlayer = 2;
+			nextPlayer = 1;
+			auxPlayer = 2;
 
 			myPlayer temp = new myPlayer();
+			temp.setId(currentPlayer);
 			player.add(temp);
 			temp = new myPlayer();
+			temp.setId(nextPlayer);
 			player.add(temp);
 			temp = new myPlayer();
+			temp.setId(auxPlayer);
 			player.add(temp);
 
 		}
@@ -225,9 +228,18 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 	}
 
 	private void incrementPlayers(){
-		if(++currentPlayer >= player.size()) currentPlayer = 0;
-		if(++nextPlayer >= player.size()) nextPlayer = 0;
-		if(++auxPlayer >= player.size()) auxPlayer = 0;
+		//current = 0, next = 1, aux = 2
+
+		//even worse.
+		int temp = currentPlayer;
+		currentPlayer = nextPlayer;
+		nextPlayer = auxPlayer;
+		auxPlayer = temp;
+
+		//it should be logically eq. but with less risk
+//		if(++currentPlayer >= player.size()) currentPlayer = 0;
+//		if(++nextPlayer >= player.size()) nextPlayer = 0;
+//		if(++auxPlayer >= player.size()) auxPlayer = 0;
 	}
 
 
@@ -237,11 +249,17 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 	public void onCompletion(MediaPlayer mp) {
 		Log.i("Music Service", mp + " player completed! wft!!! <<------");
 		((myPlayer)mp).removeCallbacks();
+		int i = ((myPlayer)mp).getId();
+		player.remove(i);
+		myPlayer rp = new myPlayer();
+		rp.setId(i);
+		player.add(i,  rp);
 
-		if(player.contains(mp)){
-			player.remove(mp);
-			player.add(new myPlayer());
-		}
+
+//		if(player.contains(mp)){
+//			player.remove(mp);
+//			player.add(new myPlayer());
+//		}
 		mp.release();
 		mp = null;
 

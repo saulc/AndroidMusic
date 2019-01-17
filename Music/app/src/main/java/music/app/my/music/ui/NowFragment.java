@@ -35,6 +35,11 @@ import music.app.my.music.types.Song;
  *
  * Control for music playback.
  * collapseable floating buttons?
+ *
+ * update 18/19
+ * now fragment extends but now replaces. control fragment.
+ *
+ *
  */
 
 public class NowFragment extends ControlFragment {
@@ -270,40 +275,6 @@ public class NowFragment extends ControlFragment {
         return view;
     }
 
-    private  void iconClicked(boolean close){
-        if(mListener != null) mListener.nowIconClicked(true, close);
-    }
-    private void playPressed(){
-        if (null != mListener) {
-            // Notify the active callbacks interface (the activity, if the
-            // fragment is attached to one) that an item has been selected.
-            mListener.playPausePressed();
-//            icon.setInAnimation(getContext(), R.anim.slidein_up);
-//            icon.setOutAnimation(getContext(), R.anim.slideout_up);
-
-        }
-    }
-
-    private void nextPressed(){
-        if (null != mListener) {
-            // Notify the active callbacks interface (the activity, if the
-            // fragment is attached to one) that an item has been selected.
-            mListener.nextPressed();
-//            icon.setInAnimation(getContext(), R.anim.slidein_left);
-//            icon.setOutAnimation(getContext(), R.anim.slideout_right);
-
-        }
-    }
-    private void prevPressed(){
-        if (null != mListener) {
-            // Notify the active callbacks interface (the activity, if the
-            // fragment is attached to one) that an item has been selected.
-            mListener.prevPressed();
-//            icon.setInAnimation(getContext(), R.anim.slidein_right);
-//            icon.setOutAnimation(getContext(), R.anim.slideout_left);
-
-        }
-    }
     private boolean infoset = false;
 
     @Override
@@ -359,8 +330,8 @@ public class NowFragment extends ControlFragment {
                 if(isMini) icon.setImageDrawable(d);
                 else setBg(d);
 
-            } else if(isMini) icon.setImageResource(R.drawable.android_robot_icon_2);
-                    else setBg(R.drawable.android_robot_icon_2);
+            } else if(isMini) icon.setImageResource(R.drawable.android_icon3a80);
+                    else setBg(R.drawable.android_icon3a80);
         }
     }
 
@@ -398,6 +369,43 @@ public class NowFragment extends ControlFragment {
         mListener.nowIconDoubleClicked();
 
     }
+
+
+    private  void iconClicked(boolean close){
+        if(mListener != null) mListener.nowIconClicked(true, close);
+    }
+    private void playPressed(){
+        if (null != mListener) {
+            // Notify the active callbacks interface (the activity, if the
+            // fragment is attached to one) that an item has been selected.
+            mListener.playPausePressed();
+//            icon.setInAnimation(getContext(), R.anim.slidein_up);
+//            icon.setOutAnimation(getContext(), R.anim.slideout_up);
+
+        }
+    }
+
+    private void nextPressed(){
+        if (null != mListener) {
+            // Notify the active callbacks interface (the activity, if the
+            // fragment is attached to one) that an item has been selected.
+            mListener.nextPressed();
+//            icon.setInAnimation(getContext(), R.anim.slidein_left);
+//            icon.setOutAnimation(getContext(), R.anim.slideout_right);
+
+        }
+    }
+    private void prevPressed(){
+        if (null != mListener) {
+            // Notify the active callbacks interface (the activity, if the
+            // fragment is attached to one) that an item has been selected.
+            mListener.prevPressed();
+//            icon.setInAnimation(getContext(), R.anim.slidein_right);
+//            icon.setOutAnimation(getContext(), R.anim.slideout_left);
+
+        }
+    }
+
 
     class MyGestureDetector extends GestureDetector.SimpleOnGestureListener {
         /**

@@ -11,9 +11,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.database.Cursor;
-import android.graphics.SurfaceTexture;
 import android.graphics.Typeface;
-import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -46,8 +44,6 @@ import android.widget.TextSwitcher;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
-
-import java.io.IOException;
 import java.util.ArrayList;
 
 import music.app.my.music.helpers.FabDoubleTapGS;
@@ -133,7 +129,9 @@ public class DrawerActivity extends AppCompatActivity
     private int currentTheme = R.style.DarkSide;    //R.style.AppTheme_NoActionBar;
 
     private boolean controlsVisible = false;
-    private TextureView bgTexture;
+    //private TextureView bgTexture;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -157,19 +155,7 @@ public class DrawerActivity extends AppCompatActivity
 
 //        bgTexture = findViewById(R.id.bgTexture);
 
-
-        //dim the systems  status and control bars
-        // 0 == show
-//        View decorView =  toolbar;
-////        int uiOptions = View.SYSTEM_UI_FLAG_LOW_PROFILE;
-//        int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-//                | View.SYSTEM_UI_FLAG_FULLSCREEN; // | View.SYSTEM_UI_FLAG_IMMERSIVE;
-//        decorView.setSystemUiVisibility(uiOptions);
-//        decorView.setSystemUiVisibility(0);
-
         toolbar.setOnMenuItemClickListener((Toolbar.OnMenuItemClickListener) this);
-
-     //   navIcon = (ImageView) findViewById(R.id.navHeaderIcon);
 
         nextText = (TextSwitcher) findViewById(R.id.nextText);
         if(nextText!=null) {
@@ -1669,6 +1655,7 @@ public class DrawerActivity extends AppCompatActivity
                                        IBinder service) {
             log("Music service connected!");
             // We've bound to LocalService, cast the IBinder and get LocalService instance
+
             MusicService.LocalBinder binder = (MusicService.LocalBinder) service;
             mService = binder.getService();
             mBound = true;

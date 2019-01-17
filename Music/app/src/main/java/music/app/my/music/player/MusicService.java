@@ -1,9 +1,6 @@
 package music.app.my.music.player;
 
 
-import java.util.HashMap;
-
-
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -24,7 +21,6 @@ import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.MediaMetadataRetriever;
 import android.media.RemoteControlClient;
-//import android.media.audiofx.Equalizer;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Handler;
@@ -32,15 +28,7 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.media.MediaDescriptionCompat;
-import android.support.v4.media.MediaMetadataCompat;
-import android.support.v4.media.session.MediaButtonReceiver;
-import android.support.v4.media.session.MediaControllerCompat;
-import android.support.v4.media.session.MediaSessionCompat;
-import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
-import android.widget.RemoteViews;
-
 import music.app.my.music.DrawerActivity;
 import music.app.my.music.R;
 import music.app.my.music.types.Song;
@@ -499,7 +487,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 					Log.i("Music Service", "No song up next, pausing player.");
 
 					mHandler.removeCallbacks(updateUi);
-					player.removeCallbacks();
+					//player.removeCallbacks();
 					//stopRequest();
 					pauseRequest();
 					//seekTo(0);
@@ -683,6 +671,11 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 
 
 	}
+
+
+
+
+
 }
 
 
