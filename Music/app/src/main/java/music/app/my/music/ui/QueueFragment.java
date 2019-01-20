@@ -161,7 +161,9 @@ public class QueueFragment extends baseListFragment {
         mListView.setFastScrollEnabled(true);
 
 
-        ((QueueAdapter)  mAdapter).setCurrent(current);
+        mAdapter.setCurrent(current);
+        mAdapter.setRepeatMode(repeatMode);
+      //  ((QueueAdapter)  mAdapter).setCurrent(current);
         mListView.setSelection(current) ;
         // mListView.setAdapter(mAdapter);
 
@@ -250,13 +252,14 @@ public class QueueFragment extends baseListFragment {
     }
 
 
-    private  int current = 0;
+    private  int current = 0, repeatMode = 0;
 
     public void setQList(plist p){
         log("Queue fragment updating list");
 
         items =   p.getArray();
         current = p.getIndex();
+        repeatMode = p.getRepeatMode();
         updateAdapter();
     }
 

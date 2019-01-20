@@ -32,6 +32,10 @@ public class QueueAdapter extends BaseAdapter implements UndoAdapter , Swappable
     private  TextView mContentView;
     private  TextView mIView;
 
+    private int repeatMode = 0;
+
+    public void setRepeatMode(int r){ repeatMode = r; }
+
     public QueueAdapter(List<Song> items, QueueListener listener) {
         mValues = items;
         mListener = listener;
@@ -44,14 +48,24 @@ public class QueueAdapter extends BaseAdapter implements UndoAdapter , Swappable
 
     }
 
+
+
     @Override
     public int getCount() {
-        return mValues.size();
+        if(repeatMode == 1 || repeatMode == 2) return Integer.MAX_VALUE;
+        //if(repeatMode == 0)
+            return mValues.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return mValues.get(position);
+        if(repeatMode == 1 && current < mValues.size()) return mValues.get(current);
+        int s = mValues.size();
+        if(repeatMode == 2) return mValues.get(position % s);
+
+       // if(repeatMode == 0)
+            return mValues.get(position);
+
     }
 
     @Override
@@ -63,6 +77,7 @@ public class QueueAdapter extends BaseAdapter implements UndoAdapter , Swappable
         long i = 0;
 
         try {
+            if(position >= mValues.size()) position %= mValues.size();
            i =  Long.parseLong(mValues.get(position).getId());
         } catch (NumberFormatException e) {
             e.printStackTrace();
@@ -75,7 +90,7 @@ public class QueueAdapter extends BaseAdapter implements UndoAdapter , Swappable
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.fragment_queueitem, parent, false);
 
-        final Song mItem = mValues.get(position);
+        final Song mItem = (Song) getItem(position);
             mView = view;
             mIdView = (TextView) view.findViewById(R.id.id);
             mContentView = (TextView) view.findViewById(R.id.content);
