@@ -47,6 +47,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
     public PlaylistAdapter(List<Playlist> items, baseListFragment.OnListFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
+        context = (Context) listener;
     }
 
     @Override
@@ -100,8 +101,9 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
      */
     private  int lastPosition = -1;
     private Context context;
-    private void setAnimation(View viewToAnimate, int position)
-    {
+    private void setAnimation(View viewToAnimate, int position){
+        if(context == null) return;
+
         // If the bound view wasn't previously displayed on screen, it's animated
         if (position > lastPosition)
         {

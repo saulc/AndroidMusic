@@ -16,14 +16,14 @@
     <item
         android:id="@+id/shuffle"
         android:checkable="true"
-        android:icon="@android:drawable/ic_menu_revert"
+        android:icon="@drawable/shuffle128"
         android:orderInCategory="100"
         android:title="Shuffle"
         app:showAsAction="always" />
     <item
         android:id="@+id/repeat"
         android:checkable="true"
-        android:icon="@android:drawable/ic_menu_rotate"
+        android:icon="@drawable/repeat128"
         android:orderInCategory="100"
         android:title="Repeat"
         app:showAsAction="always" />

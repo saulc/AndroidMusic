@@ -13,7 +13,7 @@ public class plist extends Qbase{
 	    private ArrayList<Song> songs;
 	    private int songIndex=0;
 	    private int repeatmode = 0;	//0 off, 1 repeat song, 2 repeat all
-	    private boolean shuffled = false, repeatVal=false;
+	    private boolean shuffled = false;//, repeatVal=false;
 	    private ArrayList<Song> backup;
 
 	    public plist(){
@@ -24,25 +24,21 @@ public class plist extends Qbase{
 //	    	songloader = new SongLoader();
 //	        songs = songloader.getPlayList();
 	    }
-	    public boolean repeat(){
-	    	if(repeatmode == 0){
-	    		repeatmode = 1;
-
-			}else if(repeatmode == 1){
-				repeatmode = 2;
-
-			}else if(repeatmode == 2){
-				repeatmode = 0;
-			}
-
-			repeatVal = repeatmode > 0;
-	    	return repeatVal;
+	    public int repeat(){
+	    	if(++repeatmode > 2) repeatmode = 0;
+			//repeatVal = repeatmode > 0;
+	    	return repeatmode;
 	    }
 
 		public int getRepeatMode(){
 			return repeatmode;
 		}
-	    public boolean shuffle(){
+
+	public boolean isShuffled() {
+		return shuffled;
+	}
+
+	public boolean shuffle(){
 	    	if(songs.size() == 0)
 	    		return false;
 	    	if(shuffled)

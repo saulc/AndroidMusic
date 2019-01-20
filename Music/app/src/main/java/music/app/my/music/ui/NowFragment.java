@@ -26,9 +26,11 @@ import android.widget.TextSwitcher;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
 
+import music.app.my.music.DrawerActivity;
 import music.app.my.music.R;
 import music.app.my.music.player.MusicPlayer;
 import music.app.my.music.types.Song;
+import music.app.my.music.types.plist;
 
 /**
  * Created by saul on 3/15/17.
@@ -54,7 +56,7 @@ public class NowFragment extends ControlFragment {
 //    }
     private ControlFragment.ControlFragmentListener mListener;
     private SeekBar sbar;
-    private ImageButton pp;
+    private ImageButton pp, shuffle, repeat;
     private TextSwitcher line1, line2, line3;
     private TextView pos, time;
     private ImageView icon;
@@ -92,10 +94,16 @@ public class NowFragment extends ControlFragment {
 
     }
 
+    @Override
+    public void onDestroy(){
+        mListener.onNowViewDestroyed();
+        super.onDestroy();
+    }
 
     public ImageView getIcon(){
         return icon;
     }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -168,6 +176,23 @@ public class NowFragment extends ControlFragment {
             };
 
             icon.setOnTouchListener(gestureListener);
+
+            shuffle = (ImageButton) view.findViewById(R.id.shuffleButton);
+            shuffle.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    shuffleClicked();
+                }
+            });
+
+            repeat = (ImageButton) view.findViewById(R.id.repeatButton);
+            repeat.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    repeatClicked();
+                }
+            });
+
         }
 
         line1.setFactory(new ViewSwitcher.ViewFactory() {
@@ -358,10 +383,10 @@ public class NowFragment extends ControlFragment {
 
     }
 
+
     @Override
     public void setPlayPause(Boolean isPlaying) {
-        if (isPlaying)
-            pp.setImageResource(android.R.drawable.ic_media_pause);
+        if(isPlaying) pp.setImageResource(android.R.drawable.ic_media_pause);
         else pp.setImageResource(android.R.drawable.ic_media_play);
     }
 
@@ -369,6 +394,44 @@ public class NowFragment extends ControlFragment {
     public void doubleTap(){
         mListener.nowIconDoubleClicked();
 
+    }
+
+
+    public void updateButtons(plist q){
+        if(q== null) return;
+        rpbutton(q.getRepeatMode());
+        setShuffleRes(q.isShuffled());
+    }
+
+    private void repeatClicked(){
+       int r = mListener.onRepeatClicked();
+       rpbutton(r);
+    }
+
+    private void rpbutton(int r){
+        switch (r){
+            case 0: //no repeat
+                repeat.setBackgroundResource(R.drawable.boarder); break;
+            case 1: // single repeat
+                repeat.setBackgroundResource(R.drawable.gradientcircle);
+                repeat.setImageResource(R.drawable.repeatone128);
+                break;
+            case 2: //repeat all
+                repeat.setBackgroundResource(R.drawable.gradientcircle);
+                repeat.setImageResource(R.drawable.repeat128);
+                break;
+        }
+    }
+
+    private  void shuffleClicked(){
+        boolean r = mListener.onShuffleClicked();
+        setShuffleRes(r);
+    }
+
+    private  void setShuffleRes(boolean on){
+        //set the clear board if now shuffle. set gradient if shuffle
+        if(on) shuffle.setBackgroundResource(R.drawable.gradientcircle);
+        else shuffle.setBackgroundResource(R.drawable.boarder);
     }
 
 

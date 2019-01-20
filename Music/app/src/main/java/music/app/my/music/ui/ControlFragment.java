@@ -57,6 +57,12 @@ public class ControlFragment extends Fragment {
         void onNowViewCreated();
 
         void nowIconDoubleClicked();
+
+        void onNowViewDestroyed();
+
+        boolean onShuffleClicked();
+
+        int onRepeatClicked();
     }
     private ControlFragmentListener mListener;
     private SeekBar sbar;

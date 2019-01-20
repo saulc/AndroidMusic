@@ -364,9 +364,9 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 	   NotificationCompat.Action next = new NotificationCompat.Action(android.R.drawable.ic_media_next, "Next", nextpi);
 
 
-	   Bitmap li = BitmapFactory.decodeResource(getResources(), R.drawable.android_robot_icon_2128);
-	    mBuilder.setSmallIcon(R.drawable.android_robot_icon_2128)
-			//	.setLargeIcon(li)
+	   Bitmap li = BitmapFactory.decodeResource(getResources(), R.drawable.android_icon3_128);
+	    mBuilder.setSmallIcon(R.drawable.android_icon3_128)
+				.setLargeIcon(li)
 						//.setStyle(new NotificationCompat.DecoratedCustomViewStyle())
 				.setColor(Color.argb(100, 50, 0 , 30))
 						.setOngoing(true)
@@ -456,7 +456,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
    	return player.getCurrentSong();
    }
 	public boolean shuffleSongs() {  return player.shuffle(); }
-	public boolean repeatSongs(){
+	public int repeatSongs(){
 		return player.repeat();
 	}
 
