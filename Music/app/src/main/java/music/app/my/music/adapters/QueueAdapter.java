@@ -174,6 +174,6 @@ public class QueueAdapter extends BaseAdapter implements UndoAdapter , Swappable
 
     @Override
     public void add(int i, @NonNull Object o) {
-        mListener.addToQ(i, o);
+        //mListener.addToQ(i, o);
     }
 }

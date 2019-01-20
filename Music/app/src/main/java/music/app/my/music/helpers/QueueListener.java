@@ -14,5 +14,4 @@ public interface QueueListener  {
 
     void swapItems(int i, int i1);
 
-    void addToQ(int i, Object o);
 }

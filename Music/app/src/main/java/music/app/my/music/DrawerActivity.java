@@ -132,6 +132,7 @@ public class DrawerActivity extends AppCompatActivity
     private boolean controlsVisible = false;
     //private TextureView bgTexture;
 
+    /* -----------------------------------   onCreate start.   ----------------------------------- */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -253,29 +254,287 @@ public class DrawerActivity extends AppCompatActivity
     /* -----------------------------------   onCreate over.   ----------------------------------- */
 
 
+    /* ---------- Main side drawer navigation menu ------------- */
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.nav_now) {
+
+            showNow();
+
+        } else if( id == R.id.nav_bubble) {
+            log("Nav bubble clicked!");
+            showEQTab();
+            //showBubbles();
+
+        }  else if( id == R.id.nav_theme) {
+            log("Nav theme clicked!");
+            showThemeDialog();
+
+        } else if( id == R.id.exit) {
+            log("Nav exit clicked!");
+            mService.pauseRequest();
+            mService.removeFromForeground();
+            finish();
 
 
+        } else if( id == R.id.bluetooth) {
+            log("Nav bluetooth clicked!");
+            showBluetoothSettings();
 
 
-    private boolean faderActive = false;
+        } else if( id == R.id.clear_queue) {
+            clearQueueClicked();
 
-    public void showFadeFrag(View v){
-            log("Nav icon clicked! secret shit going down! ^_- ");
-            Toast.makeText(DrawerActivity.this,
-                    " -->  ^_^  <-- ", Toast.LENGTH_LONG).show();
 
-            if(!faderActive) {
-                log("Showing fadefragment.");
-                fader = FadeFragment.newInstance();
-                showFragment(R.id.frame, fader, false);
-                faderActive = true;
-            }else{
-                log("Hiding Fader");
-                faderActive = false;
-                if(fader != null)
-                getSupportFragmentManager().beginTransaction().remove(fader).commit();
-            }
+        } else if( id == R.id.save_queue) {
+            createNewPlaylist(true);
+
+
+        } else if( id == R.id.new_playlist){
+            createNewPlaylist(false);
+
+            //show playlist after we added a new one. no else
+        }  if (id == R.id.nav_playlists || id == R.id.new_playlist) {
+            Fragment f = PlayListFragment.newInstance();
+            showFragment(R.id.frame, f, true);
+
+
+        } else if (id == R.id.nav_artists) {
+            Fragment f = ArtistFragment.newInstance();
+            showFragment(R.id.frame, f, true);
+
+        } else if (id == R.id.nav_albums) {
+            Fragment f = AlbumFragment.newInstance();
+            showFragment(R.id.frame, f, true);
+
+        } else if (id == R.id.nav_genres) {
+            Fragment f = GenreFragment.newInstance();
+            showFragment(R.id.frame, f, true);
+
+        } else if (id == R.id.nav_songs) {
+            Fragment f = SongFragment.newInstance();
+            showFragment(R.id.frame, f, true);
+
+
+        }  else if (id == R.id.nav_settings) {
+            log("Settings clicked.");
+
+            showMix();
+//            Fragment f = (Fragment) HeaderFragment.newInstance("", "");
+//            showFragment(R.id.frame, f, true);
+        }
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
     }
+
+
+
+    /* ---------- Service Connection! UI Callbacks ------------- */
+
+    /** Defines callbacks for service binding, passed to bindService() */
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            log("Music service connected!");
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+
+            MusicService.LocalBinder binder = (MusicService.LocalBinder) service;
+            mService = binder.getService();
+            mBound = true;
+            log("Music service bound!");
+
+            binder.setListener(new MusicService.BoundServiceListener() {
+
+                @Override
+                public void sendProgress(MusicPlayer player) {
+                    //this happens at 1hz, don't leave active
+//                    log("Activty got progress info. updating ui...");
+                    //update seekbar.
+                    if(player != null)
+                        updateProgress(player);
+
+                }
+
+                @Override
+                public void setPlayPause(Boolean isPlaying) {
+                    setpp(isPlaying);
+                }
+
+                @Override
+                public void setCurrentInfo(Song s) {
+                    updateCurrentInfo(s);
+                }
+
+            });
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mBound = false;
+            log("Service Disconnected :(");
+        }
+    };
+
+
+
+    /* -----------------------------------  start    ----------------------------------- */
+
+    private void handleStartIntents(){
+
+        //handle share intents if we need to...
+        // Get the intent, verify the action and get the query
+        Intent intent = getIntent();
+        String action = intent.getAction();
+        String type = intent.getType();
+        log("Got intent! action: " + action);
+
+        log("Got intent! action: " + action);
+        if(Intent.ACTION_SEND.equals(action) && type != null) {
+
+            log("GOt Action Send!!");
+            log("Looking for data in extras!!");
+            Uri uri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
+
+            log("Type: ===>> "+ type);
+            log("Oh its audio!!"  + uri.toString());
+
+            String id = uri.toString().substring(uri.toString().lastIndexOf('/'), uri.toString().length());
+            //shared = new Song("Shared Song", id );
+
+            //todo play the shared song.
+//            onSongClicked(shared);
+
+        }  else if (Intent.ACTION_SEND_MULTIPLE.equals(action)) {
+
+        }
+
+    }
+    @Override
+    public void finish(){
+        //startService(new Intent(MusicService.ACTION_STOP));
+        log("Finishing.");
+        if (mBound) {
+            log("Unbinding service.");
+            stopService(new Intent(getApplicationContext(), MusicService.class));
+//            unbindService(mConnection);
+            mBound = false;
+        }
+
+        super.finish();
+    }
+
+    @Override
+    protected void onPause(){
+        log("Pause activity.");
+        super.onPause();
+
+    }
+    @Override
+    protected void onResume(){
+        super.onResume();
+
+        log("Resume activity.");
+    }
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // Bind to LocalService
+
+        final Intent intent = new Intent("music.app.my.music.player.MUSICSERVICE");  //Intent(DrawerActivity.this, music.app.my.music.player.MusicService.class);
+        //startService(intent);
+        Log.d("Main Activity", "binding service");
+        boolean r = getApplicationContext().bindService(
+                new Intent(this, MusicService.class), mConnection , Context.BIND_AUTO_CREATE);
+
+        if(r) log("Service should be bound");
+        else log("Service binding failed.");
+        //am.registerMediaButtonEventReceiver(myEventReceiver);
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        log("Stopping Activity");
+        // am.unregisterMediaButtonEventReceiver(myEventReceiver);
+        //	saveQueue();
+    }
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    /* -----------------------------------   onCreateOptions   -----------------------------------
+    *
+    *                                app bar menu. top Icons
+    *                                                                                        */
+
+    //
+    @Override
+    public boolean onCreateOptionsMenu(final Menu menu) {
+        // Inflate the options menu from XML
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.drawer, menu);
+        // Get the SearchView and set the searchable configuration
+        // SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        final SearchView searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
+        // Assumes current activity is the searchable activity
+        //searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        //searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
+
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+
+                log("SV closed");
+                searchActive = false;
+                return true;
+            }
+        });
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                log("Query Text Submit: "+ query);
+                if(sf != null)
+                    sf.updateQuery(query);
+                searchView.clearFocus();  //close keyboard
+                MenuItem m =   menu.findItem(R.id.menu_search);
+                m.collapseActionView();    //minimize search bar
+
+                searchActive = false;  //reset the song fragment//
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                log("Query Text Change: "+ newText);
+                if(sf != null)
+                    sf.updateQuery(newText);
+                return true;
+            }
+        });
+
+        return true;
+    }
+
+
+
+    /* ---------- Themes ------------- */
     private void showThemeDialog(){
 
         log("Showing Theme picker.");
@@ -324,6 +583,7 @@ public class DrawerActivity extends AppCompatActivity
         finish();
     }
 
+    /* ---------- Floating button Menu ------------- */
     private void iniFM(){
         //next
         fab1.setOnClickListener(new View.OnClickListener() {
@@ -394,26 +654,7 @@ public class DrawerActivity extends AppCompatActivity
         });
 
     }
-
-
-    //bottom line
-//    private void showFM(){
-//        showfmenu = true;
-//        float r = -getResources().getDimension(R.dimen.fd);
-//        fab1.animate().translationX(r);
-//        fab2.animate().translationX(r*2);
-//        fab3.animate().translationX(r*3);
-//
-//    }
-//    private void hideFM(){
-//        showfmenu = false;
-//        fab1.animate().translationX(0);
-//        fab2.animate().translationX(0);
-//        fab3.animate().translationX(0);
-//    }
-
-   // circle?
-   private void moveFab(boolean up){
+    private void moveFab(boolean up){
 
        if(up) {
            float r = -getResources().getDimension(R.dimen.fab_marginvert);
@@ -429,55 +670,7 @@ public class DrawerActivity extends AppCompatActivity
            fab3.animate().translationY(r);
            fab.animate().translationY(r);
        }
-
-
    }
-
-
-        @Override
-        public void secretFragmentCreated(){
-        log("Secret mode on");
-       // secret.setTexture(bgTexture);
-
-
-        }
-
-        @Override
-        public void secretFragmentDestroyed(){
-
-        log("Secrets kill.");
-        }
-
-        @Override
-        public void onDoubleTap(){
-            log("Fab Double tap!");
-            starkMode(!stark);
-        }
-
-    @Override
-    public void nowIconDoubleClicked(){
-        log("Now icon double tapped.");
-
-
-    }
-
-    private boolean stark = false;
-    private SecretFragment secret = null;
-   //enable stark mode when showimg Fab menu.
-    private void starkMode(boolean enable) {
-
-        if(stark && secret != null){
-            getSupportFragmentManager().beginTransaction().remove(secret).commit();
-            stark = false;
-        }else if(!stark){
-            secret = SecretFragment.newInstance();
-            getSupportFragmentManager().beginTransaction().add(R.id.bgTexture, secret, "Itsasecret").commit();
-            stark = true;
-
-        }
-    }
-
-
     private void showFM(){
         showfmenu = true;
         moveFab(false);
@@ -502,163 +695,73 @@ public class DrawerActivity extends AppCompatActivity
 
 
     }
+    /* ---------- Floating button Menu ------------- */
 
 
-    private void handleStartIntents(){
+    /* ---------- Secret mode ------------- */
+        @Override
+        public void secretFragmentCreated(){
+        log("Secret mode on");
+       // secret.setTexture(bgTexture);
+        }
 
-        //handle share intents if we need to...
-        // Get the intent, verify the action and get the query
-        Intent intent = getIntent();
-        String action = intent.getAction();
-        String type = intent.getType();
-        log("Got intent! action: " + action);
+        @Override
+        public void secretFragmentDestroyed(){
+        log("Secrets kill.");
+        }
 
-        log("Got intent! action: " + action);
-        if(Intent.ACTION_SEND.equals(action) && type != null) {
+        @Override
+        public void onDoubleTap(){
+            log("Fab Double tap!");
+            starkMode(!stark);
+        }
 
-            log("GOt Action Send!!");
-            log("Looking for data in extras!!");
-            Uri uri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
+        @Override
+        public void nowIconDoubleClicked(){
+            log("Now icon double tapped.");
 
-            log("Type: ===>> "+ type);
-            log("Oh its audio!!"  + uri.toString());
-
-            String id = uri.toString().substring(uri.toString().lastIndexOf('/'), uri.toString().length());
-             //shared = new Song("Shared Song", id );
-
-            //todo play the shared song.
-//            onSongClicked(shared);
-
-        }  else if (Intent.ACTION_SEND_MULTIPLE.equals(action)) {
 
         }
 
-    }
-    @Override
-    public void finish(){
-        //startService(new Intent(MusicService.ACTION_STOP));
-        log("Finishing.");
-        if (mBound) {
-            log("Unbinding service.");
-            stopService(new Intent(getApplicationContext(), MusicService.class));
-//            unbindService(mConnection);
-            mBound = false;
-        }
+    private boolean stark = false;
+    private SecretFragment secret = null;
+   //enable stark mode when showimg Fab menu.
+    private void starkMode(boolean enable) {
 
-        super.finish();
-    }
+        if(stark && secret != null){
+            getSupportFragmentManager().beginTransaction().remove(secret).commit();
+            stark = false;
+        }else if(!stark){
+            secret = SecretFragment.newInstance();
+            getSupportFragmentManager().beginTransaction().add(R.id.bgTexture, secret, "Itsasecret").commit();
+            stark = true;
 
-    @Override
-    protected void onPause(){
-        log("Pause activity.");
-        super.onPause();
-
-    }
-    @Override
-    protected void onResume(){
-        super.onResume();
-
-        log("Resume activity.");
-    }
-    @Override
-    protected void onStart() {
-        super.onStart();
-        // Bind to LocalService
-
-        final Intent intent = new Intent("music.app.my.music.player.MUSICSERVICE");  //Intent(DrawerActivity.this, music.app.my.music.player.MusicService.class);
-        //startService(intent);
-        Log.d("Main Activity", "binding service");
-        boolean r = getApplicationContext()
-                        .bindService(new Intent(this, MusicService.class),
-                        mConnection
-                        , Context.BIND_AUTO_CREATE);
-
-        if(r) log("Service should be bound");
-        else log("Service binding failed.");
-
-        //am.registerMediaButtonEventReceiver(myEventReceiver);
-
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        log("Stopping Activity");
-        // Unbind from the service
-        // am.unregisterMediaButtonEventReceiver(myEventReceiver);
-        //	saveQueue();
-//        if (mBound) {
-//            log("Unbinding Service");
-//             unbindService(mConnection);
-//            mBound = false;
-//        }
-    }
-
-
-    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
         }
     }
 
+    /* ---------- Secret mode ------------- */
 
+    /* ---------- Fader controls ------------- */
+    private boolean faderActive = false;
+    public void showFadeFrag(View v){
+        log("Nav icon clicked! secret shit going down! ^_- ");
+        Toast.makeText(DrawerActivity.this,
+                " -->  ^_^  <-- ", Toast.LENGTH_LONG).show();
 
-
-    //app bar menu. top Icons!
-    @Override
-    public boolean onCreateOptionsMenu(final Menu menu) {
-        // Inflate the options menu from XML
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.drawer, menu);
-
-        // Get the SearchView and set the searchable configuration
-       // SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        final SearchView searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
-        // Assumes current activity is the searchable activity
-        //searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        //searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
-
-        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
-            @Override
-            public boolean onClose() {
-
-                log("SV closed");
-                searchActive = false;
-                return true;
-            }
-        });
-
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                log("Query Text Submit: "+ query);
-                if(sf != null)
-                sf.updateQuery(query);
-                searchView.clearFocus();  //close keyboard
-                 MenuItem m =   menu.findItem(R.id.menu_search);
-                 m.collapseActionView();    //minimize search bar
-
-                searchActive = false;  //reset the song fragment//
-                return true;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                log("Query Text Change: "+ newText);
-                if(sf != null)
-                sf.updateQuery(newText);
-                return true;
-            }
-        });
-
-        return true;
+        if(!faderActive) {
+            log("Showing fadefragment.");
+            fader = FadeFragment.newInstance();
+            showFragment(R.id.frame, fader, false);
+            faderActive = true;
+        }else{
+            log("Hiding Fader");
+            faderActive = false;
+            if(fader != null)
+                getSupportFragmentManager().beginTransaction().remove(fader).commit();
+        }
     }
 
-
+    /* ---------- EQ mode ------------- */
     public void setEQ(int selection, String eqname){
         log("Set eq: " + eqname);
         if(mService !=null) mService.getPlayer().setEQ(selection);
@@ -678,7 +781,6 @@ public class DrawerActivity extends AppCompatActivity
 
     public void visualizerLongClicked(){
         log("Vis long clicked.");
-
         showNow();
     }
 
@@ -701,8 +803,8 @@ public class DrawerActivity extends AppCompatActivity
         log("Showing visualizer!.");
         //vf = VisualizerDialogFragment.newInstance();
         //vf.show(getSupportFragmentManager(), "Visualizer");
-
     }
+
     @Override
     public boolean onMenuItemClick(MenuItem item) {
         int id = item.getItemId();
@@ -740,28 +842,6 @@ public class DrawerActivity extends AppCompatActivity
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        if (id == R.id.shuffle) {
-            return true;
-        } else if (id == R.id.repeat) {
-            return true;
-        } else if (id == R.id.mix) {
-            return true;
-        }
-        else if(id == R.id.menu_search){
-           // onSearchRequested();
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
     public void onSearchDestroyed(){
         log("Search Done.");
         searchActive = false;
@@ -792,9 +872,7 @@ public class DrawerActivity extends AppCompatActivity
         closeSidebar();
     }
 
-
-
-
+    /* ---------- Hide/Show extra Fragments ------------- */
     public void closeSidebar(){
         log("Closing q frame: ");
       //  mHandler.removeCallbacks(hideQframe);
@@ -881,7 +959,6 @@ public class DrawerActivity extends AppCompatActivity
 
         return  showq;
     }
-
     public int showQ(){
         log("Show Q:" + ++showq);
        // if(showq >0 && qf != null && qf.isVisible()) return showq;
@@ -906,7 +983,6 @@ public class DrawerActivity extends AppCompatActivity
         return  showq;
     }
 
-
     public void hideControls(boolean showPlaceholder){
 
         if(!controlsVisible) return;
@@ -927,6 +1003,10 @@ public class DrawerActivity extends AppCompatActivity
         controlsVisible = true;
         showFragment(R.id.controlFrame, cf, false);
     }
+
+    /* ---------- Hide/Show extra Fragments ------------- */
+
+    /* ---------- Show  Fragments ------------- */
 
     private void showFragment(int r, Fragment f, boolean addTobs){
 
@@ -969,6 +1049,8 @@ public class DrawerActivity extends AppCompatActivity
 
     }
 
+
+    /* ---------- not needed? ------------- */
     public void updateCurrentSongInfo(){
         if(mService != null ) {
             Song s = mService.getQueue().getCurrentSong();
@@ -1070,6 +1152,8 @@ public class DrawerActivity extends AppCompatActivity
 
     }
 
+
+    /* ---------- Show artist/album clicked from now fragment ------------- */
     @Override
     public void lineClicked(int i) {
 
@@ -1092,6 +1176,7 @@ public class DrawerActivity extends AppCompatActivity
 
     }
 
+    /* ---------- set up an Update to now fragment ------------- */
     @Override
     public void onNowViewCreated() {
         log("Now Fragment created");
@@ -1118,19 +1203,6 @@ public class DrawerActivity extends AppCompatActivity
 
     }
 
-
-    public void showMix(){
-        Log.d(TAG, "Showing MIX fragment");
-
-        if(mf != null && mf.isVisible() ) return;
-
-        mf =  MixxerFragment.newInstance();
-
-        showFragment(R.id.frame, mf, true);
-
-    }
-
-
     public void showNow(){
         Log.d(TAG, "Showing NOW fragment");
 
@@ -1139,29 +1211,22 @@ public class DrawerActivity extends AppCompatActivity
         if (orientation == Configuration.ORIENTATION_PORTRAIT)
         hideControls(false);
 
-        //opens the queue when its fully closed.
-//        if(showq > 2) {
-//            showq = 1;
-//            showQ();
-//        }
-
         if(nf != null && nf.isVisible() ) return;
 
         nf =  NowFragment.newInstance(false);
         showFragment(R.id.frame, nf, true);
-
-
-//        updateCurrentInfo(new Song("", ""));
     }
 
-    public void showBluetoothSettings(){
-         //shortcut direct to bluetooth setting page
-        Intent intentBluetooth = new Intent();
-        intentBluetooth.setAction(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS);
-        startActivity(intentBluetooth);
-
+    /* ---------- Show mixxer fragment ------------- */
+    public void showMix(){
+        Log.d(TAG, "Showing MIX fragment");
+        if(mf != null && mf.isVisible() ) return;
+        mf =  MixxerFragment.newInstance();
+        showFragment(R.id.frame, mf, true);
     }
 
+
+    /* ---------- Show placeholder. for now its used for eq instead. ------------- */
     private  void showBubbles(){
 
         log("Showing Bubble fragment");
@@ -1169,83 +1234,16 @@ public class DrawerActivity extends AppCompatActivity
         showFragment(R.id.frame, b, false);
 
     }
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
 
-        if (id == R.id.nav_now) {
+    public void showBluetoothSettings(){
+        //shortcut direct to bluetooth setting page
+        Intent intentBluetooth = new Intent();
+        intentBluetooth.setAction(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS);
+        startActivity(intentBluetooth);
 
-            showNow();
-
-        } else if( id == R.id.nav_bubble) {
-            log("Nav bubble clicked!");
-            showEQTab();
-            //showBubbles();
-
-        }  else if( id == R.id.nav_theme) {
-            log("Nav theme clicked!");
-            showThemeDialog();
-
-        } else if( id == R.id.exit) {
-            log("Nav exit clicked!");
-            mService.pauseRequest();
-            mService.removeFromForeground();
-            finish();
-
-
-        } else if( id == R.id.bluetooth) {
-            log("Nav bluetooth clicked!");
-            showBluetoothSettings();
-
-
-        } else if( id == R.id.clear_queue) {
-           clearQueueClicked();
-
-
-        } else if( id == R.id.save_queue) {
-            createNewPlaylist(true);
-
-
-        } else if( id == R.id.new_playlist){
-            createNewPlaylist(false);
-
-            //show playlist after we added a new one. no else
-        }  if (id == R.id.nav_playlists || id == R.id.new_playlist) {
-            Fragment f = PlayListFragment.newInstance();
-            showFragment(R.id.frame, f, true);
-
-
-        } else if (id == R.id.nav_artists) {
-            Fragment f = ArtistFragment.newInstance();
-            showFragment(R.id.frame, f, true);
-
-        } else if (id == R.id.nav_albums) {
-            Fragment f = AlbumFragment.newInstance();
-            showFragment(R.id.frame, f, true);
-
-        } else if (id == R.id.nav_genres) {
-            Fragment f = GenreFragment.newInstance();
-            showFragment(R.id.frame, f, true);
-
-        } else if (id == R.id.nav_songs) {
-            Fragment f = SongFragment.newInstance();
-            showFragment(R.id.frame, f, true);
-
-
-        }  else if (id == R.id.nav_settings) {
-            log("Settings clicked.");
-
-            showMix();
-//            Fragment f = (Fragment) HeaderFragment.newInstance("", "");
-//            showFragment(R.id.frame, f, true);
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
     }
+
+
 
     @Override
     public void onListFragmentInteraction(DummyContent.DummyItem item) {
@@ -1648,56 +1646,6 @@ public class DrawerActivity extends AppCompatActivity
 
     }
 
-    /** Defines callbacks for service binding, passed to bindService() */
-    private ServiceConnection mConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName className,
-                                       IBinder service) {
-            log("Music service connected!");
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
-
-            MusicService.LocalBinder binder = (MusicService.LocalBinder) service;
-            mService = binder.getService();
-            mBound = true;
-            log("Music service bound!");
-
-            binder.setListener(new MusicService.BoundServiceListener() {
-
-                @Override
-                public void sendProgress(MusicPlayer player) {
-                    //this happens at 1hz, don't leave active
-//                    log("Activty got progress info. updating ui...");
-                    //update seekbar.
-                    if(player != null)
-                    updateProgress(player);
-
-                }
-
-                @Override
-                public void setPlayPause(Boolean isPlaying) {
-                   setpp(isPlaying);
-                }
-
-                @Override
-                public void setCurrentInfo(Song s) {
-                    updateCurrentInfo(s);
-                }
-
-                @Override
-                public void setAudioId(int aid) {
-
-                }
-
-            });
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            mBound = false;
-            log("Service Disconnected :(");
-        }
-    };
 
 
     @Override
@@ -1759,11 +1707,6 @@ public class DrawerActivity extends AppCompatActivity
 
       //  mService.setQueue(p);
 
-    }
-
-    @Override
-    public void addToQ(int i, Object o) {
-        log("Add to Q called: " + i);
     }
 
     @Override

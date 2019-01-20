@@ -193,7 +193,6 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 		public void setPlayPause(Boolean isPlaying);
 
 		public void setCurrentInfo(Song s);
-		public void setAudioId(int aid);
 
    	}
    @Override
@@ -643,7 +642,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 		case PLAYING :
 			mListener.setPlayPause(true);
 			mListener.setCurrentInfo(player.getCurrentSong());
-			mListener.setAudioId(player.getAID());
+
 			updateFadeSettings();
 			mHandler.postDelayed(updateUi, 1000);
 			updateDream();
