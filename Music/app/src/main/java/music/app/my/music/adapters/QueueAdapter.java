@@ -68,6 +68,14 @@ public class QueueAdapter extends BaseAdapter implements UndoAdapter , Swappable
 
     }
 
+    private int getPos(int p){
+        if(repeatMode == 1 && current < mValues.size()) return  current;
+        int s = mValues.size();
+        if(repeatMode == 2) return (p % s);
+
+        return p;
+    }
+
     @Override
     public boolean hasStableIds(){
         return true;
@@ -97,13 +105,15 @@ public class QueueAdapter extends BaseAdapter implements UndoAdapter , Swappable
             mIView = (TextView) view.findViewById(R.id.i);
 
         //String t = "    ";
+        final int pos = getPos(position);
+
         if( position == current) //t =  "--> ";
             mView.setBackgroundResource(R.drawable.gradientbox);
         else mView.setBackgroundResource(android.R.color.transparent);   //mView.setBackgroundColor(R.color.colorPrimaryDark);
 
         //         Log.d("QADAPTER", "onBindViewHolder: " + current + t + position);
        // mIView.setText(t + (position + 1) + " ");
-        mIView.setText((position+1) + " ");
+        mIView.setText((pos+1) + " ");
         mContentView.setText(mItem.getArtist());
         mIdView.setText(mItem.getTitle());
 
@@ -113,7 +123,7 @@ public class QueueAdapter extends BaseAdapter implements UndoAdapter , Swappable
                 if (null != mListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
-                    mListener.onQueueItemClicked(mItem, position);
+                    mListener.onQueueItemClicked(mItem, pos);
                 }
             }
         });
@@ -124,7 +134,7 @@ public class QueueAdapter extends BaseAdapter implements UndoAdapter , Swappable
                 if (null != mListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
-                    mListener.onQueueItemLongClicked(mItem, position);
+                    mListener.onQueueItemLongClicked(mItem, pos);
                     return true;
                 }
 

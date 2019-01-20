@@ -1721,6 +1721,7 @@ public class DrawerActivity extends AppCompatActivity
     @Override
     public void onQueueItemLongClicked(Song mItem, int position) {
 
+        //moves to next.
         log(position + " Q item Long clicked " + mItem.getTitle());
 
         if( mService.getQueue().getIndex() != position) {
