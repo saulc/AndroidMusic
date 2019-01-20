@@ -16,6 +16,7 @@ public class FabDoubleTapGS extends GestureDetector.SimpleOnGestureListener {
     public interface DoubleTapListener {
         void onDoubleTap();
     }
+
     public void setDoubleTapListener(DoubleTapListener l){
         mListener = l;
 
@@ -30,7 +31,8 @@ public class FabDoubleTapGS extends GestureDetector.SimpleOnGestureListener {
     public boolean onDoubleTap(MotionEvent e){
         log("Double tap!");
         doubleTap();
-        return super.onDoubleTap(e);
+        return true;
+        //return super.onDoubleTap(e);
     }
 
 

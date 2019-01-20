@@ -2,12 +2,17 @@ package music.app.my.music.ui.browser;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.simplecityapps.recyclerview_fastscroll.interfaces.OnFastScrollStateChangeListener;
+import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.util.ArrayList;
 
@@ -48,7 +53,6 @@ public class GenreFragment extends baseListFragment {
     }
 
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -56,10 +60,12 @@ public class GenreFragment extends baseListFragment {
 
         View v = view.findViewById(R.id.list);
         // Set the adapter
-        if (v instanceof RecyclerView) {
+        if (v instanceof FastScrollRecyclerView) {
             Context context = view.getContext();
-            recyclerView = (RecyclerView) v;
+            recyclerView = (FastScrollRecyclerView) v;
 
+           // recyclerView.setLayoutManager(new LinearLayoutManager(context));
+            recyclerView.setFastScrollEnabled(true);
             recyclerView.setLayoutManager(new GridLayoutManager(context, 2));
 
             updateAdapter();
@@ -72,6 +78,7 @@ public class GenreFragment extends baseListFragment {
                 , ( baseListFragment.OnListFragmentInteractionListener) getActivity() );
         if(recyclerView== null) return;
         recyclerView.setAdapter(mAdapter);
+        recyclerView.setOnFastScrollStateChangeListener((OnFastScrollStateChangeListener)mAdapter);
         log("Updating adapter");
         mAdapter.notifyDataSetChanged();
         log("items:" + items.size());

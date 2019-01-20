@@ -196,6 +196,7 @@ public class plist extends Qbase{
 	    public void clearQueue(){
 	    	songs.clear();
 	    	resetShuffle();
+	    	songIndex = 0;
 	    }
 	    public String getQueueInfo(){
 	    	return songIndex+1 + " of " + (songs.size());

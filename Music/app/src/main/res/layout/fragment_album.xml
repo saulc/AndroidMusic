@@ -31,16 +31,23 @@
             android:layout_height="wrap_content" />
 
 
-        <android.support.v7.widget.RecyclerView
+
+        <com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/list"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            app:fastScrollPopupBgColor="?colorAccent"
+            app:fastScrollPopupTextColor="?colorPrimaryDark"
+            app:fastScrollThumbColor="?colorAccent"
+            app:fastScrollThumbEnabled="true"
+            app:fastScrollAutoHide="true"
+            app:fastScrollAutoHideDelay="2500"
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
-            android:id="@+id/list"
-            tools:listitem="@layout/fragment_queueitem">
-
-
-        </android.support.v7.widget.RecyclerView>
+            tools:listitem="@layout/fragment_baselistitem" />
 
     </LinearLayout>
 

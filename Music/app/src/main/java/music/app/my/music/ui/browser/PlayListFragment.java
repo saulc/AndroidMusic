@@ -2,6 +2,7 @@ package music.app.my.music.ui.browser;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -10,6 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
+
+import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.util.ArrayList;
 
@@ -67,10 +70,11 @@ public class PlayListFragment extends baseListFragment {
 
         View v = view.findViewById(R.id.list);
         // Set the adapter
-        if (v instanceof RecyclerView) {
+        if (v instanceof FastScrollRecyclerView) {
             Context context = view.getContext();
-             recyclerView = (RecyclerView) v;
+             recyclerView = (FastScrollRecyclerView) v;
              recyclerView.setLayoutManager(new LinearLayoutManager(context));
+            recyclerView.setFastScrollEnabled(true);
             View header =  view.findViewById(R.id.header);
             TextView t = (TextView) header.findViewById(R.id.content);
             t.setText("   + Add Playlist + ");

@@ -1,12 +1,19 @@
 package music.app.my.music.adapters;
 
+import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.simplecityapps.recyclerview_fastscroll.interfaces.OnFastScrollStateChangeListener;
+import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,15 +22,33 @@ import music.app.my.music.R;
 import music.app.my.music.types.Album;
 import music.app.my.music.ui.browser.baseListFragment;
 
-public class AlbumAdapter   extends  RecyclerView.Adapter<AlbumAdapter.ViewHolder> {
+public class AlbumAdapter   extends  RecyclerView.Adapter<AlbumAdapter.ViewHolder>
+        implements FastScrollRecyclerView.SectionedAdapter,
+        OnFastScrollStateChangeListener {
+
+    private boolean isScrolling = false;
+    @Override public void onFastScrollStart() {
+        isScrolling = true;
+
+    }
+    @Override public void onFastScrollStop() {
+        isScrolling = false;
+    }
 
     private final List<Album> mValues;
     private final baseListFragment.OnListFragmentInteractionListener mListener;
 
-    public  AlbumAdapter(ArrayList<Album> items, baseListFragment.OnListFragmentInteractionListener activity) {
+    public  AlbumAdapter( ArrayList<Album> items, baseListFragment.OnListFragmentInteractionListener activity) {
 
         mValues = items;
         mListener = activity;
+        context = (Context) activity;
+    }
+
+    @NonNull
+    @Override
+    public String getSectionName(int position) {
+        return mValues.get(position).getArtist().charAt(0)+"";
     }
 
     @Override
@@ -46,8 +71,12 @@ public class AlbumAdapter   extends  RecyclerView.Adapter<AlbumAdapter.ViewHolde
         holder.mLine2.setText(t);
 
         if(mValues.get(position).getArt() != null) {
-            Drawable d = Drawable.createFromPath(mValues.get(position).getArt());
-            holder.mIcon.setImageDrawable(d);
+            try {
+                Drawable d = Drawable.createFromPath(mValues.get(position).getArt());
+                holder.mIcon.setImageDrawable(d);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
         }
 
@@ -61,7 +90,41 @@ public class AlbumAdapter   extends  RecyclerView.Adapter<AlbumAdapter.ViewHolde
                 }
             }
         });
+        // Here you apply the animation when the view is bound
+        if(!isScrolling){
+            //  log("Setting animation. " + isScrolling);
+            setAnimation(holder.itemView, position);
+        }
     }
+
+    /**
+     * Here is the key method to apply the animation
+     */
+    private  int lastPosition = -1;
+    private Context context;
+    private void setAnimation(View viewToAnimate, int position)
+    {
+        // If the bound view wasn't previously displayed on screen, it's animated
+        if (position > lastPosition)
+        {
+            Animation animation = AnimationUtils.loadAnimation(context, R.anim.slidenscale);
+            viewToAnimate.startAnimation(animation);
+            //  lastPosition = position;  //with this items are only animated the first time you scroll.
+            //now it always animates. up and down. no animation on fast scroll.
+        }
+    }
+
+//    @Override
+//    public void onViewDetachedFromWindow(final RecyclerView.ViewHolder holder)
+//    {
+//        ((CustomViewHolder)holder).clearAnimation();
+//    }
+//
+//    public void clearAnimation()
+//    {
+//        mRootLayout.clearAnimation();
+//    }
+//
 
     @Override
     public int getItemCount() {

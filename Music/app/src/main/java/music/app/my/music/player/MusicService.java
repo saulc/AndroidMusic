@@ -27,12 +27,16 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.service.dreams.DreamService;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import music.app.my.music.DrawerActivity;
+import music.app.my.music.Dream;
 import music.app.my.music.R;
 import music.app.my.music.types.Song;
 import music.app.my.music.types.plist;
+
+
 
 public class MusicService extends Service implements OnSharedPreferenceChangeListener, MusicPlayer.MusicPlayerStateListener{
 
@@ -58,8 +62,12 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
    public static final String ACTION_BLANK = "com.app.m6.action.ACTION_BLANK";
 	public static final String ACTION_DUCK = "com.app.m6.action.ACTION_DUCK";
 	public static final String ACTION_GOOSE = "com.app.m6.action.ACTION_GOOSE";
+	//dream intent to get now playing., snooze start, wake end dream
+	public static final String ACTION_SNOOZE = "com.app.m6.action.ACTION_SNOOZE";
+	public static final String ACTION_WAKE = "com.app.m6.action.ACTION_WAKE";
+	private boolean dreaming = false;
 
-   private RemoteControlClientCompat mRemoteControlClientCompat;
+	private RemoteControlClientCompat mRemoteControlClientCompat;
    private MediaControlReceiver mediaReceiver;
    private NotificationCompat.Builder mBuilder;
    private NotificationManager mNotificationManager;
@@ -130,6 +138,11 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 				player.duck();
 		   log("Music service Audio ducking: " + player.isDucking() );
 
+	   } else if(action.equals(ACTION_SNOOZE)) {
+		   dreaming = true;
+		   updateDream();
+	   }else if(action.equals(ACTION_WAKE)) {
+		   endDream();
 	   }
 
 
@@ -461,6 +474,36 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 	   return player;
    }
 
+   private Intent snoozeIntent;
+
+	private void endDream(){
+		if(!dreaming) return;
+		dreaming = false;
+	}
+
+   private void updateDream(){
+		if(!dreaming) return;
+		log("Sending info to dream .");
+
+		if(snoozeIntent == null) {
+			snoozeIntent = new Intent(this, Dream.class);
+			snoozeIntent.setAction(Dream.ACTION_UPDATE_MEDIA_INFO);
+		}
+
+	   if(player.getQueue()==null) return;
+	   Song s = getQueue().getCurrentSong();
+	   if(s == null) return;
+
+	   snoozeIntent.putExtra("TITLE", s.getTitle());
+	   snoozeIntent.putExtra("ARTIST", s.getArtist());
+	   snoozeIntent.putExtra("ALBUM", s.getAlbum());
+	   //snoozeIntent.putExtra("TITLE", s.getAlbumArt());
+
+	   startService(snoozeIntent);
+
+   }
+
+
 	public Runnable updateUi = new Runnable(){
 		@Override
 		public void run()
@@ -603,6 +646,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 			mListener.setAudioId(player.getAID());
 			updateFadeSettings();
 			mHandler.postDelayed(updateUi, 1000);
+			updateDream();
 
 			setUpAsForeground("Playing");;
 			// Tell any remote controls that our playback state is 'paused'.

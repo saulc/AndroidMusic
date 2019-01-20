@@ -2,16 +2,33 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/dreamBG"
     android:background="@android:color/transparent" >
 
     <TextView
         android:id="@+id/dreamText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:lineSpacingExtra="10sp"
         android:padding="@dimen/text_margin"
+        android:paddingBottom="@dimen/top_text_margin"
         android:text="Hello !"
         android:textAlignment="center"
-        android:textSize="44sp"
-        android:textStyle="bold" />
+        android:textSize="124sp"
+        android:textStyle="bold"
+        android:typeface="monospace" />
+
+    <TextView
+        android:id="@+id/dreamSubText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/dreamText"
+        android:fontFamily="casual"
+        android:padding="@dimen/text_margin"
+        android:paddingTop="@dimen/top_text_margin"
+        android:text=" ^_^ "
+        android:textAlignment="center"
+        android:textSize="14sp"
+        android:textStyle="bold|italic" />
+
+
 </RelativeLayout>

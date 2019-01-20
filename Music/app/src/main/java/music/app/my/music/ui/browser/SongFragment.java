@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,6 +22,9 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import com.simplecityapps.recyclerview_fastscroll.interfaces.OnFastScrollStateChangeListener;
+import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.util.ArrayList;
 
@@ -163,12 +167,16 @@ public class SongFragment extends baseListFragment implements MediaHelperListene
 
         View v = view.findViewById(R.id.list);
         // Set the adapter
-        if (v instanceof RecyclerView) {
+        if (v instanceof FastScrollRecyclerView) {
             Context context = view.getContext();
-            recyclerView = (RecyclerView) v;
-            recyclerView.setLayoutManager(new GridLayoutManager(context, 1));
+            recyclerView = (FastScrollRecyclerView) v;
+                recyclerView.setLayoutManager(new LinearLayoutManager(context));
+                recyclerView.setFastScrollEnabled(true);
+              //  recyclerView.setAutoHideEnabled(false);
 
-            recyclerView.setVerticalScrollBarEnabled(true);
+//            recyclerView.setLayoutManager(new GridLayoutManager(context, 1));
+
+           // recyclerView.setVerticalScrollBarEnabled(true);
             songbar = view.findViewById(R.id.songbar);
             songbar.setProgress(songprogress);
             songbar.setMax(100);
@@ -301,6 +309,7 @@ public class SongFragment extends baseListFragment implements MediaHelperListene
 
         if(recyclerView == null) return;
         recyclerView.setAdapter(mAdapter);
+        recyclerView.setOnFastScrollStateChangeListener((OnFastScrollStateChangeListener)mAdapter);
         log("Updating song list adapter");
         mAdapter.notifyDataSetChanged();
         if(items == null)

@@ -327,6 +327,7 @@ public class NowFragment extends ControlFragment {
                 d = new BitmapDrawable(getResources(), rc);
                 log("Bitmap scaled");
 
+
                 if(isMini) icon.setImageDrawable(d);
                 else setBg(d);
 

@@ -1,11 +1,18 @@
 package music.app.my.music.adapters;
 
+import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.TextView;
+
+import com.simplecityapps.recyclerview_fastscroll.interfaces.OnFastScrollStateChangeListener;
+import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.util.List;
 
@@ -21,7 +28,18 @@ import music.app.my.music.ui.browser.baseListFragment;
 
 
 
-public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
+public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>
+        implements FastScrollRecyclerView.SectionedAdapter,
+        OnFastScrollStateChangeListener {
+
+    private boolean isScrolling = false;
+    @Override public void onFastScrollStart() {
+        isScrolling = true;
+
+    }
+    @Override public void onFastScrollStop() {
+        isScrolling = false;
+    }
 
     private final List<Song> mValues;
     private final baseListFragment.OnListFragmentInteractionListener mListener;
@@ -34,7 +52,15 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         this.isPlaylist = isPlaylist;
         pid = id;
         pname = name;
+        context = (Context) listener;
     }
+
+    @NonNull
+    @Override
+    public String getSectionName(int position) {
+        return mValues.get(position).getTitle().charAt(0)+"";
+    }
+
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -107,6 +133,28 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                 }
             }
         });
+        // Here you apply the animation when the view is bound
+        if(!isScrolling){
+            //  log("Setting animation. " + isScrolling);
+            setAnimation(holder.itemView, position);
+        }
+    }
+
+    /**
+     * Here is the key method to apply the animation
+     */
+    private  int lastPosition = -1;
+    private Context context;
+    private void setAnimation(View viewToAnimate, int position)
+    {
+        // If the bound view wasn't previously displayed on screen, it's animated
+        if (position > lastPosition)
+        {
+            Animation animation = AnimationUtils.loadAnimation(context, R.anim.slidein_right);
+            viewToAnimate.startAnimation(animation);
+          //  lastPosition = position;  //with this items are only animated the first time you scroll.
+            //now it always animates. up and down. no animation on fast scroll.
+        }
     }
 
     @Override

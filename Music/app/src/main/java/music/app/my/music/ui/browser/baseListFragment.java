@@ -6,11 +6,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.util.ArrayList;
 
@@ -48,7 +51,8 @@ public  class baseListFragment extends Fragment  implements MediaHelperListener 
     protected MediaStoreHelper msHelper;
     protected RecyclerView.Adapter mAdapter;
     protected ArrayList<Playlist> items;
-    protected RecyclerView recyclerView;
+//    protected RecyclerView recyclerView;
+    protected FastScrollRecyclerView recyclerView;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -88,11 +92,13 @@ public  class baseListFragment extends Fragment  implements MediaHelperListener 
         // Set the adapter
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
-            recyclerView = (RecyclerView) view;
+            recyclerView = (FastScrollRecyclerView) view;
 //            if (mColumnCount <= 1) {
 //                recyclerView.setLayoutManager(new LinearLayoutManager(context));
 //            } else {
-            recyclerView.setLayoutManager(new GridLayoutManager(context, 2));
+//            recyclerView.setLayoutManager(new GridLayoutManager(context, 2));
+            recyclerView.setLayoutManager(new LinearLayoutManager(context));
+            recyclerView.setFastScrollEnabled(true);
             //            }
             updateAdapter();
         }

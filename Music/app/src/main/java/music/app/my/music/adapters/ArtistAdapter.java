@@ -1,10 +1,18 @@
 package music.app.my.music.adapters;
 
+import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.TextView;
+
+import com.simplecityapps.recyclerview_fastscroll.interfaces.OnFastScrollStateChangeListener;
+import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,15 +21,20 @@ import music.app.my.music.R;
 import music.app.my.music.types.Artist;
 import music.app.my.music.ui.browser.baseListFragment;
 
-public class ArtistAdapter extends  RecyclerView.Adapter<ArtistAdapter.ViewHolder> {
+public class ArtistAdapter extends  RecyclerView.Adapter<ArtistAdapter.ViewHolder>
+        implements FastScrollRecyclerView.SectionedAdapter,
+        OnFastScrollStateChangeListener {
 
+    private boolean isScrolling = false;
     private final List<Artist> mValues;
     private final baseListFragment.OnListFragmentInteractionListener mListener;
 
     public ArtistAdapter(ArrayList<Artist> items, baseListFragment.OnListFragmentInteractionListener activity) {
 
+        log("Artist Adapter Created.");
         mValues = items;
         mListener = activity;
+        context = (Context) activity;
     }
 
     @Override
@@ -57,11 +70,62 @@ public class ArtistAdapter extends  RecyclerView.Adapter<ArtistAdapter.ViewHolde
                 }
             }
         });
+        // Here you apply the animation when the view is bound
+        if(!isScrolling){
+          //  log("Setting animation. " + isScrolling);
+            setAnimation(holder.itemView, position);
+        }
+       // log("Item binding...");
+    }
+
+    private final String TAG = getClass().getSimpleName();
+    private void log(String s){
+        Log.d(TAG, s);
+    }
+
+
+
+    @Override
+    public void onFastScrollStart() {
+        log("Fast scroll started. " + isScrolling);
+        isScrolling = true;
+        log("Fast scroll started. " + isScrolling);
+    }
+
+    @Override
+    public void onFastScrollStop() {
+        log("Fast scroll stopped." + isScrolling);
+        isScrolling = false;
+        log("Fast scroll stopped." + isScrolling);
+    }
+
+    /**
+     * Here is the key method to apply the animation
+     */
+    private  int lastPosition = -1;
+    private Context context;
+    private void setAnimation(View viewToAnimate, int position)
+    {
+        log("animation: " +  isScrolling);
+        // If the bound view wasn't previously displayed on screen, it's animated
+        if (position > lastPosition)
+        {
+            Animation animation = AnimationUtils.loadAnimation(context, R.anim.slidenscale);
+            viewToAnimate.startAnimation(animation);
+            //  lastPosition = position;  //with this items are only animated the first time you scroll.
+            //now it always animates. up and down. no animation on fast scroll.
+        }
     }
 
     @Override
     public int getItemCount() {
         return mValues.size();
+    }
+
+    @NonNull
+    @Override
+    public String getSectionName(int position) {
+        return mValues.get(position).getArtist().charAt(0)+"";
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

@@ -3,11 +3,15 @@ package music.app.my.music.ui.browser;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.simplecityapps.recyclerview_fastscroll.interfaces.OnFastScrollStateChangeListener;
+import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.util.ArrayList;
 
@@ -62,11 +66,11 @@ public class ArtistFragment extends baseListFragment {
         // Set the adapter
         if (v instanceof RecyclerView) {
             Context context = view.getContext();
-             recyclerView = (RecyclerView) v;
-
+             recyclerView = (FastScrollRecyclerView) v;
                 recyclerView.setLayoutManager(new GridLayoutManager(context, 2));
-
-          updateAdapter();
+//            recyclerView.setLayoutManager(new LinearLayoutManager(context));
+            updateAdapter();
+            recyclerView.setFastScrollEnabled(true);
         }
         return view;
     }
@@ -75,6 +79,7 @@ public class ArtistFragment extends baseListFragment {
         mAdapter = new ArtistAdapter(items
                 , ( baseListFragment.OnListFragmentInteractionListener) getActivity() );
         recyclerView.setAdapter(mAdapter);
+        recyclerView.setOnFastScrollStateChangeListener((OnFastScrollStateChangeListener)mAdapter);
         log("Updating adapter");
         mAdapter.notifyDataSetChanged();
         log("items:" + items.size());

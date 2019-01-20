@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
+
 import music.app.my.music.DrawerActivity;
 import music.app.my.music.R;
 import music.app.my.music.ui.browser.baseListFragment;
@@ -55,9 +57,9 @@ public class PlaceholderFragment extends baseListFragment {
         textView.setText("Now Playing: " + arg);
 
         // Set the adapter
-        if (view instanceof RecyclerView) {
+        if (view instanceof FastScrollRecyclerView) {
             Context context = view.getContext();
-            recyclerView = (RecyclerView) view;
+            recyclerView = (FastScrollRecyclerView) view;
 
                 recyclerView.setLayoutManager(new LinearLayoutManager(context));
 
