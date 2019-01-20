@@ -2,21 +2,17 @@ package music.app.my.music;
 
 import android.animation.LayoutTransition;
 import android.content.ComponentName;
-import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
-import android.database.Cursor;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
@@ -26,7 +22,6 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MenuInflater;
 import android.view.MotionEvent;
-import android.view.TextureView;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -47,19 +42,16 @@ import android.widget.ViewSwitcher;
 import java.util.ArrayList;
 
 import music.app.my.music.helpers.FabDoubleTapGS;
-import music.app.my.music.helpers.MixListener;
 import music.app.my.music.helpers.PlaylistHelper;
 import music.app.my.music.helpers.QueueListener;
 import music.app.my.music.player.MusicPlayer;
 import music.app.my.music.player.MusicService;
-import music.app.my.music.player.myPlayer;
 import music.app.my.music.types.Album;
 import music.app.my.music.types.Artist;
 import music.app.my.music.types.Genre;
 import music.app.my.music.types.plist;
 import music.app.my.music.types.Playlist;
 import music.app.my.music.types.Song;
-import music.app.my.music.ui.MixFragment;
 import music.app.my.music.ui.MixxerFragment;
 import music.app.my.music.ui.browser.AlbumFragment;
 import music.app.my.music.ui.browser.ArtistFragment;
@@ -85,7 +77,7 @@ public class DrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         baseListFragment.OnListFragmentInteractionListener,
         HeaderFragment.OnFragmentInteractionListener,
-        QueueListener, MixListener,
+        QueueListener ,
         ControlFragment.ControlFragmentListener,
         NewPlaylistDialog.OnDialogInteractionListener ,
         MixxerFragment.MixxerListener,
@@ -1127,7 +1119,7 @@ public class DrawerActivity extends AppCompatActivity
         } else {
           getSupportFragmentManager().beginTransaction().remove(vf).commit();
           vf = null;
-          nowIconLongClicked();
+          //nowIconLongClicked();
         }
 
         //showFragment(R.id.frame, vf, true);
@@ -1244,7 +1236,6 @@ public class DrawerActivity extends AppCompatActivity
     }
 
 
-
     @Override
     public void onListFragmentInteraction(DummyContent.DummyItem item) {
         Log.d(TAG, "List item clicked");
@@ -1293,23 +1284,19 @@ public class DrawerActivity extends AppCompatActivity
     }
 
 
-
+    /* ---------- Playlist stuff ------------- */
     @Override
     public void cancelClicked() {
         Log.d(TAG, "Playlist  create terminated.");
 
     }
 
-
-
     @Override
     public void nameEnted(String name, boolean isQ) {
         Log.d(TAG, "Playlist  name entered: " + name);
         PlaylistHelper.newPlaylist(getApplicationContext(), name);
-
         Toast.makeText(mService, "Created Playlist: " + name, Toast.LENGTH_SHORT).show();
-        if(isQ)
-            saveQueueAsPlaylist(name);
+        if(isQ)  saveQueueAsPlaylist(name);
     }
 
     //called back fro nameEnted when playlist has been created.
@@ -1433,9 +1420,28 @@ public class DrawerActivity extends AppCompatActivity
     }
 
 
-    /*
-      end of add group to playlist
-    */
+    /* ---------- remove song from playlist trigged. show comfirm dialog ------------- */
+    @Override
+    public  void onPlaylistSongLongClicked(Song s, String pid, String pname, int pos) {
+
+        log("Playlist song long clicked! deleting item: " + s.getTitle() + "from playlist " + pname);
+
+        DialogFragment c = ConfirmDeleteDialogFragment.newInstance(pname, pid, s.getId(), pos);
+        c.show(getSupportFragmentManager(), "REMOVESONG");
+
+    }
+
+    /* ---------- remove song comfirmed, show snackbar and delete it. ------------- */
+    public void deletedSong(String pname, String pid, String sid, int pos) {
+        //TODO add an 'undo" to the snackbar.
+        View contextView = findViewById(R.id.controlFrame);
+        Snackbar.make(contextView, "deleting item: " +sid + " from playlist " + pname, Snackbar.LENGTH_LONG).show();
+        PlaylistHelper.deleleFromPlaylist(getApplicationContext(), Long.parseLong(pid), pname, sid , pos);
+
+    }
+
+    /* ---------- playlist stuff over ------------- */
+
 
     //calls above method when a playlist is seltected
     @Override
@@ -1452,6 +1458,7 @@ public class DrawerActivity extends AppCompatActivity
         c.show(getSupportFragmentManager(), song.getId());
     }
 
+    /* ---------- lock screen orientation ------------- */
     @Override
     public void onBubblesReady() {
         log("Bubbles ready. locking screen.");
@@ -1518,9 +1525,6 @@ public class DrawerActivity extends AppCompatActivity
     }
 
 
-
-
-
     @Override
     public void onSongNextupClicked(int position, Song item) {
         Log.d(TAG, "Song nextup clicked" + item.getTitle() + " : " + item.getArtist());
@@ -1579,75 +1583,8 @@ public class DrawerActivity extends AppCompatActivity
 
 
 
-    public void updateQueueFrag(plist p){
-        if(qf != null && showq != 0)
-            qf.setQList(p);
-    }
 
-    @Override
-    public void playPausePressed(){
-        startService(toggleIntent);
-    }
-
-    @Override
-    public void nextPressed() {
-        startService(nextIntent);
-    }
-
-    @Override
-    public void prevPressed() {
-        startService(previousIntent);
-    }
-
-    @Override
-    public void readyForInfo() {
-
-    }
-
-    @Override
-    public void seekBarChanged(int progress) {
-        mService.seekTo(progress);
-    }
-
-
-    public void setpp(Boolean isPlaying){
-        if(nf != null) nf.setPlayPause(isPlaying);
-        if(cf != null && controlsVisible) cf.setPlayPause(isPlaying);
-        int r = !isPlaying ? android.R.drawable.ic_media_play : android.R.drawable.ic_media_pause;
-        fab2.setImageResource(r);
-    }
-
-    @Override
-    public void onMixxerDestroyed() {
-        mixxerReadyForUpdates = false;
-    }
-
-    public void updateProgress(MusicPlayer player){
-        if(mixxerReadyForUpdates) mf.updateMixxerPlayer(player);
-        if(nf != null && nf.isVisible()) nf.updateProgressBar(player);
-        if(controlsVisible)
-        {
-                cf.updateProgressBar(player);
-        }
-
-    }
-
-    public void updateCurrentInfo(Song s){
-
-        if(mixxerReadyForUpdates) mf.updateMP(mService.getPlayer());
-
-        if(vf != null) vf.setAid(mService.getPlayer().getAID());
-        if(nf != null) nf.updateSongInfo(s);
-        if(cf != null) cf.updateSongInfo(s);
-
-        updateNextSongInfo();
-
-        updateQueueFrag(mService.getQueue());
-
-    }
-
-
-
+    /* ---------- Queue Fragment ------------- */
     @Override
     public void qFragCreated() {
         log("Q frag created");
@@ -1669,19 +1606,15 @@ public class DrawerActivity extends AppCompatActivity
 
     @Override
     public void onQueueItemLongClicked(Song mItem, int position) {
-
         //moves to next.
         log(position + " Q item Long clicked " + mItem.getTitle());
-
         if( mService.getQueue().getIndex() != position) {
             plist q =  mService.getQueue();
            int index = q.getIndex();
            Song clicked = q.removeSong(position);
            if(position < index) q.setIndex(index - 1);
            q.addNextSong(clicked);
-
         }
-
         updateCurrentSongInfo();
         updateQueueFrag(mService.getQueue());
         updateNextSongInfo();
@@ -1722,81 +1655,93 @@ public class DrawerActivity extends AppCompatActivity
     }
 
 
-
-    @Override
-    public  void onPlaylistSongLongClicked(Song s, String pid, String pname, int pos) {
-
-        log("Playlist song long clicked! deleting item: " + s.getTitle() + "from playlist " + pname);
-
-        DialogFragment c = ConfirmDeleteDialogFragment.newInstance(pname, pid, s.getId(), pos);
-        c.show(getSupportFragmentManager(), "REMOVESONG");
-
-    }
+    /* ---------- Queue Fragment end ------------- */
 
 
-        public void deletedSong(String pname, String pid, String sid, int pos) {
+    /* ---------- MIxxer Fragment ------------- */
 
-        View contextView = findViewById(R.id.controlFrame);
-        Snackbar.make(contextView, "deleting item: " +sid + " from playlist " + pname, Snackbar.LENGTH_LONG).show();
-
-        PlaylistHelper.deleleFromPlaylist(getApplicationContext(), Long.parseLong(pid), pname, sid , pos);
-
-    }
-
-
-    @Override
-    public void onHeaderFragmentInteraction(Uri uri) {
-        log("Header fragment interaction");
-    }
-
-    @Override
-    public void onMixItemClicked(String mItem, int position) {
-        log("Mix item clicked: " + position);
-        ArrayList<myPlayer> p = mService.getPlayer().getmPlayers();
-        if(position < p.size()){
-            if(p.get(position).isPlaying() || !p.get(position).isPaused()) p.get(position).pausePlayback();
-            else  p.get(position).resumePlayback();
-           // mf.updateProgressBar(mService.getPlayer());
-        }
-    }
-
-    @Override
-    public void onMixItemLongClicked(myPlayer mItem, int position) {
-        log("Mix item long clicked: " + position);
-    }
-
-
-    @Override
-    public void onMixViewCreated() {
-        log("Mix Fragment created");
-
-//        if(mf != null && mf.isVisible()) {
-//            log("Mix Fragment setting updater");
-//
-//            final Handler h = new Handler();
-//            h.postDelayed(new Runnable() {
-//                @Override
-//                public void run() {
-//                    if (mf.isVisible()) {
-//                        if (mService != null)
-//                            updateProgress(mService.getPlayer());
-//
-//                        mf.updateAdapter();
-//                        Log.d(TAG, "Mix updating..");
-//                        h.removeCallbacks(this);
-//                    }
-//                }
-//            }, 1000);
-//        }
-
-    }
 
     private boolean mixxerReadyForUpdates = false;
-
+    @Override
+    public void onMixxerDestroyed() {
+        mixxerReadyForUpdates = false;
+    }
 
     @Override
     public void onMixxerCreated() {
         log("Mixxer Created.");
         mixxerReadyForUpdates = true;
     }
+    /* ---------- Mixxer Fragment end ------------- */
+
+    public void updateQueueFrag(plist p){
+        if(qf != null && showq != 0)
+            qf.setQList(p);
+    }
+
+    @Override
+    public void playPausePressed(){
+        startService(toggleIntent);
+    }
+
+    @Override
+    public void nextPressed() {
+        startService(nextIntent);
+    }
+
+    @Override
+    public void prevPressed() {
+        startService(previousIntent);
+    }
+
+    @Override
+    public void readyForInfo() {
+
+    }
+
+    /* ---------- User clicked seekbar ------------- */
+    @Override
+    public void seekBarChanged(int progress) {
+        mService.seekTo(progress);
+    }
+
+    /* ---------- Music Serice Callbacks UpdateUI ------------- */
+    public void setpp(Boolean isPlaying){
+        if(nf != null) nf.setPlayPause(isPlaying);
+        if(cf != null && controlsVisible) cf.setPlayPause(isPlaying);
+        int r = !isPlaying ? android.R.drawable.ic_media_play : android.R.drawable.ic_media_pause;
+        fab2.setImageResource(r);
+    }
+
+
+    //updates seekbar and fader cue at 1hz
+    /* ---------- Music Serice Callbacks UpdateUI ------------- */
+    public void updateProgress(MusicPlayer player){
+        if(mixxerReadyForUpdates) mf.updateMixxerPlayer(player);
+        if(nf != null && nf.isVisible()) nf.updateProgressBar(player);
+        if(controlsVisible)
+        {
+            cf.updateProgressBar(player);
+        }
+
+    }
+
+    //called on pause/play only
+    /* ---------- Music Serice Callbacks UpdateUI ------------- */
+    public void updateCurrentInfo(Song s){
+
+        if(mixxerReadyForUpdates) mf.updateMP(mService.getPlayer());
+
+        if(vf != null) vf.setAid(mService.getPlayer().getAID());
+        if(nf != null) nf.updateSongInfo(s);
+        if(cf != null) cf.updateSongInfo(s);
+
+        updateNextSongInfo();
+
+        updateQueueFrag(mService.getQueue());
+
+    }
+
+
+
 }

@@ -71,7 +71,7 @@ public class HeaderFragment extends Fragment {
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
-            mListener.onHeaderFragmentInteraction(uri);
+           // mListener.onHeaderFragmentInteraction(uri);
         }
     }
 
@@ -104,6 +104,6 @@ public class HeaderFragment extends Fragment {
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onHeaderFragmentInteraction(Uri uri);
+       // void onHeaderFragmentInteraction(Uri uri);
     }
 }
