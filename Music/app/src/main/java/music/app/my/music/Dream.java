@@ -9,21 +9,15 @@ import android.os.Handler;
 import android.service.dreams.DreamService;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Display;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.TextView;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 import music.app.my.music.helpers.FabDoubleTapGS;
 import music.app.my.music.player.MusicService;
@@ -119,10 +113,12 @@ public class Dream extends DreamService implements FabDoubleTapGS.DoubleTapListe
             String t = b.getString("TITLE");
             String a = b.getString("ARTIST");
             String ab = b.getString("ALBUM");
+            boolean isPlaying = b.getBoolean("PLAYING");
 
-            msg = "Now playing: " + t + System.lineSeparator()
-                     + a + " : " + ab;
-            if(b == null) msg = "";
+            if(isPlaying)
+            msg = "Now playing: " + t + System.lineSeparator() + a + " : " + ab;
+           // if(b == null)
+            else msg = "";
             log(msg);
             //if(subText != null) subText.setText(msg);
 

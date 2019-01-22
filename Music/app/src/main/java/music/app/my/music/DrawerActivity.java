@@ -272,6 +272,10 @@ public class DrawerActivity extends AppCompatActivity
             showEQTab();
             //showBubbles();
 
+        } else if (id == R.id.nav_dream) {
+            log("Nav dream clicked!");
+            showDaydream();
+
         } else if (id == R.id.nav_theme) {
             log("Nav theme clicked!");
             showThemeDialog();
@@ -611,6 +615,17 @@ public class DrawerActivity extends AppCompatActivity
         }
 
     }
+
+
+    /* ---------- Daydream ------------- */
+    private void showDaydream(){
+        log("Sending Daydream intent.");
+        final Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.setClassName("com.android.systemui", "com.android.systemui.Somnambulator");
+        startActivity(intent);
+
+    }
+
 
     /* ---------- Themes ------------- */
     private void showThemeDialog() {

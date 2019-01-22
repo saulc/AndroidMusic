@@ -493,6 +493,8 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 	   Song s = getQueue().getCurrentSong();
 	   if(s == null) return;
 
+
+	   snoozeIntent.putExtra("PLAYING", player.isPlaying() );
 	   snoozeIntent.putExtra("TITLE", s.getTitle());
 	   snoozeIntent.putExtra("ARTIST", s.getArtist());
 	   snoozeIntent.putExtra("ALBUM", s.getAlbum());
