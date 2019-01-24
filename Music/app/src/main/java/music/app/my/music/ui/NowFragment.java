@@ -356,8 +356,8 @@ public class NowFragment extends ControlFragment {
                 if(isMini) icon.setImageDrawable(d);
                 else setBg(d);
 
-            } else if(isMini) icon.setImageResource(R.drawable.android_icon3a80);
-                    else setBg(R.drawable.android_icon3a80);
+            } else if(isMini) icon.setImageResource(R.drawable.android_icon32a5);
+                    else setBg(R.drawable.android_icon32a5);
         }
     }
 

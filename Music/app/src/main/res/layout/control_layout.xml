@@ -24,7 +24,7 @@
             android:layout_weight="1"
             android:background="@android:color/transparent"
             android:cropToPadding="false"
-            app:srcCompat="@drawable/android_robot_icon_2128" />
+            app:srcCompat="@drawable/android_icon32128" />
 
         <LinearLayout
             android:layout_width="match_parent"

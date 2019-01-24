@@ -193,7 +193,7 @@ public class BubbleFragment extends SongFragment {
                         d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, icon, icon, true));
 
                         fab.setImageDrawable(d);
-                    } else fab.setImageResource(R.drawable.android_robot_icon_2128);
+                    } else fab.setImageResource(R.drawable.android_icon32128);
                 }
                 fab.setTag(i);
                 bubbleFrame.addView(fab, i);

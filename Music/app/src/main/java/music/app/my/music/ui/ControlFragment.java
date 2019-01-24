@@ -216,7 +216,7 @@ public class ControlFragment extends Fragment {
 //                        d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, 512, 512, true));
 
                         icon.setImageDrawable(d);
-                    } else icon.setImageResource(R.drawable.android_robot_icon_2);
+                    } else icon.setImageResource(R.drawable.android_icon32a5);
                 }
             }
 

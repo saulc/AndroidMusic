@@ -364,8 +364,8 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 	   NotificationCompat.Action next = new NotificationCompat.Action(android.R.drawable.ic_media_next, "Next", nextpi);
 
 
-	   Bitmap li = BitmapFactory.decodeResource(getResources(), R.drawable.android_icon3_128);
-	    mBuilder.setSmallIcon(R.drawable.android_icon3_128)
+	   Bitmap li = BitmapFactory.decodeResource(getResources(), R.drawable.android_icon32128);
+	    mBuilder.setSmallIcon(R.drawable.android_icon3small)
 				.setLargeIcon(li)
 						//.setStyle(new NotificationCompat.DecoratedCustomViewStyle())
 				.setColor(Color.argb(100, 50, 0 , 30))

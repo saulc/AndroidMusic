@@ -18,7 +18,7 @@
         android:layout_height="90dp"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
         android:onClick="showFadeFrag"
-        android:src="@drawable/android_icon3_128" />
+        android:src="@drawable/android_icon32a5" />
 
     <TextView
         android:layout_width="match_parent"

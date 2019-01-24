@@ -4,6 +4,6 @@
     <!-- Set the Background Image-->
     <item android:gravity="center" >
         <bitmap  android:gravity="center"
-            android:src="@drawable/android_icon3_128"/>
+            android:src="@drawable/android_icon32128"/>
     </item>
 </layer-list>
