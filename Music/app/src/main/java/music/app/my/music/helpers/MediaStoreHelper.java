@@ -329,9 +329,11 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
 			log("Genre Items loaded");
 			ArrayList<Song> songs = new ArrayList<Song>();
 			while(cursor.moveToNext()) {
-				songs.add(new Song(cursor.getString(0), cursor.getString(1)
-						,cursor.getString(2), cursor.getString(3), cursor.getString(4)
-						, cursor.getString(5), cursor.getString(6) ) );
+				songs.add(new Song(cursor.getString(0), cursor.getString(1) ,
+								cursor.getString(2), cursor.getString(3),
+								cursor.getString(4) , cursor.getString(5),
+								cursor.getString(6) , cursor.getString(7),
+						cursor.getString(8), cursor.getString(9) ) );
 			}
 			log("Returning Genre with "+ songs.size() + " Items to activity");
 			 mListener.genreItemLoaderFinished(songs);
@@ -537,11 +539,14 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
 	private String[] genreMembersProjection = {
 			MediaStore.Audio.Genres.Members.TITLE,
 			MediaStore.Audio.Genres.Members.GENRE_ID,
-			MediaStore.Audio.Genres.Members.ARTIST,
-			MediaStore.Audio.Genres.Members.ALBUM,
 			MediaStore.Audio.Genres.Members.AUDIO_ID,
+			MediaStore.Audio.Genres.Members.DURATION,
 			MediaStore.Audio.Genres.Members.DATA,
-			MediaStore.Audio.Genres.Members.ARTIST_ID
+			MediaStore.Audio.Genres.Members.ARTIST,
+			MediaStore.Audio.Genres.Members.ARTIST_ID,
+			MediaStore.Audio.Genres.Members.ALBUM,
+			MediaStore.Audio.Genres.Members.ALBUM_ID,
+			MediaStore.Audio.Genres.Members.YEAR
 
 	};
 

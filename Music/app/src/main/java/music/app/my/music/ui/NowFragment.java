@@ -55,7 +55,7 @@ public class NowFragment extends ControlFragment {
 //        void seekBarChanged(int progress);
 //    }
     private ControlFragment.ControlFragmentListener mListener;
-    private SeekBar sbar;
+    private SeekBar sbar, vbar;
     private ImageButton pp, shuffle, repeat;
     private TextSwitcher line1, line2, line3;
     private TextView pos, time;
@@ -193,6 +193,8 @@ public class NowFragment extends ControlFragment {
                 }
             });
 
+            vbar = view.findViewById(R.id.volBar);
+
         }
 
         line1.setFactory(new ViewSwitcher.ViewFactory() {
@@ -299,6 +301,29 @@ public class NowFragment extends ControlFragment {
         mListener.onNowViewCreated();
         return view;
     }
+
+
+    public void setupVolbar(int max, int v){
+        vbar.setMax(max);
+        vbar.setProgress(v);
+        vbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                if(b) mListener.onVolChanged(i);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+    }
+
 
     private boolean infoset = false;
 

@@ -15,6 +15,7 @@ public class Song extends Qbase{
 	private String albumArt;
 	private String albumId;
 	private String artistId;
+	private String year;
 //	
 //	public Song(String title, String filePath, String artist, String album){
 //		this.title = title;
@@ -29,7 +30,24 @@ public class Song extends Qbase{
 		this.genre = gid;
 	}
 
-	public Song(String title, String gid, String artist, String album, String id, String filePath,  String artistId ){
+	/*
+	genreMembersProjection = {
+			MediaStore.Audio.Genres.Members.TITLE,
+			MediaStore.Audio.Genres.Members.GENRE_ID,
+			MediaStore.Audio.Genres.Members.AUDIO_ID,
+			MediaStore.Audio.Genres.Members.DURATION,
+			MediaStore.Audio.Genres.Members.DATA,
+			MediaStore.Audio.Genres.Members.ARTIST,
+			MediaStore.Audio.Genres.Members.ARTIST_ID,
+			MediaStore.Audio.Genres.Members.ALBUM,
+			MediaStore.Audio.Genres.Members.ALBUM_ID,
+			MediaStore.Audio.Genres.Members.YEAR
+
+	};		genre memebers. 10 args.
+	 */
+
+	public Song(String title, String gid, String id, String duration, String filePath,
+				String artist, String artistId, String album, String albumId, String year){
 		super();
 		this.title = title;
 		this.filePath = filePath;
@@ -37,11 +55,13 @@ public class Song extends Qbase{
 		this.album = album;
 		this.id = id;
 		this.genre = gid;
-
+		this.albumId = albumId;
+		this.year = year;
 		this.artistId = artistId;
-		//this.duration = duration;
+		this.duration = duration;
 	}
 
+	//default projection/ all songs
 	public Song(String title, String filePath, String artist, String album, String duration, String id, String albumId, String artistId ){
 		super();
 		this.title = title;
@@ -67,8 +87,11 @@ public class Song extends Qbase{
 			MediaStore.Audio.Playlists.Members.PLAY_ORDER,
 			MediaStore.Audio.Playlists.Members.ARTIST_ID
 
+		playlists and album memebers. 9 args.
 	 */
-	public Song(String title, String filePath, String artist, String album, String duration, String id, String albumId, String play, String artistId){
+
+	public Song(String title, String filePath, String artist, String album, String duration,
+				String id, String albumId, String play, String artistId){
 		super();
 		this.title = title;
 		this.filePath = filePath;
@@ -80,7 +103,9 @@ public class Song extends Qbase{
 		this.duration = duration;
 		this.artistId = artistId;
 	}
-	
+
+	public String getYear(){ return  year; }
+	public void setYear(String y){ year = y; }
 	public int getKey(){
 		return key;
 	}

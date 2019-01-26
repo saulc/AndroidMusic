@@ -147,7 +147,7 @@ public class DrawerActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         //ini media events
-//        am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 //        myEventReceiver = new MediaControlReceiver();
 
         //add android default trasitions to main layout changes.
@@ -1183,6 +1183,7 @@ public class DrawerActivity extends AppCompatActivity
                         if (mService.getQueue().getSize() > 0) {
                             updateCurrentInfo(mService.getCurrentSong());
                             updateNowButtons(mService.getQueue());
+                            nf.setupVolbar(getMaxVol(), getVol());
                         }
                 Log.d(TAG, "Now updating..");
                 h.removeCallbacks(this);
@@ -1771,6 +1772,7 @@ public class DrawerActivity extends AppCompatActivity
         log("Fader switch: "+ b);
     }
 
+
     @Override
     public void fadeInDurationChanged(int i) {
         log("Fader in Duration: "+ i);
@@ -1797,6 +1799,31 @@ public class DrawerActivity extends AppCompatActivity
 
     }
 
+    @Override
+    public int getMaxVol() {
+        int max = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+        return max;
+    }
+
+    @Override
+    public int getVol() {
+        return am.getStreamVolume(AudioManager.STREAM_MUSIC);
+
+    }
+
+    @Override
+    public void onVolChanged(int i) {
+        log("Vol changed: "+ i);
+        int max = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+        if(i > max) i = max;
+        else if(i < 0) i = 0;
+
+        am.setStreamVolume(
+                AudioManager.STREAM_MUSIC, // Stream type
+                i, // Index
+                0 //AudioManager.FLAG_SHOW_UI // Flags
+        );
+    }
 
     /* ---------- not needed? ------------- */
 //    public void updateCurrentSongInfo() {

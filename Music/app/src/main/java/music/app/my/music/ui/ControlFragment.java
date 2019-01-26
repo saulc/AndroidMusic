@@ -63,6 +63,12 @@ public class ControlFragment extends Fragment {
         boolean onShuffleClicked();
 
         int onRepeatClicked();
+
+        void onVolChanged(int i);
+
+        int getMaxVol();
+
+        int getVol();
     }
     private ControlFragmentListener mListener;
     private SeekBar sbar;
