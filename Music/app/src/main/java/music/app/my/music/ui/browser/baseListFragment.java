@@ -235,6 +235,8 @@ public  class baseListFragment extends Fragment  implements MediaHelperListener 
 
         void onArtistClicked(Artist mItem);
 
+        void onArtistLongClicked(Artist mItem);
+
         void onAlbumClicked(Album mItem);
 
         void onSongNextupClicked(int position, Song id);

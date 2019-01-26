@@ -1248,10 +1248,22 @@ public class DrawerActivity extends AppCompatActivity
         Log.d(TAG, "List item clicked");
     }
 
+
+    //shows albums/ then all songs option.
     @Override
     public void onArtistClicked(Artist mItem) {
         log("Artist Selected: " + mItem.getArtist());
-        log("Looking for albums/songs");
+        log("Looking for songs");
+
+        Fragment f = AlbumFragment.newInstance(mItem.getArtist(), mItem.getId());
+        showFragment(R.id.frame, f, true);
+    }
+
+    //shows all songs by artist.
+    @Override
+    public void onArtistLongClicked(Artist mItem) {
+        log("Artist long Clicked: " + mItem.getArtist());
+        log("Looking for songs");
 
         Fragment f =  (Fragment) SongFragment.newInstance();
         Bundle b = new Bundle();

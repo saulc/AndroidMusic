@@ -11,28 +11,24 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
-import android.preference.PreferenceActivity;
 import android.app.ActionBar;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.MenuItem;
 
-import java.util.List;
 
 /**
- * A {@link PreferenceActivity} that presents a set of application settings. On
- * handset devices, settings are presented as a single list. On tablets,
- * settings are split by category, with category headers shown to the left of
- * the list of settings.
+ *
  * <p>
  * See <a href="http://developer.android.com/design/patterns/settings.html">
  * Android Design: Settings</a> for design guidelines and the <a
  * href="http://developer.android.com/guide/topics/ui/settings.html">Settings
  * API Guide</a> for more information on developing a Settings UI.
  */
-public class MyDreamSettingsActivity extends PreferenceActivity {
+public class MyDreamSettingsActivity extends AppCompatActivity {
 
     /**
      * A preference value change listener that updates the preference's summary
@@ -136,19 +132,19 @@ public class MyDreamSettingsActivity extends PreferenceActivity {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public boolean onIsMultiPane() {
-        return isXLargeTablet(this);
-    }
+//    @Override
+//    public boolean onIsMultiPane() {
+//        return isXLargeTablet(this);
+//    }
 
     /**
      * {@inheritDoc}
      */
-    @Override
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public void onBuildHeaders(List<Header> target) {
-        loadHeadersFromResource(R.xml.pref_headers, target);
-    }
+//    @Override
+//    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+//    public void onBuildHeaders(List<Header> target) {
+//        loadHeadersFromResource(R.xml.pref_headers, target);
+//    }
 
     /**
      * This method stops fragment injection in malicious applications.

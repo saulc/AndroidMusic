@@ -34,12 +34,25 @@ public class AlbumFragment  extends baseListFragment {
     // private ArrayList<Playlist> items;
     // private RecyclerView recyclerView;
 
-    private String pid = null;
-    private String pname = null;
+    private String id = null;
+    private String name = null;
+    private static final String arg1 = "ARTIST";
+    private static final String arg2 = "ARTISTID";
+
+
+
+    public static AlbumFragment newInstance(String artist, String artistId) {
+        AlbumFragment fragment = new AlbumFragment();
+        Bundle b = new Bundle();
+        b.putString(arg1, artist);
+        b.putString(arg2, artistId);
+        fragment.setArguments(b);
+        return fragment;
+    }
+
 
     public static AlbumFragment newInstance() {
         AlbumFragment fragment = new AlbumFragment();
-
         return fragment;
     }
 
@@ -51,6 +64,11 @@ public class AlbumFragment  extends baseListFragment {
         //   iniMsHelper();
         items = new ArrayList<Album>();
 
+        Bundle b = getArguments();
+        if(b != null){
+            name = b.getString(arg1);
+            id = b.getString(arg2);
+        }
     }
 
 
@@ -68,6 +86,7 @@ public class AlbumFragment  extends baseListFragment {
             recyclerView.setFastScrollEnabled(true);
             recyclerView.setLayoutManager(new GridLayoutManager(context, 3));
             //
+
             updateAdapter();
         }
         return view;
@@ -90,7 +109,9 @@ public class AlbumFragment  extends baseListFragment {
     public void helperReady(){
         log("Helper ready, loading Albums");
 
-        msHelper.loadAlbums();
+        //get albums for only artist. or all albums
+        if(name != null) msHelper.loadAlbums(name);
+        else msHelper.loadAlbums();
     }
 
     @Override

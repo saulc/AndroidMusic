@@ -70,6 +70,16 @@ public class ArtistAdapter extends  RecyclerView.Adapter<ArtistAdapter.ViewHolde
                 }
             }
         });
+        holder.mView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                if(mListener != null){
+                    mListener.onArtistLongClicked(holder.mItem);
+                    return true;
+                }
+                return false;
+            }
+        });
         // Here you apply the animation when the view is bound
         if(!isScrolling){
           //  log("Setting animation. " + isScrolling);

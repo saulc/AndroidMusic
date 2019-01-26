@@ -48,7 +48,7 @@ public class AlbumAdapter   extends  RecyclerView.Adapter<AlbumAdapter.ViewHolde
     @NonNull
     @Override
     public String getSectionName(int position) {
-        return mValues.get(position).getArtist().charAt(0)+"";
+        return mValues.get(position).getAlbum().charAt(0)+"";
     }
 
     @Override

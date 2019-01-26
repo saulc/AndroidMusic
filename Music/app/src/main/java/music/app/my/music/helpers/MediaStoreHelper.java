@@ -121,6 +121,12 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
 		getLoaderManager().initLoader(mLOADER, null, this);
 
 	}
+	public void loadAlbums(String artist) {
+		myType = LOADER_TYPE.ALBUMS;
+		pname = artist;
+		getLoaderManager().initLoader(mLOADER, null, this);
+
+	}
 	public void loadGenreItems(String id, String pname) {
 		myType = LOADER_TYPE.GENREITEMS;
 		pid = id;
@@ -198,6 +204,11 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
         else if(myType == LOADER_TYPE.ALBUMS)
         {
 			log("Albums loader Created");
+			if(pname != null){		//for artist albums.
+				String arg[] = { pname };
+				return new CursorLoader(mContext, albumUri, albumProjection, albumSelection, arg, albumSort);
+			}
+			//all albums
             return new CursorLoader(mContext, albumUri, albumProjection, null, null, albumSort);
         }
 		else if(myType == LOADER_TYPE.ALBUMITEMS)
@@ -459,7 +470,11 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
 	   private Uri albumUri = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI;
 	   private String albumSort = MediaStore.Audio.Albums.ALBUM + " COLLATE LOCALIZED ASC";
 
-	   private String[] albumMemberProjection = {
+	   //for artist albums
+	private String albumSelection =  MediaStore.Audio.Albums.ARTIST + "=?";
+
+
+	private String[] albumMemberProjection = {
 				MediaStore.Audio.Media.TITLE,
 				MediaStore.Audio.Media.DATA,
 				MediaStore.Audio.Media.ARTIST,
