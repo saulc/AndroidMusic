@@ -533,7 +533,7 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
 	};
 
 
-	private String genreMembersSortOrder = MediaStore.Audio.Genres.Members.TITLE   + " COLLATE LOCALIZED ASC";
+	private String genreMembersSortOrder = MediaStore.Audio.Genres.Members.ARTIST   + " COLLATE LOCALIZED ASC";
 	private String[] genreMembersProjection = {
 			MediaStore.Audio.Genres.Members.TITLE,
 			MediaStore.Audio.Genres.Members.GENRE_ID,

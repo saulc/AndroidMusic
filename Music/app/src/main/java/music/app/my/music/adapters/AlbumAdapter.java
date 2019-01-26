@@ -1,6 +1,10 @@
 package music.app.my.music.adapters;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -58,6 +62,33 @@ public class AlbumAdapter   extends  RecyclerView.Adapter<AlbumAdapter.ViewHolde
         return new ViewHolder(view);
     }
 
+    private static final int[] colors = { Color.BLACK,Color.RED,Color.MAGENTA,Color.CYAN,
+            Color.BLUE,Color.GREEN,Color.YELLOW,Color.DKGRAY, Color.GRAY };
+    private static int ci = 0;
+
+    private int getArtColor(){
+        if(++ci >= colors.length) ci = 0;
+        return colors[ci];
+    }
+
+    private Bitmap createAlbumBit(String msg){
+        final int width = 200, height = 200;
+        final Bitmap rc = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas cc = new Canvas((rc));
+        Paint p = new Paint();
+        cc.drawARGB(0, 0, 0, 0);
+        p.setStrokeWidth(3.0f);
+        p.setColor(Color.WHITE);
+        cc.drawCircle(width/2, height/2, width/2-10f, p);
+        p.setColor(getArtColor());
+        cc.drawCircle(width/2, height/2, width/2-10f, p);
+        p.setColor(Color.WHITE);
+        p.setTextSize(133f);
+        cc.drawText(msg, width/3, height*.7f, p);
+        return rc;
+    }
+
+
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
@@ -78,7 +109,7 @@ public class AlbumAdapter   extends  RecyclerView.Adapter<AlbumAdapter.ViewHolde
                 e.printStackTrace();
             }
 
-        }
+        }else holder.mIcon.setImageBitmap(createAlbumBit(holder.mItem.getAlbum().charAt(0)+""));
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
