@@ -86,6 +86,20 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 			//myPlayer p = player.get(currentPlayer);
 			p.setFadeOutGap(g);
 	}
+	public void setFadeInGap(int g){
+		for(myPlayer p: player)
+			p.setStartGap(g);
+	}
+	public void setFadeOutDuration(int g){
+		for(myPlayer p: player)
+			p.setFadeOutDuration(g);
+	}
+
+	public void setFadeInDuration(int g){
+		for(myPlayer p: player)
+			p.setFadeInDuration(g);
+	}
+
 
 	private void setState(MUSICPLAYER_STATE s){
 		mState = s;
@@ -349,6 +363,10 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 			seekMe=0;
 		}
 		if(playWhenPrepared == true){
+			//apply fade in gap if its been set. skip song intro.
+			if(player.get(currentPlayer).getStartGap() > 0)
+				player.get(currentPlayer).seekTo(player.get(currentPlayer).getStartGap());
+
 			playRequest();
 		} //else player.get(currentPlayer).pause();
 	}

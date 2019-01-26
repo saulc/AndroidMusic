@@ -194,32 +194,35 @@ public class myPlayer extends MediaPlayer
 				setVol(1f);
 		}
 		
-		 	public int getFadeInDuration() {
+
+
+		public int getFadeInDuration() {
 				return fadeInDuration;
 			}
+	public int getFadeOutDuration() {
+		return fadeOutDuration;
+	}
+	public int getFadeOutGap() {
+		return fadeOutGap;
+	}
+	public int getStartGap() { return  startGap; }
 
 			public void setFadeInDuration(int fadeInDurationSecs) {
+	    		if(fadeInDurationSecs < 1) fadeInDurationSecs = 1;
 				this.fadeInDuration = fadeInDurationSecs *1000;
 			}
 
-			public int getFadeOutDuration() {
-				return fadeOutDuration;
-			}
 			public void setFadeOutDuration(int fadeOutDurationSecs) {
+	    	if(fadeOutDurationSecs < 1) fadeOutDurationSecs = 1;
 				this.fadeOutDuration = fadeOutDurationSecs*1000;
 			}
 
-			public int getFadeOutGap() {
-				return fadeOutGap;
-			}
-
 			public void setFadeOutGap(int fadeOutGapSecs) {
+	    	if(fadeOutGapSecs < 1) fadeOutGapSecs = 1;
 				this.fadeOutGap = fadeOutGapSecs * 1000;
 			}
 
-			public int getStartGap() { return  startGap; }
-
-			public void setStartGap(int s){ startGap = s*1000; }
+			public void setStartGap(int s){ if(s < 1) s = 1; startGap = s*1000; }
 
 	/*
     boolean	True if the method handled the error, false if it didn't.

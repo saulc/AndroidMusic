@@ -718,7 +718,20 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 	}
 
 
+	public void setFadeInDuration(int i){
+		player.setFadeInDuration(i);
+	}
 
+	public void setFadeOutDuration(int i){
+		player.setFadeOutDuration(i);
+	}
+
+	public void setFadeInGap(int i){
+		player.setFadeInGap(i);
+	}
+	public void setFadeOutGap(int i){
+		player.setFadeOutGap(i);
+	}
 
 
 }

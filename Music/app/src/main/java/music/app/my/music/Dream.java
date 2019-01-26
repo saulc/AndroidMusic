@@ -13,6 +13,7 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.text.DateFormat;
@@ -31,8 +32,10 @@ public class Dream extends DreamService implements FabDoubleTapGS.DoubleTapListe
     }
 
     private ViewGroup bg;
+    private View touch;
     private String msg;
     private TextView dreamText, subText;
+    private ProgressBar dreamTicker;
     private Handler mhandler;
     private int delay = 1000; //every second?
     private int width, height;
@@ -66,12 +69,12 @@ public class Dream extends DreamService implements FabDoubleTapGS.DoubleTapListe
             case 4: return Color.BLUE;
             case 5: return Color.CYAN;
             case 6: return Color.MAGENTA;
-            case 7: return Color.TRANSPARENT;
-            case 8: return Color.WHITE;
+            case 7: return Color.GRAY;
+          //  case 8: return Color.WHITE;
         }
         return Color.argb(100, 100, 100, 0);
    }
-    private int mcolors = 9, cc;
+    private int mcolors = 8, cc;
 
     private void clicked(){
         log("Clicked!!");
@@ -176,12 +179,10 @@ public class Dream extends DreamService implements FabDoubleTapGS.DoubleTapListe
         msg = "";
         dreamText = findViewById(R.id.dreamText);
         subText = findViewById(R.id.dreamSubText);
-        dreamText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                clicked();
-            }
-        });
+
+        dreamTicker = findViewById(R.id.dreamTicker);
+        dreamTicker.setMax(60);
+        dreamTicker.setProgress(0);
 
         FabDoubleTapGS dt =  new FabDoubleTapGS();
         dt.setDoubleTapListener(this);
@@ -195,20 +196,33 @@ public class Dream extends DreamService implements FabDoubleTapGS.DoubleTapListe
                 return false;
             }
         };
-        dreamText.setOnTouchListener(gestureListener);
 
+        //double tap anywhere to exit
+        //tap to change bg color
+        touch = findViewById(R.id.dreamTouchView);
+        touch.setOnTouchListener(gestureListener);
+
+        touch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                clicked();
+            }
+        });
     }
 
     //-------------------------------------------------------------
 
     private void updateTime(){
         Date d = new Date();
-        DateFormat dateFormat = new SimpleDateFormat(" h:");
+        DateFormat dateFormat = new SimpleDateFormat("h:mma");
         String s = dateFormat.format(d) + System.lineSeparator();
-        dateFormat = new SimpleDateFormat("mm");
-        s += dateFormat.format(d) + System.lineSeparator();
-        dateFormat = new SimpleDateFormat("ssa");
-        s += dateFormat.format(d);
+       // dateFormat = new SimpleDateFormat("mm");
+        //s += dateFormat.format(d) + System.lineSeparator();
+        dateFormat = new SimpleDateFormat("ss");
+        //s += dateFormat.format(d);
+        int sec = Integer.parseInt(dateFormat.format(d));
+        dreamTicker.setProgress(sec);
+
 
         dateFormat = new SimpleDateFormat("EEEE MMMM d yyyy ");
         String s2 = dateFormat.format(d);
@@ -220,20 +234,19 @@ public class Dream extends DreamService implements FabDoubleTapGS.DoubleTapListe
     }
 
 
-    private  float v =  1.0f, vx = 10f;  //update to v = height/10f; onDreamStarted()
+    private  float v =  100.0f, vx = 10f;  //update to v = height/10f; onDreamStarted()
     private float y = 0;
     private float x = 0;
-    private int pad = (int)(height*.8);
 
     private  void updateAnimation(){
         //a simple bounce animation.
         y += v;
         log("Y: " + y + "  Height: " + height);
-        if(y > pad || y < 0 - pad){
+        if(y > height/2 || y < 100){
             v *= -1f;
         }
         dreamText.animate().translationY( y );
-        subText.animate().translationY( y );
+        //subText.animate().translationY( y );
 
         x += vx;
         if(x > width/2 || x < 0 ){

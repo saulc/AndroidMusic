@@ -1761,6 +1761,42 @@ public class DrawerActivity extends AppCompatActivity
 
     }
 
+    @Override
+    public void mixSwitched(boolean b) {
+        log("Fader Mix switch: "+ b);
+    }
+
+    @Override
+    public void fadeSwitched(boolean b) {
+        log("Fader switch: "+ b);
+    }
+
+    @Override
+    public void fadeInDurationChanged(int i) {
+        log("Fader in Duration: "+ i);
+        if(mService != null)  mService.setFadeInDuration(i);
+    }
+
+    @Override
+    public void fadeOutDurationChanged(int i) {
+        log("Fader out Duration: "+ i);
+        if(mService != null)  mService.setFadeOutDuration(i);
+    }
+
+    @Override
+    public void fadeOutGapChanged(int i) {
+        log("Fader out gap: "+ i);
+        if(mService != null)  mService.setFadeOutGap(i);
+
+    }
+
+    @Override
+    public void fadeInGapChanged(int i) {
+        log("Fader in gap: "+ i);
+        if(mService != null)  mService.setFadeInGap(i);
+
+    }
+
 
     /* ---------- not needed? ------------- */
 //    public void updateCurrentSongInfo() {

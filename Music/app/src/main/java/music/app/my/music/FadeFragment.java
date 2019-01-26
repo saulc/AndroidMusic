@@ -7,11 +7,17 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
+import android.widget.SeekBar;
+import android.widget.Switch;
 
 
 public class FadeFragment extends Fragment {
 
     private FaderListener mListener;
+
+    private SeekBar s0, s1, s2, s3;
+    private Switch mixSwitch, fadeSwitch;
 
     public FadeFragment() {
         // Required empty public constructor
@@ -39,7 +45,104 @@ public class FadeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_fade, container, false);
+        View v =  inflater.inflate(R.layout.fragment_fade, container, false);
+        s0 = v.findViewById(R.id.fade0);
+        s1 = v.findViewById(R.id.fade1);
+        s2 = v.findViewById(R.id.fade2);
+        s3 = v.findViewById(R.id.fade3);
+        //all out of 100 %. for 'easier' math.
+        s0.setMax(10);
+        s1.setMax(10);
+        s2.setMax(10);
+        s3.setMax(10);
+
+        //fade in
+        s0.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                mListener.fadeInDurationChanged(i);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+        //fade out
+        s1.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                mListener.fadeOutDurationChanged(i);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+        //fade in gap
+        s2.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                mListener.fadeInGapChanged(i);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+        //fade out gap
+        s3.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                mListener.fadeOutGapChanged(i);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        mixSwitch = v.findViewById(R.id.mixmodeSwitch);
+        fadeSwitch = v.findViewById(R.id.crossfadeSwitch);
+
+        mixSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                mListener.mixSwitched(b);
+            }
+        });
+
+        fadeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                mListener.fadeSwitched(b);
+            }
+        });
+
+        return v;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -77,6 +180,16 @@ public class FadeFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface FaderListener {
-        // TODO: Update argument type and name
+        void mixSwitched(boolean b);
+
+        void fadeSwitched(boolean b);
+
+        void fadeInDurationChanged(int i);
+
+        void fadeOutDurationChanged(int i);
+
+        void fadeOutGapChanged(int i);
+
+        void fadeInGapChanged(int i);
     }
 }
