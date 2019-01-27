@@ -411,8 +411,11 @@ public class NowFragment extends ControlFragment {
 
     @Override
     public void setPlayPause(Boolean isPlaying) {
-        if(isPlaying) pp.setImageResource(android.R.drawable.ic_media_pause);
-        else pp.setImageResource(android.R.drawable.ic_media_play);
+
+        if(isPlaying) pp.setImageResource(R.drawable.media_02);
+        else pp.setImageResource(R.drawable.media_01);
+//        if(isPlaying) pp.setImageResource(android.R.drawable.ic_media_pause);
+//        else pp.setImageResource(android.R.drawable.ic_media_play);
     }
 
 

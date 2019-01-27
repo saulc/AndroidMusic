@@ -125,7 +125,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/big_button"
         android:gravity="center_horizontal"
         android:orientation="horizontal">
 
@@ -136,9 +136,10 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginRight="@dimen/text_margin"
             android:layout_weight="2"
+            android:scaleType="fitCenter"
             android:background="@android:color/transparent"
-            android:padding="@dimen/big_button_pad"
-            android:src="@android:drawable/ic_media_previous" />
+            android:padding="@dimen/top_text_margin"
+            android:src="@drawable/media_03" />
 
         <ImageButton
             android:id="@+id/playpauseButton"
@@ -147,9 +148,10 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginRight="@dimen/text_margin"
             android:layout_weight="3"
+            android:scaleType="fitCenter"
             android:background="@android:color/transparent"
-            android:padding="@dimen/big_button_pad"
-            android:src="@android:drawable/ic_media_play" />
+            android:padding="@dimen/top_text_margin"
+            android:src="@drawable/media_01" />
 
         <ImageButton
             android:id="@+id/nextButton"
@@ -157,9 +159,10 @@
             android:layout_height="match_parent"
             android:layout_gravity="center_horizontal"
             android:layout_weight="2"
+            android:scaleType="fitCenter"
             android:background="@android:color/transparent"
-            android:padding="@dimen/big_button_pad"
-            android:src="@android:drawable/ic_media_next" />
+            android:padding="@dimen/top_text_margin"
+            android:src="@drawable/media_04" />
 
     </LinearLayout>
 
@@ -173,6 +176,7 @@
             android:id="@+id/vold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:alpha=".5"
             android:padding="@dimen/top_text_margin"
             android:src="@android:drawable/ic_lock_silent_mode" />
 
@@ -188,6 +192,7 @@
             android:id="@+id/volu"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:alpha=".5"
             android:padding="@dimen/top_text_margin"
             android:src="@android:drawable/ic_lock_silent_mode_off" />
 
