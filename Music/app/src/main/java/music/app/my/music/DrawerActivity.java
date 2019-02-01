@@ -1463,7 +1463,7 @@ public class DrawerActivity extends AppCompatActivity
     /* ---------- playlist stuff over ------------- */
 
 
-    //calls above method when a playlist is seltected
+    //calls above method when a playlist is selected
     @Override
     public void onOptionLongClicked(Song song) {
         Log.d(TAG, "Option long clicked, add to playlist");
