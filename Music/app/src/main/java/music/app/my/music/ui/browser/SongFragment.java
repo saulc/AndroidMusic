@@ -27,6 +27,8 @@ import com.simplecityapps.recyclerview_fastscroll.interfaces.OnFastScrollStateCh
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 import music.app.my.music.R;
 import music.app.my.music.adapters.SongAdapter;
@@ -133,11 +135,13 @@ public class SongFragment extends baseListFragment implements MediaHelperListene
     private void nextLongClicked() {
         mListener.addSongsToPlaylist(items, true);
     }
-
     private void opLongClicked() {
         mListener.addSongsToPlaylist(items, false);
     }
-
+    private void headerLongClicked(){
+        Collections.shuffle(items);
+        mListener.addSongsToQueue(items, true);
+    }
     private void headerClicked(){
         mListener.addSongsToQueue(items, true);
     }
@@ -246,6 +250,14 @@ public class SongFragment extends baseListFragment implements MediaHelperListene
                 }
             });
 
+            header.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    log("Song Group header Long clicked");
+                    headerLongClicked();
+                    return true;
+                }
+            });
             next.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {

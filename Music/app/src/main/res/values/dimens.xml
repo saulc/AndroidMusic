@@ -11,7 +11,6 @@
     <dimen name="top_text_margin">4dp</dimen>
     <dimen name="controlpad">60dp</dimen>
     <dimen name="big_button">50dp</dimen>
-    <dimen name="mini_button_pad">20dp</dimen>
     <dimen name="fd">70dp</dimen>
     <dimen name="fc">90dp</dimen>
     <dimen name="now_button">44dp</dimen>

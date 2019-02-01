@@ -1526,6 +1526,7 @@ public class DrawerActivity extends AppCompatActivity
             startService(playIntent);
         }
 
+        showNow();
         updateQueueFrag(p);
 
 //        updateNextSongInfo();
@@ -1727,9 +1728,10 @@ public class DrawerActivity extends AppCompatActivity
 
     /* ---------- Music Serice Callbacks UpdateUI ------------- */
     public void setpp(Boolean isPlaying){
-        if(nf != null) nf.setPlayPause(isPlaying);
+        if(nf != null && nowShowing) nf.setPlayPause(isPlaying);
         if(cf != null && controlsVisible) cf.setPlayPause(isPlaying);
-        int r = !isPlaying ? android.R.drawable.ic_media_play : android.R.drawable.ic_media_pause;
+        int r = !isPlaying ? //R.drawable.media_01 : R.drawable.media_02;
+         android.R.drawable.ic_media_play : android.R.drawable.ic_media_pause;
         fab2.setImageResource(r);
     }
 

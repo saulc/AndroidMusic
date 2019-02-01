@@ -81,6 +81,7 @@
             android:layout_width="@dimen/now_button"
             android:layout_height="@dimen/now_button"
             android:background="@drawable/gradientcircle"
+            android:layout_marginStart="@dimen/text_margin"
             android:padding="@dimen/top_text_margin"
             android:scaleType="fitXY"
             app:srcCompat="@drawable/shuffle128" />
@@ -90,7 +91,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="00"
-            android:textColor="?colorPrimary"
+            android:padding="@dimen/top_text_margin"
+            android:layout_marginStart="@dimen/text_margin"
+            android:textColor="?colorAccent"
             android:textSize="12sp"
             android:typeface="monospace" />
 
@@ -98,8 +101,6 @@
             android:id="@+id/seekBar"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/top_text_margin"
-            android:layout_marginRight="@dimen/top_text_margin"
             android:layout_weight="1" />
 
         <TextView
@@ -107,7 +108,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="00"
-            android:textColor="?colorPrimary"
+            android:padding="@dimen/top_text_margin"
+            android:layout_marginEnd="@dimen/text_margin"
+            android:textColor="?colorAccent"
             android:textSize="12sp"
             android:typeface="monospace" />
 
@@ -116,6 +119,7 @@
             android:layout_width="@dimen/now_button"
             android:layout_height="@dimen/now_button"
             android:background="@drawable/boarder"
+            android:layout_marginEnd="@dimen/text_margin"
             android:padding="@dimen/top_text_margin"
             android:scaleType="fitXY"
             app:srcCompat="@drawable/repeat128" />
@@ -176,6 +180,7 @@
             android:id="@+id/vold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/text_margin"
             android:alpha=".5"
             android:padding="@dimen/top_text_margin"
             android:src="@android:drawable/ic_lock_silent_mode" />
@@ -184,14 +189,13 @@
             android:id="@+id/volBar"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/top_text_margin"
-            android:layout_marginRight="@dimen/top_text_margin"
             android:layout_weight="1" />
 
         <ImageView
             android:id="@+id/volu"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/text_margin"
             android:alpha=".5"
             android:padding="@dimen/top_text_margin"
             android:src="@android:drawable/ic_lock_silent_mode_off" />

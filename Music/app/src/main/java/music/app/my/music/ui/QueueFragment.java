@@ -21,7 +21,10 @@ import com.nhaarman.listviewanimations.itemmanipulation.dragdrop.TouchViewDragga
 import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.OnDismissCallback;
 import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.undo.SimpleSwipeUndoAdapter;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import music.app.my.music.R;
 import music.app.my.music.adapters.QueueAdapter;
@@ -176,40 +179,42 @@ public class QueueFragment extends baseListFragment {
         log("items:" + s);
     }
 
-    private  void updateHeader(){
+    private String secToString(long td){
+        //format secs to display time nicely.
+        long second = (td ) % 60;
+        long minute = (td / 60) % 60;
+        long hour = (td / ( 60 * 60)) % 24;
+        long day = (td / ( 60 * 60 * 24) );
 
+        String m = (day > 0) ? day + "d" : "" ;
+        m += (hour > 0) ? hour + "h" : "" ;
+        m += (minute > 0) ? minute + "m" : "";
+        m += String.format("%02ds", second);
+
+        return m;
+    }
+
+
+    private  void updateHeader(){
         int s = items.size();
         String m = "Now playing queue contains: " + s + " song" + ( (s >1) ? "s": "");
 
         //song count only, 1 = seconds. 2 = full count, 3 remaining playtime
-        if (headerMode > 2) {
-            int td = 0;     //total duration in seconds
+        if (headerMode > 1) {
+            m += " Remaining Playtime: ";
+
+            long td = 0;     //total duration in seconds
             for (int i=current; i< items.size(); i++) td += items.get(i).getDuration();
-            m += " Remaining Playtime: " + td + "Seconds ";
+
+            if(headerMode == 2) m +=  td + "Seconds ";   //seconds only
+            else m += secToString(td);      //long version.
 
         }
         else if (headerMode > 0) {
             //long version
-            int td = 0;     //total duration in seconds
+            long td = 0;     //total duration in seconds
             for (Song i : items) td += i.getDuration();
-
-            int hr = td / 60 /60;
-            int min = td / 60;
-            int sec = td % 60;
-            m += " Playtime: ";
-            if(hr > 24) {
-                int days = hr/24;
-                m += days + "d";
-                hr %= 24;
-            }
-            m +=   hr + "h" + min + "m" +  sec + "s ";
-
-            if (headerMode > 1) {
-//                if (td / 60 / 60 > 0) m += "~ " + (td / 60 / 60) + "d";
-//                if (td / 60 / 24 > 0) m += (td / 60 / 24) + "h";
-//                m += (td / 60) + "m" + (td % 60) + "s ";
-            }
-
+            m += " Total Playtime: " + secToString(td);
         }
         qHeader.setText( m );
     }

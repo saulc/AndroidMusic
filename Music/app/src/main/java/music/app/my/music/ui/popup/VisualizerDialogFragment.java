@@ -198,7 +198,7 @@ public  class VisualizerDialogFragment extends Fragment implements Visualizer.On
 
 
        // log("Updating waves..." + width + " " + height);
-
+//ran out of memeory.
         final Bitmap rc = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas cc = new Canvas((rc));
         Paint p = new Paint();

@@ -222,6 +222,7 @@ public class Dream extends DreamService implements FabDoubleTapGS.DoubleTapListe
         //s += dateFormat.format(d);
         int sec = Integer.parseInt(dateFormat.format(d));
         dreamTicker.setProgress(sec);
+        if(sec % 10 == 0) any = true;       //animate Y axis every 10 seconds.
 
 
         dateFormat = new SimpleDateFormat("EEEE MMMM d yyyy ");
@@ -234,20 +235,23 @@ public class Dream extends DreamService implements FabDoubleTapGS.DoubleTapListe
     }
 
 
+    private boolean any = false;
     private  float v =  100.0f, vx = 10f;  //update to v = height/10f; onDreamStarted()
     private float y = 0;
     private float x = 0;
 
     private  void updateAnimation(){
         //a simple bounce animation.
-        y += v;
-        log("Y: " + y + "  Height: " + height);
-        if(y > height/2 || y < 100){
-            v *= -1f;
+        if(any) {
+            y += v;
+            log("Y: " + y + "  Height: " + height);
+            if (y > height / 2 || y < 100) {
+                v *= -1f;
+            }
+            dreamText.animate().translationY(y);
+            //subText.animate().translationY( y );
+            any = false;
         }
-        dreamText.animate().translationY( y );
-        //subText.animate().translationY( y );
-
         x += vx;
         if(x > width/2 || x < 0 ){
             vx *= -1f;

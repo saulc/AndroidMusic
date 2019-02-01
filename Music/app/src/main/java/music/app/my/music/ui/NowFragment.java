@@ -96,7 +96,7 @@ public class NowFragment extends ControlFragment {
 
     @Override
     public void onDestroy(){
-        mListener.onNowViewDestroyed();
+        if(!isMini) mListener.onNowViewDestroyed();
         super.onDestroy();
     }
 
@@ -194,6 +194,7 @@ public class NowFragment extends ControlFragment {
             });
 
             vbar = view.findViewById(R.id.volBar);
+
 
         }
 
