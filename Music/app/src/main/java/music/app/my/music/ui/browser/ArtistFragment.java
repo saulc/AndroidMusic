@@ -67,8 +67,8 @@ public class ArtistFragment extends baseListFragment {
         if (v instanceof RecyclerView) {
             Context context = view.getContext();
              recyclerView = (FastScrollRecyclerView) v;
-                recyclerView.setLayoutManager(new GridLayoutManager(context, 2));
-//            recyclerView.setLayoutManager(new LinearLayoutManager(context));
+//                recyclerView.setLayoutManager(new GridLayoutManager(context, 2));
+            recyclerView.setLayoutManager(new LinearLayoutManager(context));
             updateAdapter();
             recyclerView.setFastScrollEnabled(true);
         }

@@ -127,7 +127,7 @@ public class PlayListFragment extends baseListFragment {
         log("Updating adapter");
         mAdapter.notifyDataSetChanged();
         log("items:" + items.size());
-        String sl = items.size() + " song" +  ( (items.size()==1) ? "" : "s");
+        String sl = items.size() + " playlist" +  ( (items.size()==1) ? "" : "s");
         countline.setText(sl);
     }
 

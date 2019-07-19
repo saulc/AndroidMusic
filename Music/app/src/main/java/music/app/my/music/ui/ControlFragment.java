@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import music.app.my.music.DrawerActivity;
 import music.app.my.music.R;
 import music.app.my.music.player.MusicPlayer;
+import music.app.my.music.types.Artist;
 import music.app.my.music.types.Playlist;
 import music.app.my.music.types.Song;
 
@@ -69,6 +70,10 @@ public class ControlFragment extends Fragment {
         int getMaxVol();
 
         int getVol();
+
+        void onArtistLongClick(Artist a);
+
+        void playPauseLongClicked();
     }
     private ControlFragmentListener mListener;
     private SeekBar sbar;

@@ -44,6 +44,15 @@ public class myPlayer extends MediaPlayer
 		mHandler.post(fadeInVolume);
 		
 	}
+	private boolean fadingIn = false;
+
+	public boolean isFadingIn() {
+		return fadingIn;
+	}
+
+	public void fadeIn(){
+		mHandler.post(fadeInVolume);
+	}
 	public void playAndFadeIn(int ms){
 		fadeInDuration = ms;
 		playAndFadeIn();
@@ -114,7 +123,8 @@ public class myPlayer extends MediaPlayer
 	    	@Override
 	    public void run()
 	    {
-	    	
+	    	if(!fadingIn) fadingIn = true;
+
 	    		//setVol( (float) ( Math.log( mCurrentStep + 1) / (Math.log( (fadeInDuration/20)) )) );
 	    		setVol( (float) ( Math.pow(mCurrentStep, 2) / Math.pow((fadeInDuration / 50), 2) ) );
 	    		//Log.d("Myplayer", mCurrentStep + " fading in: " + volumeValue);
@@ -126,6 +136,7 @@ public class myPlayer extends MediaPlayer
 	        	setVol(1);
 	        	mHandler.removeCallbacks(fadeInVolume);
 	        	mCurrentStep = 1;
+	        	fadingIn = false;
 	        } else mHandler.postDelayed(fadeInVolume, 50);
 	    }
 	    };
@@ -145,7 +156,7 @@ public class myPlayer extends MediaPlayer
 
 	    		mCurrentStep++;
 	    //    if (mCurrentStep++ > (fadeOutDuration/20)) {  || (getCurrentPosition() >= getDuration()) 
-	    		if((volumeValue <= 0.15) ){
+	    		if((volumeValue <= 0.05) ){
 	        	setVol(0f);
 	        	mHandler.removeCallbacks(fadeOutVolume);
 	        	mCurrentStep = 1;

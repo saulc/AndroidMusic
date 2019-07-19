@@ -63,11 +63,10 @@ public class GenreFragment extends baseListFragment {
         if (v instanceof FastScrollRecyclerView) {
             Context context = view.getContext();
             recyclerView = (FastScrollRecyclerView) v;
-
-           // recyclerView.setLayoutManager(new LinearLayoutManager(context));
             recyclerView.setFastScrollEnabled(true);
-            recyclerView.setLayoutManager(new GridLayoutManager(context, 2));
 
+//                recyclerView.setLayoutManager(new GridLayoutManager(context, 2));
+            recyclerView.setLayoutManager(new LinearLayoutManager(context));
             updateAdapter();
         }
         return view;

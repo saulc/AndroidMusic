@@ -142,6 +142,9 @@ public class QueueFragment extends baseListFragment {
 
     //    animationAdapter.setAbsListView(mListView);
   //      mListView.setAdapter(animationAdapter);
+        if( getView()  == null) return;
+        if(mListView == null)   mListView = (DynamicListView) getView().findViewById(R.id.qlistview);
+
         mListView.enableDragAndDrop();
         mListView.setDraggableManager(new TouchViewDraggableManager(R.id.content));
 
@@ -157,19 +160,14 @@ public class QueueFragment extends baseListFragment {
                 }
         );
 
-
         swipeUndoAdapter.setAbsListView(mListView);
         mListView.setAdapter(swipeUndoAdapter);
         mListView.enableSimpleSwipeUndo();
         mListView.setFastScrollEnabled(true);
 
-
         mAdapter.setCurrent(current);
         mAdapter.setRepeatMode(repeatMode);
-      //  ((QueueAdapter)  mAdapter).setCurrent(current);
         mListView.setSelection(current) ;
-        // mListView.setAdapter(mAdapter);
-
         log("Updating adapter");
         mAdapter.notifyDataSetChanged();
 

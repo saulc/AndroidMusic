@@ -5,6 +5,7 @@ import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.media.audiofx.Equalizer;
+import android.os.Handler;
 import android.util.Log;
 
 
@@ -18,6 +19,7 @@ import music.app.my.music.types.plist;
 public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 
 	private Equalizer eq;
+	private Handler mHandler;
 	
 	private ArrayList<myPlayer> player;
 	 private int currentPlayer = 0;	//the one actually palying
@@ -56,7 +58,8 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 		}
 		queue = new plist();
 		index = 0;
-		
+
+		mHandler = new Handler();
 	}
 
 	//3 myplayers only! never add. never remove. only reset.
@@ -68,13 +71,13 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 			auxPlayer = 2;
 
 			myPlayer temp = new myPlayer();
-			temp.setId(currentPlayer);
+			temp.setId(0);
 			player.add(temp);
 			temp = new myPlayer();
-			temp.setId(nextPlayer);
+			temp.setId(1);
 			player.add(temp);
 			temp = new myPlayer();
-			temp.setId(auxPlayer);
+			temp.setId(2);
 			player.add(temp);
 
 		}
@@ -263,7 +266,9 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 	public void onCompletion(MediaPlayer mp) {
 		Log.i("Music Service", mp + " player completed! wft!!! <<------");
 		((myPlayer)mp).removeCallbacks();
+
 		int i = ((myPlayer)mp).getId();
+		Log.i("Music Service", "PLayer completed: " + i);
 		player.remove(i);
 		myPlayer rp = new myPlayer();
 		rp.setId(i);
@@ -303,9 +308,33 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 	    	player.get(currentPlayer).playAndFadeIn();
 	    	setState(MUSICPLAYER_STATE.PLAYING);
 
+	    	mHandler.postDelayed(volCheck, 3000);
+	    	//fix annoying problem where current player is faded out
+			//can't find the cause. must have a solve anyway.
+
 	    }
 	
 	}
+
+	public void fadeIn(){
+		player.get(currentPlayer).fadeIn();
+	}
+
+	private Runnable volCheck = new Runnable() {
+		@Override
+		public void run() {
+			log("Checking volume levels.");
+			myPlayer p = player.get(currentPlayer);
+			if(!p.isPaused() && p.isPlaying()){
+				if(p.getVolumeValue() <= .1f){
+					log("Fading in...");
+					p.fadeIn();
+				}
+			}
+
+		}
+	};
+
 
 	public int getAID(){
 		return player.get(currentPlayer).getAudioSessionId();

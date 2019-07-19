@@ -2,10 +2,8 @@ package music.app.my.music.player;
 
 
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.app.TaskStackBuilder;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -15,9 +13,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.MediaMetadataRetriever;
 import android.media.RemoteControlClient;
@@ -33,6 +29,7 @@ import android.util.Log;
 import music.app.my.music.DrawerActivity;
 import music.app.my.music.Dream;
 import music.app.my.music.R;
+import music.app.my.music.helpers.NotificationHelper;
 import music.app.my.music.types.Song;
 import music.app.my.music.types.plist;
 
@@ -69,14 +66,15 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 
 	private RemoteControlClientCompat mRemoteControlClientCompat;
    private MediaControlReceiver mediaReceiver;
-   private NotificationCompat.Builder mBuilder;
-   private NotificationManager mNotificationManager;
+//   private NotificationCompat.Builder mBuilder;
+//   private NotificationManager mNotificationManager;
  //  MyNoisyAudioStreamReceiver mNoisyAudioReceiver;
    private Notification mNotification = null;
   // private Equalizer eq;
    private  AudioFocusHelper audioFocus;
    private String queuePlaylist = "QUEUE";
    private long queuePlaylistId =  0;
+   private NotificationHelper noti;
 
 	private void log(String s){
 		Log.d(getClass().getSimpleName(), s);
@@ -108,6 +106,9 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
          setupRemoteControls();
 
          loadQueue();
+
+
+	   noti = new NotificationHelper(this);
 
        //  eq = new Equalizer(100, player.getAudioSessionId());
        //  setupEq();
@@ -152,6 +153,10 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
    }
 
 
+   public void fadeIn(){
+   	 log("Fading called.");
+   	 player.fadeIn();
+   }
    public void duck(){
    log("Music service Audio ducking: " + player.isDucking() );
 	   player.setDucking(!player.isDucking());
@@ -189,6 +194,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 
    	//public void sendProgress(HashMap<String, String> info);
 
+	//   public void showNoti(String msg);
 	    public void sendProgress(MusicPlayer player);
 		public void setPlayPause(Boolean isPlaying);
 
@@ -330,69 +336,86 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
    private void setUpAsForeground(String text) {
 	   Log.i("Music Service", "Setting service as Foreground");
 
-			   mBuilder =  new NotificationCompat.Builder(this);
-
-	   //RemoteViews rv = new RemoteViews(getPackageName(), R.layout.notification_layout);
+	   NotificationCompat.Builder nb = null;
 
 	   Song s = getQueue().getCurrentSong();
-	   Intent resultIntent = new Intent(this, DrawerActivity.class);
-	   TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-	   stackBuilder.addNextIntentWithParentStack(resultIntent);
-	   PendingIntent resultPendingIntent =
-			   stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-
-	   int pr = android.R.drawable.ic_media_pause;
-	   if(text.contains("Paused"))
-		   pr = android.R.drawable.ic_media_play;
+	   nb = noti.getNotification1(s.getTitle() + " (" + text + ") ", s.getArtist() +
+			   " - " + s.getAlbum());
 
 
-	   Intent pi = new Intent(this, MusicService.class);
-	   pi.setAction(MusicService.ACTION_TOGGLE_PLAYBACK);
-	   PendingIntent togglepi = PendingIntent.getService(this, 21, pi, PendingIntent.FLAG_UPDATE_CURRENT );
-	   NotificationCompat.Action pp = new NotificationCompat.Action(pr, "Play/Pause", togglepi);
+	   if (nb != null) {
 
-	   //previous
-	   Intent prei = new Intent(this, MusicService.class);
-	   prei.setAction(MusicService.ACTION_PREVIOUS);
-	   PendingIntent prevpi = PendingIntent.getService(this, 22, prei, PendingIntent.FLAG_UPDATE_CURRENT );
-	   NotificationCompat.Action previous = new NotificationCompat.Action(android.R.drawable.ic_media_previous, "Previous", prevpi);
+		  mNotification =  noti.notify(NOTIFICATION_ID, nb);
 
-	   //next
-	   Intent nexi = new Intent(this, MusicService.class);
-	   nexi.setAction(MusicService.ACTION_NEXT);
-	   PendingIntent nextpi = PendingIntent.getService(this, 23, nexi, PendingIntent.FLAG_UPDATE_CURRENT );
-	   NotificationCompat.Action next = new NotificationCompat.Action(android.R.drawable.ic_media_next, "Next", nextpi);
-
-
-	   Bitmap li = BitmapFactory.decodeResource(getResources(), R.drawable.android_icon32128);
-	    mBuilder.setSmallIcon(R.drawable.android_icon3small)
-				.setLargeIcon(li)
-						//.setStyle(new NotificationCompat.DecoratedCustomViewStyle())
-				.setColor(Color.argb(100, 50, 0 , 30))
-						.setOngoing(true)
-						.setContentIntent(resultPendingIntent)
-				.addAction(previous)
-				.addAction(pp)
-				.addAction(next)
-   		        .setContentTitle(s.getTitle() + " (" + text + ") ")
-   		        .setContentText( s.getArtist())
-				.setSubText(s.getAlbum())
-                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
-				//.setStyle(new NotificationCompat.BigTextStyle().bigText(s.getArtist()));
-
-
-
-   		 mNotificationManager =  (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-   		 mNotification = mBuilder.build();
-   		// mNotification.contentView = rv;
-   		mNotificationManager.notify(NOTIFICATION_ID, mNotification);
+	   }
+	if(mNotification !=null)
    		startForeground(NOTIFICATION_ID, mNotification);
-
    }
+
+
+//			   mBuilder =  new NotificationCompat.Builder(this);
+
+//	   //RemoteViews rv = new RemoteViews(getPackageName(), R.layout.notification_layout);
+//
+//	   Song s = getQueue().getCurrentSong();
+//	   Intent resultIntent = new Intent(this, DrawerActivity.class);
+//	   TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+//	   stackBuilder.addNextIntentWithParentStack(resultIntent);
+//	   PendingIntent resultPendingIntent =
+//			   stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+//
+//	   int pr = android.R.drawable.ic_media_pause;
+//	   if(text.contains("Paused"))
+//		   pr = android.R.drawable.ic_media_play;
+//
+//
+//	   Intent pi = new Intent(this, MusicService.class);
+//	   pi.setAction(MusicService.ACTION_TOGGLE_PLAYBACK);
+//	   PendingIntent togglepi = PendingIntent.getService(this, 21, pi, PendingIntent.FLAG_UPDATE_CURRENT );
+//	   NotificationCompat.Action pp = new NotificationCompat.Action(pr, "Play/Pause", togglepi);
+//
+//	   //previous
+//	   Intent prei = new Intent(this, MusicService.class);
+//	   prei.setAction(MusicService.ACTION_PREVIOUS);
+//	   PendingIntent prevpi = PendingIntent.getService(this, 22, prei, PendingIntent.FLAG_UPDATE_CURRENT );
+//	   NotificationCompat.Action previous = new NotificationCompat.Action(android.R.drawable.ic_media_previous, "Previous", prevpi);
+//
+//	   //next
+//	   Intent nexi = new Intent(this, MusicService.class);
+//	   nexi.setAction(MusicService.ACTION_NEXT);
+//	   PendingIntent nextpi = PendingIntent.getService(this, 23, nexi, PendingIntent.FLAG_UPDATE_CURRENT );
+//	   NotificationCompat.Action next = new NotificationCompat.Action(android.R.drawable.ic_media_next, "Next", nextpi);
+//
+//
+//	   Bitmap li = BitmapFactory.decodeResource(getResources(), R.drawable.android_icon32128);
+//	    mBuilder.setSmallIcon(R.drawable.android_icon3small)
+//				.setLargeIcon(li)
+//						//.setStyle(new NotificationCompat.DecoratedCustomViewStyle())
+//				.setColor(Color.argb(100, 50, 0 , 30))
+//						.setOngoing(true)
+//						.setContentIntent(resultPendingIntent)
+//				.addAction(previous)
+//				.addAction(pp)
+//				.addAction(next)
+//   		        .setContentTitle(s.getTitle() + " (" + text + ") ")
+//   		        .setContentText( s.getArtist())
+//				.setSubText(s.getAlbum())
+//                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+//				//.setStyle(new NotificationCompat.BigTextStyle().bigText(s.getArtist()));
+//
+//
+//
+//   		 mNotificationManager =  (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+//   		 mNotification = mBuilder.build();
+//   		// mNotification.contentView = rv;
+//   		mNotificationManager.notify(NOTIFICATION_ID, mNotification);
+//   		startForeground(NOTIFICATION_ID, mNotification);
+//
+//   }
 
    public void removeFromForeground(){
    		log("Removing Service from foreground.");
-   		mNotificationManager.cancelAll();
+   		//mNotificationManager.cancelAll();
    		stopForeground(true);
    }
 

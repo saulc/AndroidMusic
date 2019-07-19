@@ -84,8 +84,9 @@ public class AlbumFragment  extends baseListFragment {
             recyclerView = (FastScrollRecyclerView)  v;
             //recyclerView.setLayoutManager(new LinearLayoutManager(context));
             recyclerView.setFastScrollEnabled(true);
-            recyclerView.setLayoutManager(new GridLayoutManager(context, 3));
-            //
+
+//                recyclerView.setLayoutManager(new GridLayoutManager(context, 2));
+            recyclerView.setLayoutManager(new LinearLayoutManager(context));
 
             updateAdapter();
         }

@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Music</string>
+    <string name="noti_channel_default">Music</string>
+    <string name="noti_channel_second">Music news</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

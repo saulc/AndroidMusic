@@ -2,6 +2,7 @@ package music.app.my.music;
 
 import android.animation.LayoutTransition;
 import android.app.ActionBar;
+import android.app.Notification;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -20,8 +21,10 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatDelegate;
 import android.util.Log;
 import android.view.GestureDetector;
+import android.view.KeyEvent;
 import android.view.MenuInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -43,6 +46,7 @@ import android.widget.Toast;
 import android.widget.ViewSwitcher;
 import java.util.ArrayList;
 
+import music.app.my.music.helpers.NotificationHelper;
 import music.app.my.music.helpers.FabDoubleTapGS;
 import music.app.my.music.helpers.PlaylistHelper;
 import music.app.my.music.helpers.QueueListener;
@@ -130,6 +134,8 @@ public class DrawerActivity extends AppCompatActivity
 
     private MediaControlReceiver myEventReceiver;
     private AudioManager am;
+
+  //  private NotificationHelper noti;
 
     /* -----------------------------------   onCreate start.   ----------------------------------- */
 
@@ -242,6 +248,8 @@ public class DrawerActivity extends AppCompatActivity
 
         log("Starting service");
         startService(startIntent);
+
+       // noti = new NotificationHelper(this);
 //        if(controlsVisible)
 //            showControls();
 
@@ -252,6 +260,16 @@ public class DrawerActivity extends AppCompatActivity
 
     }
 
+//    @Override
+//    public void showNoti(String msg){
+//        int id = 0;
+//        Notification.Builder nb = null;
+//        nb = noti.getNotification1("Music", msg);
+//
+//        if (nb != null) {
+//            noti.notify(id, nb);
+//        }
+//    }
 
     /* -----------------------------------   onCreate over.   ----------------------------------- */
 
@@ -455,9 +473,17 @@ public class DrawerActivity extends AppCompatActivity
         log("Resume activity.");
     }
 
+
+    @Override
+    public void onArtistLongClick(Artist a) {
+        onArtistLongClicked(a);
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
+
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
         // Bind to LocalService
 
         final Intent intent = new Intent("music.app.my.music.player.MUSICSERVICE");  //Intent(DrawerActivity.this, music.app.my.music.player.MusicService.class);
@@ -1474,7 +1500,7 @@ public class DrawerActivity extends AppCompatActivity
     @Override
     public void onNextLongClicked(Song song) {
         Log.d(TAG, "Option long clicked, add to top of playlist");
-        DialogFragment c = ChoosePlaylistDialogFragment.newInstance(song.getTitle(), song.getId(), false, true, null);
+        DialogFragment c = ChoosePlaylistDialogFragment.newInstance(song.getTitle(), song.getId(), false, false, null);
         c.show(getSupportFragmentManager(), song.getId());
     }
 
@@ -1526,7 +1552,7 @@ public class DrawerActivity extends AppCompatActivity
             startService(playIntent);
         }
 
-        showNow();
+        if(play) showNow();     //on header clicked.
         updateQueueFrag(p);
 
 //        updateNextSongInfo();
@@ -1696,7 +1722,7 @@ public class DrawerActivity extends AppCompatActivity
     /* ---------- Mixxer Fragment end ------------- */
 
     public void updateQueueFrag(plist p){
-        if(qf != null && showq != 0)
+        if(qf != null && showq != 0 && p != null)
             qf.setQList(p);
     }
 
@@ -1736,6 +1762,12 @@ public class DrawerActivity extends AppCompatActivity
     }
 
 
+    @Override
+    public void playPauseLongClicked() {
+        if(mService != null)
+        mService.getPlayer().fadeIn();
+    }
+
     //updates seekbar and fader cue at 1hz
     /* ---------- Music Serice Callbacks UpdateUI ------------- */
     public void updateProgress(MusicPlayer player){
@@ -1755,8 +1787,8 @@ public class DrawerActivity extends AppCompatActivity
         if(mixxerReadyForUpdates) mf.updateMP(mService.getPlayer());
 
         if(vf != null) vf.setAid(mService.getPlayer().getAID());
-        if(nf != null) nf.updateSongInfo(s);
-        if(cf != null) cf.updateSongInfo(s);
+        if(nf != null && nowShowing) nf.updateSongInfo(s);
+        if(cf != null && controlsVisible) cf.updateSongInfo(s);
 
 //        updateNextSongInfo();
 
@@ -1825,6 +1857,27 @@ public class DrawerActivity extends AppCompatActivity
                 i, // Index
                 0 //AudioManager.FLAG_SHOW_UI // Flags
         );
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        //just let the system do it if nowfrag is not visble
+        if(!nowShowing || nf == null) return super.onKeyDown(keyCode, event);
+
+        if ((keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)){
+            //Do something
+            log("Volume down button clicked.");
+            am.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, 0);
+        }else if ((keyCode == KeyEvent.KEYCODE_VOLUME_UP)){
+            //Do something
+            log("Volume up button clicked.");
+            am.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, 0);
+        }
+
+        //show the change on the now fragment if its showing.
+        if(nowShowing && nf != null) nf.updateVol(getVol());
+
+        return true;
     }
 
     /* ---------- not needed? ------------- */

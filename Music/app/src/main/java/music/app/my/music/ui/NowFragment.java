@@ -10,6 +10,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatDelegate;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Gravity;
@@ -29,6 +30,7 @@ import android.widget.ViewSwitcher;
 import music.app.my.music.DrawerActivity;
 import music.app.my.music.R;
 import music.app.my.music.player.MusicPlayer;
+import music.app.my.music.types.Artist;
 import music.app.my.music.types.Song;
 import music.app.my.music.types.plist;
 
@@ -54,6 +56,8 @@ public class NowFragment extends ControlFragment {
 //        void readyForInfo();
 //        void seekBarChanged(int progress);
 //    }
+
+    private String id, artist;
     private ControlFragment.ControlFragmentListener mListener;
     private SeekBar sbar, vbar;
     private ImageButton pp, shuffle, repeat;
@@ -63,7 +67,7 @@ public class NowFragment extends ControlFragment {
     private LinearLayout bg;
     private GestureDetector gestureDetector;
     private View.OnTouchListener gestureListener;
-
+    private Bitmap rc;
 
     private boolean isMini = false;
 
@@ -107,6 +111,8 @@ public class NowFragment extends ControlFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+
         isMini = getArguments().getBoolean("ISMINI");
         View view;
         if (isMini) view = inflater.inflate(R.layout.nowmini_layout, container, false);
@@ -258,6 +264,13 @@ public class NowFragment extends ControlFragment {
             }
         });
 
+        line2.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                mListener.onArtistLongClick(getArtist());
+                return true;
+            }
+        });
         sbar = (SeekBar) view.findViewById(R.id.seekBar);
         sbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -277,6 +290,13 @@ public class NowFragment extends ControlFragment {
             }
         });
         pp = (ImageButton) view.findViewById(R.id.playpauseButton);
+        pp.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                playLongClicked();
+                return true;
+            }
+        });
         pp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -304,6 +324,9 @@ public class NowFragment extends ControlFragment {
     }
 
 
+    private Artist getArtist(){
+        return new Artist(id, artist);
+    }
     public void setupVolbar(int max, int v){
         vbar.setMax(max);
         vbar.setProgress(v);
@@ -325,6 +348,9 @@ public class NowFragment extends ControlFragment {
         });
     }
 
+    public void updateVol(int v){
+        vbar.setProgress(v);
+    }
 
     private boolean infoset = false;
 
@@ -354,6 +380,8 @@ public class NowFragment extends ControlFragment {
         log("Now Playing: "+ s.getTitle() + " : " + s.getArtist());
 
 
+        artist = s.getArtist();
+        id = s.getArtistId();
         line1.setText(s.getTitle());
         line2.setText(s.getArtist());
         line3.setText(s.getAlbum());
@@ -368,7 +396,9 @@ public class NowFragment extends ControlFragment {
                 log("Drawable created.");
                 Bitmap bitmap = ((BitmapDrawable) d).getBitmap();
                 bitmap = Bitmap.createScaledBitmap(bitmap, 600, 600, true);
-                final Bitmap rc = Bitmap.createBitmap(600  , 600, Bitmap.Config.ARGB_8888);
+
+                //if(rc != null) rc.recycle();
+                rc = Bitmap.createBitmap(600  , 600, Bitmap.Config.ARGB_8888);
                 Canvas cc = new Canvas((rc));
                 Paint pt = new Paint();
                 pt.setAlpha(100);
@@ -382,6 +412,8 @@ public class NowFragment extends ControlFragment {
                 if(isMini) icon.setImageDrawable(d);
                 else setBg(d);
 
+                bitmap.recycle();
+               // rc.recycle(); //free up memory
             } else if(isMini) icon.setImageResource(R.drawable.android_icon32a5);
                     else setBg(R.drawable.android_icon32a5);
         }
@@ -466,6 +498,11 @@ public class NowFragment extends ControlFragment {
 
     private  void iconClicked(boolean close){
         if(mListener != null) mListener.nowIconClicked(true, close);
+    }
+
+    private void playLongClicked(){
+
+        if (null != mListener) mListener.playPauseLongClicked();
     }
     private void playPressed(){
         if (null != mListener) {
