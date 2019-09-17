@@ -55,6 +55,7 @@
         <item name="colorPrimaryDark">@color/colorscd</item>
         <item name="colorAccent">@color/colorsca</item>
         <item name="android:colorBackground">?colorPrimaryDark</item>
+        <item name="android:colorForeground">@color/darksideca</item>
     </style>
 
     <style name="AppThemeJarvis" parent="Theme.AppCompat.Light.NoActionBar" >

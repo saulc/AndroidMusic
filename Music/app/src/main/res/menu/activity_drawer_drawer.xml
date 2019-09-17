@@ -40,13 +40,25 @@
     <item android:title="Settings">
         <menu>
             <item
-                android:id="@+id/nav_theme"
-                android:icon="@android:drawable/ic_menu_view"
-                android:title="Theme" />
+                android:id="@+id/save_queue"
+                android:icon="@android:drawable/ic_menu_save"
+                android:title="Save Queue" />
+            <item
+                android:id="@+id/clear_queue"
+                android:icon="@android:drawable/ic_menu_delete"
+                android:title="Clear Queue" />
+            <item
+                android:id="@+id/new_playlist"
+                android:icon="@android:drawable/ic_input_add"
+                android:title="New Playlist" />
             <item
                 android:id="@+id/nav_dream"
                 android:icon="@android:drawable/ic_menu_recent_history"
                 android:title="Daydream" />
+            <item
+                android:id="@+id/nav_setdream"
+                android:icon="@android:drawable/ic_menu_recent_history"
+                android:title="Daydream Settings " />
             <item
                 android:id="@+id/nav_settings"
                 android:icon="@android:drawable/ic_menu_preferences"
@@ -56,17 +68,9 @@
                 android:icon="@android:drawable/stat_sys_data_bluetooth"
                 android:title="Bluetooth" />
             <item
-                android:id="@+id/new_playlist"
-                android:icon="@android:drawable/ic_input_add"
-                android:title="New Playlist" />
-            <item
-                android:id="@+id/save_queue"
-                android:icon="@android:drawable/ic_menu_save"
-                android:title="Save Queue" />
-            <item
-                android:id="@+id/clear_queue"
-                android:icon="@android:drawable/ic_menu_delete"
-                android:title="Clear Queue" />
+                android:id="@+id/nav_theme"
+                android:icon="@android:drawable/ic_menu_view"
+                android:title="Theme" />
             <item
                 android:id="@+id/exit"
                 android:icon="@android:drawable/btn_dialog"

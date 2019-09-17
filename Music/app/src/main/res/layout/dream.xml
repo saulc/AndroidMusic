@@ -12,6 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
+        android:layout_marginTop="@dimen/text_margin"
         android:max="60"
         android:progress="33"
         android:theme="@style/DreamProgressBarStyle" />

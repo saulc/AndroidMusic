@@ -16,6 +16,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
@@ -294,6 +295,10 @@ public class DrawerActivity extends AppCompatActivity
             log("Nav dream clicked!");
             showDaydream();
 
+        } else if (id == R.id.nav_setdream) {
+            log("Nav dream settings clicked!");
+            showDaydreamSettings();
+
         } else if (id == R.id.nav_theme) {
             log("Nav theme clicked!");
             showThemeDialog();
@@ -357,7 +362,6 @@ public class DrawerActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
-
 
 
     /* ---------- Service Connection! UI Callbacks ------------- */
@@ -651,6 +655,13 @@ public class DrawerActivity extends AppCompatActivity
         startActivity(intent);
 
     }
+
+    private void showDaydreamSettings() {
+
+        final  Intent intent = new Intent(Settings.ACTION_DREAM_SETTINGS);
+        startActivity(intent);
+    }
+
 
 
     /* ---------- Themes ------------- */
@@ -1214,7 +1225,7 @@ public class DrawerActivity extends AppCompatActivity
                 Log.d(TAG, "Now updating..");
                 h.removeCallbacks(this);
             }
-        }, 1000);
+        }, 300);
 
 
     }
