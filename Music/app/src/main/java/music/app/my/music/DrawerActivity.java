@@ -1,8 +1,6 @@
 package music.app.my.music;
 
 import android.animation.LayoutTransition;
-import android.app.ActionBar;
-import android.app.Notification;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -47,7 +45,6 @@ import android.widget.Toast;
 import android.widget.ViewSwitcher;
 import java.util.ArrayList;
 
-import music.app.my.music.helpers.NotificationHelper;
 import music.app.my.music.helpers.FabDoubleTapGS;
 import music.app.my.music.helpers.PlaylistHelper;
 import music.app.my.music.helpers.QueueListener;
@@ -117,7 +114,7 @@ public class DrawerActivity extends AppCompatActivity
     private final String TAG = getClass().getSimpleName();
 
     private void log(String s) {
-        Log.d(TAG, s);
+        Log.i(TAG, s);
     }
 
     private MusicService mService;
@@ -286,8 +283,8 @@ public class DrawerActivity extends AppCompatActivity
 
             showNow();
 
-        } else if (id == R.id.nav_bubble) {
-            log("Nav bubble clicked!");
+        } else if (id == R.id.nav_eq) {
+            log("Nav eq clicked!");
             showEQTab();
             //showBubbles();
 

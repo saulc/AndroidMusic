@@ -105,7 +105,7 @@ public class Dream extends DreamService implements FabDoubleTapGS.DoubleTapListe
                     getString(R.string.preference_file_key), Context.MODE_PRIVATE);
 
         int defaultValue = 0; //black
-        cc = sharedPref.getInt(getString(R.string.saved_theme), defaultValue);
+        cc = sharedPref.getInt(getString(R.string.last_dream), defaultValue);
 
 
     }
@@ -146,6 +146,7 @@ public class Dream extends DreamService implements FabDoubleTapGS.DoubleTapListe
         log("Dreaming window size: " + width + " h: " + height);
 
         getLastBG();
+        clicked();
         mhandler = new Handler();
         mhandler.postDelayed(updateDream, 2000);
 

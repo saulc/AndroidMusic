@@ -8,9 +8,9 @@
             android:icon="@android:drawable/ic_menu_more"
             android:title="Now Playing" />
         <item
-            android:id="@+id/nav_bubble"
+            android:id="@+id/nav_eq"
             android:icon="@android:drawable/ic_menu_add"
-            android:title="Bubbles!" />
+            android:title="EQ!" />
         <item
             android:id="@+id/nav_playlists"
             android:icon="@android:drawable/ic_menu_save"
