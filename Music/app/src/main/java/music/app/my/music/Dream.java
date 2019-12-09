@@ -49,7 +49,7 @@ public class Dream extends DreamService implements FabDoubleTapGS.DoubleTapListe
     private Runnable updateDream = new Runnable() {
         @Override
         public void run() {
-            log("Update Dream.");
+           // log("Update Dream.");
             updateTime();
             mhandler.postDelayed(updateDream, delay);
 

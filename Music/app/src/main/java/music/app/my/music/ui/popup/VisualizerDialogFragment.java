@@ -162,6 +162,21 @@ public  class VisualizerDialogFragment extends Fragment implements Visualizer.On
          }
     }
 
+    public void stop(){
+
+        log("Visualizer stopped.");
+        try {
+            vis.setEnabled(false);
+            vis.release();
+            vis = null;
+
+            iv.setImageResource(R.drawable.gradientbox);
+            iv = null;
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     private void iniVis() {
         log("ini Vis");
@@ -189,7 +204,6 @@ public  class VisualizerDialogFragment extends Fragment implements Visualizer.On
 
         log("Starting Vis! width: " + width + " height: " + height);
     }
-
 
 
     private void updateIV(byte[] waves){
@@ -280,6 +294,7 @@ public  class VisualizerDialogFragment extends Fragment implements Visualizer.On
     public void onWaveFormDataCapture(Visualizer visualizer, byte[] bytes, int i) {
 
        // log("Visualizer Data capture Wave: " + bytes.length);
+        if(iv != null)
         updateIV(bytes);
 
 

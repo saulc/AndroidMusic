@@ -911,22 +911,6 @@ public class DrawerActivity extends AppCompatActivity
 
     }
 
-    public void visualizerLongClicked() {
-        log("Vis long clicked.");
-        showNow();
-    }
-
-
-    public void visualizerCreated() {
-        log("Vis created.");
-        if (mService != null && mService.getPlayer() != null && mService.getPlayer().isPlaying()) {
-            vf.setImageView(nf.getIcon());
-            vf.setAid(mService.getPlayer().getAID());
-            //vf.setEnabled(true);
-        }
-
-    }
-
 
 
     //adjust layout weights to hide/show queue and player
@@ -1131,15 +1115,36 @@ public class DrawerActivity extends AppCompatActivity
         showNow();
     }
 
+
+
+    public void visualizerLongClicked() {
+        log("Vis long clicked.");
+        nowIconLongClicked();
+        // showNow();
+    }
+
+
+    public void visualizerCreated() {
+        log("Vis created.");
+        if (mService != null && mService.getPlayer() != null && mService.getPlayer().isPlaying()) {
+            vf.setImageView(nf.getIcon());
+            vf.setAid(mService.getPlayer().getAID());
+            //vf.setEnabled(true);
+        }
+
+    }
+
+
     @Override
     public void nowIconLongClicked() {
 
-        Log.d(TAG, "Now icon Long clicked ");
+        Log.d(TAG, "Now icon Long clicked " + (vf==null) );
 
         if (vf == null) {
             vf = VisualizerDialogFragment.newInstance();
             getSupportFragmentManager().beginTransaction().show(vf).commit();
         } else {
+            vf.stop();
             getSupportFragmentManager().beginTransaction().remove(vf).commit();
             vf = null;
             //nowIconLongClicked();
