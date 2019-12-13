@@ -985,14 +985,14 @@ public class DrawerActivity extends AppCompatActivity
             LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
                     DrawerLayout.LayoutParams.MATCH_PARENT,
                     0,
-                    (float) (2 * showq)
+                    (float) ((showq == 2 ? 2:1)  * showq)
             );
             findViewById(R.id.sidebar).setLayoutParams(param);
 
             param = new LinearLayout.LayoutParams(
                     DrawerLayout.LayoutParams.MATCH_PARENT,
                     0,
-                    (showq < 3) ? 5.0f : 0.0f
+                    (showq < 3) ? 6.0f : 0.0f
             );
             findViewById(R.id.frame).setLayoutParams(param);
 
