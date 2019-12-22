@@ -8,10 +8,6 @@
             android:icon="@android:drawable/ic_menu_more"
             android:title="Now Playing" />
         <item
-            android:id="@+id/nav_eq"
-            android:icon="@android:drawable/ic_menu_add"
-            android:title="EQ!" />
-        <item
             android:id="@+id/nav_playlists"
             android:icon="@android:drawable/ic_menu_save"
             android:title="PlayLists" />
@@ -36,9 +32,7 @@
 
     </group>
 
-
-    <item android:title="Settings">
-        <menu>
+    <group android:checkableBehavior="single">
             <item
                 android:id="@+id/save_queue"
                 android:icon="@android:drawable/ic_menu_save"
@@ -52,6 +46,14 @@
                 android:icon="@android:drawable/ic_input_add"
                 android:title="New Playlist" />
             <item
+                android:id="@+id/nav_eq"
+                android:icon="@android:drawable/ic_menu_add"
+                android:title="EQ!" />
+            <item
+                android:id="@+id/bluetooth"
+                android:icon="@android:drawable/stat_sys_data_bluetooth"
+                android:title="Bluetooth" />
+            <item
                 android:id="@+id/nav_dream"
                 android:icon="@android:drawable/ic_menu_recent_history"
                 android:title="Daydream" />
@@ -64,10 +66,6 @@
                 android:icon="@android:drawable/ic_menu_preferences"
                 android:title="Settings" />
             <item
-                android:id="@+id/bluetooth"
-                android:icon="@android:drawable/stat_sys_data_bluetooth"
-                android:title="Bluetooth" />
-            <item
                 android:id="@+id/nav_theme"
                 android:icon="@android:drawable/ic_menu_view"
                 android:title="Theme" />
@@ -75,7 +73,7 @@
                 android:id="@+id/exit"
                 android:icon="@android:drawable/btn_dialog"
                 android:title="Exit" />
-        </menu>
-    </item>
+
+    </group>
 
 </menu>
