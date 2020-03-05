@@ -18,12 +18,12 @@
 
         <item
             android:id="@+id/nav_albums"
-            android:icon="@android:drawable/ic_menu_agenda"
+            android:icon="@android:drawable/ic_menu_slideshow"
             android:title="Albums" />
 
         <item
             android:id="@+id/nav_songs"
-            android:icon="@android:drawable/ic_lock_idle_low_battery"
+            android:icon="@android:drawable/ic_menu_mapmode"
             android:title="Songs" />
         <item
             android:id="@+id/nav_genres"
@@ -59,8 +59,8 @@
                 android:title="Daydream" />
             <item
                 android:id="@+id/nav_setdream"
-                android:icon="@android:drawable/ic_menu_recent_history"
-                android:title="Daydream Settings " />
+                android:icon="@android:drawable/ic_input_get"
+                android:title="set Dream" />
             <item
                 android:id="@+id/nav_settings"
                 android:icon="@android:drawable/ic_menu_preferences"

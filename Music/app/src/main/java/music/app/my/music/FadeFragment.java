@@ -39,6 +39,7 @@ public class FadeFragment extends Fragment {
 //            mParam1 = getArguments().getString(ARG_PARAM1);
 //            mParam2 = getArguments().getString(ARG_PARAM2);
 //        }
+//        this is a test oh shit, some is fired.
     }
 
     @Override

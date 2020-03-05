@@ -306,7 +306,7 @@ public class SongFragment extends baseListFragment implements MediaHelperListene
             mhandler.removeCallbacks(updatesongbar);
         }
 
-        log("progress: " + songbar.getProgress());
+     //   log("progress: " + songbar.getProgress());
 
     }
     @Override

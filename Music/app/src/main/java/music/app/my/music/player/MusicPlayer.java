@@ -39,7 +39,7 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 	
 	private boolean CrossFadeEnabled = true;
 	private boolean playWhenPrepared = true;
-	private int fadeInDuration = 1000, fadeOutDuration = 2000, fadeOutGap = 4000;
+	private int fadeInDuration = 1000, fadeOutDuration = 2000, fadeOutGap = 4000, fadeInGap = 1000;
 
 	private void log(String s){
 		Log.d(getClass().getSimpleName(), s);
@@ -55,6 +55,7 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 			fadeInDuration = 500;
 			fadeOutDuration = 500;
 			fadeOutGap = 2000;
+			fadeInGap = 500;
 		}
 		queue = new plist();
 		index = 0;
@@ -80,25 +81,37 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 			temp.setId(2);
 			player.add(temp);
 
+
 		}
 
 	}
 
+	//update the new music player's fader settings ..
+	public void updateFader(){
+		setFadeInDuration(fadeInDuration);
+		setFadeInGap(fadeInGap);
+		setFadeOutDuration(fadeOutDuration);
+		setFadeOutGap(fadeOutGap);
+	}
 	public void setFadeOutGap(int g){
+		fadeOutGap = g;
 		for(myPlayer p: player)
 			//myPlayer p = player.get(currentPlayer);
 			p.setFadeOutGap(g);
 	}
 	public void setFadeInGap(int g){
+		fadeInGap = g;
 		for(myPlayer p: player)
 			p.setStartGap(g);
 	}
 	public void setFadeOutDuration(int g){
+		fadeOutDuration = g;
 		for(myPlayer p: player)
 			p.setFadeOutDuration(g);
 	}
 
 	public void setFadeInDuration(int g){
+		fadeInDuration = g;
 		for(myPlayer p: player)
 			p.setFadeInDuration(g);
 	}
@@ -140,12 +153,11 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 	}
 	
 	public void pauseRequest() {
-		 if(mState == MUSICPLAYER_STATE.PLAYING || mState == MUSICPLAYER_STATE.PLAYING_DUCKING)
+		 if(mState == MUSICPLAYER_STATE.PLAYING || mState == MUSICPLAYER_STATE.PLAYING_DUCKING) {
 			 player.get(currentPlayer).pausePlayback();
-			 
-			 
+
 			 setState(MUSICPLAYER_STATE.PAUSED_USER);
-		 
+		 }
 	}
 	
 	public void previousRequest() {
@@ -273,6 +285,7 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 		myPlayer rp = new myPlayer();
 		rp.setId(i);
 		player.add(i,  rp);
+		updateFader();
 
 
 //		if(player.contains(mp)){
@@ -308,7 +321,7 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 	    	player.get(currentPlayer).playAndFadeIn();
 	    	setState(MUSICPLAYER_STATE.PLAYING);
 
-	    	mHandler.postDelayed(volCheck, 3000);
+	    	mHandler.postDelayed(volCheck, fadeInDuration+10);
 	    	//fix annoying problem where current player is faded out
 			//can't find the cause. must have a solve anyway.
 
@@ -427,6 +440,10 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 			}
 		}
 	}
+
+	public int getFadeInGap(){ return player.get(currentPlayer).getStartGap(); }
+
+	public int getFadeInDuration(){ return player.get(currentPlayer).getFadeInDuration(); }
 	public int getFadeOutDuration(){ return player.get(currentPlayer).getFadeOutDuration(); }
 	public int getFadeOutGap(){ return player.get(currentPlayer).getFadeOutGap(); }
 

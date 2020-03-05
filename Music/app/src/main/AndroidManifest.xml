@@ -2,13 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="music.app.my.music">
 
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"   />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"   />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
-    <application
+    <application android:requestLegacyExternalStorage="true"
         android:allowBackup="true"
         android:icon="@drawable/android_icon32128"
         android:label="@string/app_name"

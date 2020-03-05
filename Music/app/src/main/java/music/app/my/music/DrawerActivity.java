@@ -272,7 +272,7 @@ public class DrawerActivity extends AppCompatActivity
     /* -----------------------------------   onCreate over.   ----------------------------------- */
 
 
-    /* ---------- Main side drawer navigation menu ------------- */
+    /* ---------- Main side drawer_actions navigation menu ------------- */
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -575,7 +575,7 @@ public class DrawerActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(final Menu menu) {
         // Inflate the options menu from XML
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.drawer, menu);
+        inflater.inflate(R.menu.drawer_actions, menu);
         // Get the SearchView and set the searchable configuration
         // SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         final SearchView searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
@@ -1877,13 +1877,16 @@ public class DrawerActivity extends AppCompatActivity
         //just let the system do it if nowfrag is not visble
         if(!nowShowing || nf == null) return super.onKeyDown(keyCode, event);
 
+
         if ((keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)){
             //Do something
             log("Volume down button clicked.");
+//            prevPressed();
             am.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, 0);
         }else if ((keyCode == KeyEvent.KEYCODE_VOLUME_UP)){
             //Do something
             log("Volume up button clicked.");
+//            nextPressed();
             am.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, 0);
         }
 

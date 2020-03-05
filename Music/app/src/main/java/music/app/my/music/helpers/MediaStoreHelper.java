@@ -223,7 +223,7 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
 
 			log("Song Item loader Created");
 
-				return new CursorLoader(mContext, songUri, defaultProjection , defaultSelection, null, defaultSort);
+				return new CursorLoader(mContext, songUri, defaultProjection , null, null, defaultSort);
 
 		}
 		else  if(myType == LOADER_TYPE.QUERY) {

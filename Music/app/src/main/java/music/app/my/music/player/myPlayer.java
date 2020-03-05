@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.util.Log;
 
 public class myPlayer extends MediaPlayer
+
 		implements MediaPlayer.OnErrorListener {
 
 	private Handler mHandler = new Handler();

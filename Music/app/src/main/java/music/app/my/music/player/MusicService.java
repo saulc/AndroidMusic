@@ -669,6 +669,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 			mListener.setCurrentInfo(player.getCurrentSong());
 
 			updateFadeSettings();
+			//player.updateFader();
 			mHandler.postDelayed(updateUi, 1000);
 			updateDream();
 
@@ -730,12 +731,45 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 	}
 
 
-	private void updateFadeSettings(){
+	private void updateFadeSettings() {
 		log("Updating Fader settings.");
 
-		int g = 11; //player.getQueue().getCurrentSong().getDuration() - 12;
-		log("Setting Fade out to 67% = -" + g + " seconds remaining.");
-		if(g > 10) player.setFadeOutGap(g);
+		updateig();
+		updateog();
+
+
+	}
+	private void updateig(){
+			log("fade In gap");
+		int g = player.getFadeInGap()/1000;
+		int d =  player.getQueue().getCurrentSong().getDuration() ;
+		log("fg: " + g);
+		if(g >= 9) {
+			//for max fade, cutout last 33%
+			g = (int) (d * .22);
+			if (d <= 33) g = 3;
+		}
+			log("song length: " + d);
+			log("Setting Fade in to 22% = -" + g + " seconds remaining.");
+
+		 setFadeInGap(g);
+		player.seekTo(g); //
+
+
+	}
+
+	private void updateog(){
+		log("fade out Gap");
+		int g = player.getFadeOutGap()/1000;
+		int d =  player.getQueue().getCurrentSong().getDuration() ;
+		if(g >= 10) {
+			//for max fade, cutout last 33%
+			g = (int) (d * .33);
+			if (d <= 33) g = 4;
+			log("song length: " + d);
+			log("Setting Fade out to 67% = -" + g + " seconds remaining.");
+		}
+		 setFadeOutGap(g);
 
 
 	}

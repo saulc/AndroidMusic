@@ -227,7 +227,8 @@ public class Dream extends DreamService implements FabDoubleTapGS.DoubleTapListe
 
     private void updateTime(){
         Date d = new Date();
-        DateFormat dateFormat = new SimpleDateFormat("h:mma");
+        DateFormat dateFormat = new SimpleDateFormat("h:mm");
+        DateFormat af = new SimpleDateFormat("aa");
         String s = dateFormat.format(d) + System.lineSeparator();
        // dateFormat = new SimpleDateFormat("mm");
         //s += dateFormat.format(d) + System.lineSeparator();
@@ -239,6 +240,11 @@ public class Dream extends DreamService implements FabDoubleTapGS.DoubleTapListe
         dateFormat = new SimpleDateFormat("EEEE MMMM d yyyy ");
         String s2 = dateFormat.format(d);
 
+        String ap = af.format(d);
+        //log("am: " + ap);
+        if(ap.toLowerCase().compareTo( "am") == 0)
+            dreamText.setTextColor(Color.GRAY);
+        else dreamText.setTextColor(Color.RED);
         dreamText.setText(s.toLowerCase());
         subText.setText(s2 + batt +  System.lineSeparator() +  msg);
         if(sec % 10 == 0) any = true;       //animate Y axis every 10 seconds.
