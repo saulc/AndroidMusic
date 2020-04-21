@@ -8,22 +8,16 @@
         android:orientation="vertical" >
 
 
-        <com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
-            android:id="@+id/menulist"
-            android:name="music.app.my.music.ui.QueueFragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="@dimen/top_text_margin"
-            android:layout_marginRight="@dimen/top_text_margin"
-            app:fastScrollAutoHide="true"
-            app:fastScrollAutoHideDelay="2500"
-            app:fastScrollPopupBgColor="?colorAccent"
-            app:fastScrollPopupTextColor="?colorPrimaryDark"
-            app:fastScrollThumbColor="?colorAccent"
-            app:fastScrollThumbEnabled="true"
-            app:layoutManager="LinearLayoutManager"
-            tools:context="music.app.my.music.ui.QueueFragment"
-            tools:listitem="@layout/fragment_queueitem" />
+
+    <android.support.design.widget.NavigationView
+        android:id="@+id/nav_view"
+        android:layout_width="@dimen/nav_width"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="?colorPrimary"
+        android:fitsSystemWindows="true"
+        app:headerLayout="@layout/nav_header_drawer"
+        app:menu="@menu/activity_drawer_drawer" />
 
 
     </LinearLayout>

@@ -109,6 +109,7 @@ public class DrawerActivity extends AppCompatActivity
     private FloatingActionButton fab1;
     private FloatingActionButton fab;
 
+    private boolean autoCloseDrawer = true;
     private boolean showfmenu = false; //show/hide floating control buttons.
     private int showq = 0; //0 == hidden, 1 = miniplayer q, 2 = half, 3 = full screen, todo 4 edit plist
 
@@ -229,10 +230,11 @@ public class DrawerActivity extends AppCompatActivity
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        if(navigationView != null)
-        navigationView.setNavigationItemSelectedListener(this);
+        if(navigationView != null)   navigationView.setNavigationItemSelectedListener(this);
+        //no nav view. for wide screens use persistent menu list
 
-        
+        int res  = getResources().getConfiguration().orientation;
+        autoCloseDrawer = ( res != Configuration.ORIENTATION_LANDSCAPE );
 
         startIntent = new Intent(getApplicationContext(), MusicService.class);
         startIntent.setAction(MusicService.ACTION_BLANK);
@@ -361,9 +363,10 @@ public class DrawerActivity extends AppCompatActivity
             showMixx();
 
         }
-
-            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
+            if(autoCloseDrawer) {
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                drawer.closeDrawer(GravityCompat.START);
+            }
         return true;
     }
 
