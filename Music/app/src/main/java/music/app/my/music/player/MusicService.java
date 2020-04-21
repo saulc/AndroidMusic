@@ -671,7 +671,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 			updateFadeSettings();
 			//player.updateFader();
 			mHandler.postDelayed(updateUi, 1000);
-			updateDream();
+			updateDream(); //send now playing info to daydream..screensaver...
 
 			setUpAsForeground("Playing");;
 			// Tell any remote controls that our playback state is 'paused'.

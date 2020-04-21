@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+    android:background="@color/colorPrimaryDark"
+        android:orientation="vertical" >
+
+
+        <com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
+            android:id="@+id/menulist"
+            android:name="music.app.my.music.ui.QueueFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="@dimen/top_text_margin"
+            android:layout_marginRight="@dimen/top_text_margin"
+            app:fastScrollAutoHide="true"
+            app:fastScrollAutoHideDelay="2500"
+            app:fastScrollPopupBgColor="?colorAccent"
+            app:fastScrollPopupTextColor="?colorPrimaryDark"
+            app:fastScrollThumbColor="?colorAccent"
+            app:fastScrollThumbEnabled="true"
+            app:layoutManager="LinearLayoutManager"
+            tools:context="music.app.my.music.ui.QueueFragment"
+            tools:listitem="@layout/fragment_queueitem" />
+
+
+    </LinearLayout>

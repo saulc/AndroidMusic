@@ -57,6 +57,7 @@ import music.app.my.music.types.Genre;
 import music.app.my.music.types.plist;
 import music.app.my.music.types.Playlist;
 import music.app.my.music.types.Song;
+import music.app.my.music.ui.MixFragment;
 import music.app.my.music.ui.MixxerFragment;
 import music.app.my.music.ui.browser.AlbumFragment;
 import music.app.my.music.ui.browser.ArtistFragment;
@@ -95,7 +96,7 @@ public class DrawerActivity extends AppCompatActivity
     private VisualizerDialogFragment vf = null;
 
     private FadeFragment fader = null;
-    private MixxerFragment mf = null;
+    private MixFragment mf = null;
     private NowFragment nf = null;
     private QueueFragment qf = null;
     private ControlFragment cf = null;
@@ -228,8 +229,10 @@ public class DrawerActivity extends AppCompatActivity
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        if(navigationView != null)
         navigationView.setNavigationItemSelectedListener(this);
 
+        
 
         startIntent = new Intent(getApplicationContext(), MusicService.class);
         startIntent.setAction(MusicService.ACTION_BLANK);
@@ -350,12 +353,16 @@ public class DrawerActivity extends AppCompatActivity
         } else if (id == R.id.nav_settings) {
             log("Settings clicked.");
 
-            showMix();
+//            showMix();
 //            Fragment f = (Fragment) HeaderFragment.newInstance("", "");
 //            showFragment(R.id.frame, f, true);
+        } else if (id == R.id.nav_mix) {
+            log("mix clicked.");
+            showMixx();
+
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -1257,12 +1264,20 @@ public class DrawerActivity extends AppCompatActivity
     }
 
     /* ---------- Show mixxer fragment ------------- */
-    public void showMix(){
-        Log.d(TAG, "Showing MIX fragment");
+//    public void showMix(){
+//        Log.d(TAG, "Showing MIX fragment");
+//        if(mf != null && mf.isVisible() ) return;
+//        mf =  MixxerFragment.newInstance();
+//        showFragment(R.id.frame, mf, true);
+//    }
+    //show new kt mixer/fader
+    public void showMixx(){
+        Log.d(TAG, "Showing MIixX fragment");
         if(mf != null && mf.isVisible() ) return;
-        mf =  MixxerFragment.newInstance();
+        mf =  MixFragment.Companion.newInstance();
         showFragment(R.id.frame, mf, true);
     }
+
 
 
     /* ---------- Show placeholder. for now its used for eq instead. ------------- */
@@ -1784,7 +1799,7 @@ public class DrawerActivity extends AppCompatActivity
     //updates seekbar and fader cue at 1hz
     /* ---------- Music Serice Callbacks UpdateUI ------------- */
     public void updateProgress(MusicPlayer player){
-        if(mixxerReadyForUpdates) mf.updateMixxerPlayer(player);
+//        if(mixxerReadyForUpdates) mf.updateMixxerPlayer(player);
         if(nowShowing) nf.updateProgressBar(player);
         if(controlsVisible)
         {
@@ -1797,7 +1812,7 @@ public class DrawerActivity extends AppCompatActivity
     /* ---------- Music Serice Callbacks UpdateUI ------------- */
     public void updateCurrentInfo(Song s){
 
-        if(mixxerReadyForUpdates) mf.updateMP(mService.getPlayer());
+//        if(mixxerReadyForUpdates) mf.updateMP(mService.getPlayer());
 
         if(vf != null) vf.setAid(mService.getPlayer().getAID());
         if(nf != null && nowShowing) nf.updateSongInfo(s);

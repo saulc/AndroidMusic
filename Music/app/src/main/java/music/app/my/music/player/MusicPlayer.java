@@ -116,6 +116,11 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 			p.setFadeInDuration(g);
 	}
 
+	public int getFadeInGap(){ return player.get(currentPlayer).getStartGap(); }
+	public int getFadeInDuration(){ return player.get(currentPlayer).getFadeInDuration(); }
+	public int getFadeOutDuration(){ return player.get(currentPlayer).getFadeOutDuration(); }
+	public int getFadeOutGap(){ return player.get(currentPlayer).getFadeOutGap(); }
+
 
 	private void setState(MUSICPLAYER_STATE s){
 		mState = s;
@@ -321,7 +326,7 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 	    	player.get(currentPlayer).playAndFadeIn();
 	    	setState(MUSICPLAYER_STATE.PLAYING);
 
-	    	mHandler.postDelayed(volCheck, fadeInDuration+10);
+	    	mHandler.postDelayed(volCheck, getFadeInDuration()+100);
 	    	//fix annoying problem where current player is faded out
 			//can't find the cause. must have a solve anyway.
 
@@ -440,12 +445,6 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 			}
 		}
 	}
-
-	public int getFadeInGap(){ return player.get(currentPlayer).getStartGap(); }
-
-	public int getFadeInDuration(){ return player.get(currentPlayer).getFadeInDuration(); }
-	public int getFadeOutDuration(){ return player.get(currentPlayer).getFadeOutDuration(); }
-	public int getFadeOutGap(){ return player.get(currentPlayer).getFadeOutGap(); }
 
 	public int getCurrentPosition(){
 		if(!isPlaying()) return 0;
