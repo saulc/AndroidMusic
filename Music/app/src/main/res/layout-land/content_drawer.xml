@@ -26,7 +26,7 @@
         <include
             layout="@layout/menulist"
             android:id="@+id/menu_view"
-            android:layout_width="@dimen/nav_width"
+            android:layout_width="@dimen/menu_width"
             android:layout_height="match_parent"
             android:layout_gravity="start"
             android:background="?colorPrimary"  />

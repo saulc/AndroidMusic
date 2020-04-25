@@ -41,7 +41,7 @@ import music.app.my.music.ui.ControlFragment;
 /**
  * Created by saul on 7/26/16.
  */
-public class SongFragment extends baseListFragment implements MediaHelperListener {
+public class   SongFragment extends baseListFragment implements MediaHelperListener {
 
     public enum SF_TYPE {QUEUE, PLAYLISTITEMS, SONGS, ALBUMS, ARTISTS, GENRE, QUERY, BUBBLE };
     private SF_TYPE myType = SF_TYPE.SONGS;

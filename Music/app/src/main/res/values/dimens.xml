@@ -15,7 +15,7 @@
     <dimen name="fc">90dp</dimen>
     <dimen name="now_button">44dp</dimen>
     <dimen name="nav_width">180dp</dimen>
-    <dimen name="menu_width">120dp</dimen>
+    <dimen name="menu_width">80dp</dimen>
     <item name="frame_height" type="dimen">80%</item>
 
 </resources>

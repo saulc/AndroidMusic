@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.simplecityapps.recyclerview_fastscroll.interfaces.OnFastScrollStateChangeListener;
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
@@ -77,6 +78,7 @@ public class AlbumFragment  extends baseListFragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_baselist, container, false);
 
+        updateHeader(view);
         View v = view.findViewById(R.id.list);
         // Set the adapter
         if (v instanceof FastScrollRecyclerView) {
@@ -104,6 +106,18 @@ public class AlbumFragment  extends baseListFragment {
         mAdapter.notifyDataSetChanged();
         log("items:" + items.size());
 
+    }
+
+    private  TextView infoText;
+    private void updateHeader(View v){
+
+        View header =  v.findViewById(R.id.header);
+        TextView t = (TextView) header.findViewById(R.id.content);
+        infoText = (TextView) header.findViewById(R.id.line2);
+        infoText.setText("...");
+
+        String a = "All Albums";
+        t.setText(a);
     }
 
     @Override
