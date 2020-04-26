@@ -101,15 +101,16 @@ public class AlbumAdapter   extends  RecyclerView.Adapter<AlbumAdapter.ViewHolde
 
         holder.mLine2.setText(t);
 
-        if(mValues.get(position).getArt() != null) {
-            try {
-                Drawable d = Drawable.createFromPath(mValues.get(position).getArt());
-                holder.mIcon.setImageDrawable(d);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-        }else holder.mIcon.setImageBitmap(createAlbumBit(holder.mItem.getAlbum().charAt(0)+""));
+//        if(mValues.get(position).getArt() != null) {
+//            try {
+//                Drawable d = Drawable.createFromPath(mValues.get(position).getArt());
+//                holder.mIcon.setImageDrawable(d);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//
+//        }else
+            holder.mIcon.setImageBitmap(createAlbumBit(holder.mItem.getAlbum().charAt(0)+""));
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -122,10 +123,10 @@ public class AlbumAdapter   extends  RecyclerView.Adapter<AlbumAdapter.ViewHolde
             }
         });
         // Here you apply the animation when the view is bound
-        if(!isScrolling){
-            //  log("Setting animation. " + isScrolling);
-            setAnimation(holder.itemView, position);
-        }
+//        if(!isScrolling){
+//            //  log("Setting animation. " + isScrolling);
+//            setAnimation(holder.itemView, position);
+//        }
     }
 
     /**

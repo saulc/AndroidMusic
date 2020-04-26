@@ -18,20 +18,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal">
-
-
-    <LinearLayout
-        android:layout_weight="5"
-        android:layout_width="0dp"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
         <FrameLayout
-
             android:id="@+id/frame"
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -57,7 +50,6 @@
             android:orientation="vertical">
 
             <FrameLayout
-
                 android:id="@+id/controlFrame"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
@@ -68,16 +60,6 @@
                 android:layout_height="wrap_content" />
 
         </LinearLayout>
-
-    </LinearLayout>
-        <android.support.design.widget.NavigationView
-            android:id="@+id/menu_view"
-            android:layout_width="@dimen/smenu_width"
-            android:layout_height="match_parent"
-            android:layout_gravity="start"
-            android:background="?colorPrimary"
-            android:fitsSystemWindows="true"
-            app:menu="@menu/activity_drawer_drawer" />
 
     </LinearLayout>
 
