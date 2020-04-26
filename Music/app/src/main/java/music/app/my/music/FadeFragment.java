@@ -133,7 +133,7 @@ public class FadeFragment extends Fragment {
         });
 
         mixSwitch = v.findViewById(R.id.mixmodeSwitch);
-        fadeSwitch = v.findViewById(R.id.crossfadeSwitch);
+//        fadeSwitch = v.findViewById(R.id.crossfadeSwitch);
 
         mixSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -141,13 +141,13 @@ public class FadeFragment extends Fragment {
                 mListener.mixSwitched(b);
             }
         });
-
-        fadeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                mListener.fadeSwitched(b);
-            }
-        });
+//
+//        fadeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+//                mListener.fadeSwitched(b);
+//            }
+//        });
 
         return v;
     }

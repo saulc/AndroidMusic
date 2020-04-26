@@ -8,6 +8,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CompoundButton
+import android.widget.RadioGroup
 import android.widget.SeekBar
 import android.widget.Switch
 import music.app.my.music.R
@@ -34,11 +36,37 @@ class MixFragment : Fragment() {
         s1 = v.findViewById(R.id.fade1)
         s2 = v.findViewById(R.id.fade2)
         s3 = v.findViewById(R.id.fade3)
+
+        mixSwitch = v.findViewById(R.id.mixmodeSwitch)
+
+        mixSwitch?.setOnCheckedChangeListener( object : CompoundButton.OnCheckedChangeListener{
+            override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
+                log("mix Switch clicked: " + isChecked)
+                setMixMode(isChecked)
+            }
+        })
+
+
         iniBars()
 
         return v
     }
 
+    fun setMixMode(mixOn: Boolean){
+        if(mixOn){
+            s0?.progress = s0!!.max
+            s1?.progress = s1!!.max
+            s2?.progress = s2!!.max
+            s3?.progress = s3!!.max
+
+        } else {
+
+            s0?.progress = s0!!.min
+            s1?.progress = s1!!.min
+            s2?.progress = s0!!.min
+            s3?.progress = s1!!.min
+        }
+    }
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 //        viewModel = ViewModelProviders.of(this).get(MixViewModel::class.java)
@@ -69,8 +97,7 @@ class MixFragment : Fragment() {
     private  var s1:SeekBar? = null
     private  var s2:SeekBar? = null
     private  var s3:SeekBar? = null
-    private val mixSwitch: Switch? = null
-    private  var fadeSwitch: Switch? = null
+    private var mixSwitch: Switch? = null
 
     fun loadValues(){
          s0?.progress =   viewModel.fadeIn
@@ -140,10 +167,4 @@ class MixFragment : Fragment() {
         })
 
     }
-    fun setFadeVal(v: Int, par: Int){
-        when(par){
-
-        }
-    }
-
 }
