@@ -744,13 +744,18 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 		int g = player.getFadeInGap()/1000;
 		int d =  player.getQueue().getCurrentSong().getDuration() ;
 		log("fg: " + g);
-		if(g >= 9) {
+		if(g > 7) {
 			//for max fade, cutout last 33%
-			g = (int) (d * .22);
+			g = (int) (d * .7);
+
+			if(g > 10) g = (int) (d * .33);
+			else if(g > 9) g = (int) (d * .22);
+			else if(g > 8) g = (int) (d * .11);
+
 			if (d <= 33) g = 3;
 		}
 			log("song length: " + d);
-			log("Setting Fade in to 22% = -" + g + " seconds remaining.");
+			log("Setting Fade in: " + g + " seconds remaining.");
 
 		 setFadeInGap(g);
 		player.seekTo(g); //
@@ -762,12 +767,16 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 		log("fade out Gap");
 		int g = player.getFadeOutGap()/1000;
 		int d =  player.getQueue().getCurrentSong().getDuration() ;
-		if(g >= 10) {
+		if(g > 7) {
 			//for max fade, cutout last 33%
-			g = (int) (d * .33);
+			g = (int) (d * .7);
+			if(g > 10) g = (int) (d * .33);
+			else if(g > 9) g = (int) (d * .22);
+			else if(g > 8) g = (int) (d * .11);
+
 			if (d <= 33) g = 4;
 			log("song length: " + d);
-			log("Setting Fade out to 67% = -" + g + " seconds remaining.");
+			log("Setting Fade out: " + g + " seconds remaining.");
 		}
 		 setFadeOutGap(g);
 

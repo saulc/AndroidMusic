@@ -548,7 +548,13 @@ public class DrawerActivity extends AppCompatActivity
     public int onRepeatClicked(){
         log("Repeat clicked");
         int b = mService.repeatSongs();
-        Toast.makeText(mService, "Repeat: " + b, Toast.LENGTH_SHORT).show();
+        String bb = "";
+        switch (b){
+            case 0: bb = "Off"; break;
+            case 1: bb = "Single"; break;
+            case 2: bb = "All"; break;
+        }
+        Toast.makeText(mService, "Repeat: " + bb, Toast.LENGTH_SHORT).show();
 
         return b;
     }

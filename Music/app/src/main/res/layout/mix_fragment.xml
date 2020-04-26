@@ -15,6 +15,7 @@
         android:id="@+id/mixText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:lines="1"
         android:text="Cross Fade Settings"
         android:textAlignment="center" />
 
@@ -23,24 +24,28 @@
             android:id="@+id/label0"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:lines="1"
             android:text="Fade In Duration:"
             android:textAlignment="center" />
         <TextView
             android:id="@+id/label1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:lines="1"
             android:text="Fade Out Duration:"
             android:textAlignment="center" />
         <TextView
             android:id="@+id/label2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:lines="1"
             android:text="Fade in Gap:"
             android:textAlignment="center" />
         <TextView
             android:id="@+id/label3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:lines="1"
             android:text="Fade Out Gap:"
             android:textAlignment="center" />
         <Switch
@@ -87,6 +92,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:max="11"
+            android:min="1"
             android:progress="9" />
 
         <SeekBar
@@ -95,6 +101,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:max="11"
+            android:min="1"
             android:progress="9" />
     </LinearLayout>
 
