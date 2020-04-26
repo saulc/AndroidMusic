@@ -231,6 +231,8 @@ public class DrawerActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         if(navigationView != null)   navigationView.setNavigationItemSelectedListener(this);
+        NavigationView menuView = (NavigationView) findViewById(R.id.menu_view);
+        if(menuView != null)   menuView.setNavigationItemSelectedListener(this);
         //no nav view. for wide screens use persistent menu list
 
         int res  = getResources().getConfiguration().orientation;

@@ -142,6 +142,10 @@ public class Dream extends DreamService implements FabDoubleTapGS.DoubleTapListe
         DisplayMetrics metrics = getApplicationContext().getResources().getDisplayMetrics();
         width = metrics.widthPixels;
         height = metrics.heightPixels;
+        float den = metrics.density;
+        if(den < 2f)
+        dreamText.setTextSize(333f);
+        log("density: " + den);
         //v = Math.round(height/10f);
         log("Dreaming window size: " + width + " h: " + height);
 
