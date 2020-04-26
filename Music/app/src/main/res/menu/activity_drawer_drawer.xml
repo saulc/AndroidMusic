@@ -53,10 +53,14 @@
                 android:id="@+id/bluetooth"
                 android:icon="@android:drawable/stat_sys_data_bluetooth"
                 android:title="Bluetooth" />
-        <item
-            android:id="@+id/nav_mix"
-            android:icon="@android:drawable/ic_dialog_alert"
-            android:title="MIiIXX" />
+            <item
+                android:id="@+id/nav_mix"
+                android:icon="@android:drawable/ic_dialog_alert"
+                android:title="MIiIXX" />
+            <item
+                android:id="@+id/nav_settings"
+                android:icon="@android:drawable/ic_menu_preferences"
+                android:title="Settings" />
             <item
                 android:id="@+id/nav_dream"
                 android:icon="@android:drawable/ic_menu_recent_history"
@@ -65,10 +69,6 @@
                 android:id="@+id/nav_setdream"
                 android:icon="@android:drawable/ic_input_get"
                 android:title="set Dream" />
-            <item
-                android:id="@+id/nav_settings"
-                android:icon="@android:drawable/ic_menu_preferences"
-                android:title="Settings" />
             <item
                 android:id="@+id/nav_theme"
                 android:icon="@android:drawable/ic_menu_view"

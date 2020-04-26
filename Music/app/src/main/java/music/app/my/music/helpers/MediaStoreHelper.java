@@ -449,6 +449,8 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
 
 	private Uri songUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
 	private String defaultSort =  MediaStore.Audio.Media.TITLE + " COLLATE LOCALIZED ASC";
+	private String allAlbumSort =  MediaStore.Audio.Media.ALBUM + " COLLATE LOCALIZED ASC";
+	private String allArtistSort =  MediaStore.Audio.Media.ARTIST + " COLLATE LOCALIZED ASC";
 	private String defaultSelection = MediaStore.Audio.Media.IS_MUSIC + " != 0";
 	private String[] defaultProjection = {
             MediaStore.Audio.Media.TITLE,

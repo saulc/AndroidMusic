@@ -46,6 +46,7 @@ import android.widget.ViewSwitcher;
 import java.util.ArrayList;
 
 import music.app.my.music.helpers.FabDoubleTapGS;
+import music.app.my.music.helpers.FaderSettingListener;
 import music.app.my.music.helpers.PlaylistHelper;
 import music.app.my.music.helpers.QueueListener;
 import music.app.my.music.player.MediaControlReceiver;
@@ -87,7 +88,7 @@ public class DrawerActivity extends AppCompatActivity
         ControlFragment.ControlFragmentListener,
         NewPlaylistDialog.OnDialogInteractionListener ,
         MixxerFragment.MixxerListener,
-        FadeFragment.FaderListener,
+        FaderSettingListener,
         SecretFragment.SecretListener,
         FabDoubleTapGS.DoubleTapListener,
         Toolbar.OnMenuItemClickListener {
@@ -96,7 +97,8 @@ public class DrawerActivity extends AppCompatActivity
     private VisualizerDialogFragment vf = null;
 
     private FadeFragment fader = null;
-    private MixFragment mf = null;
+    private MixxerFragment mf = null;
+    private MixFragment mx = null;
     private NowFragment nf = null;
     private QueueFragment qf = null;
     private ControlFragment cf = null;
@@ -152,6 +154,8 @@ public class DrawerActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // Enable the Up button
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         //ini media events
         am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 //        myEventReceiver = new MediaControlReceiver();
@@ -357,7 +361,7 @@ public class DrawerActivity extends AppCompatActivity
         } else if (id == R.id.nav_settings) {
             log("Settings clicked.");
 
-//            showMix();
+            showMix();
 //            Fragment f = (Fragment) HeaderFragment.newInstance("", "");
 //            showFragment(R.id.frame, f, true);
         } else if (id == R.id.nav_mix) {
@@ -487,10 +491,6 @@ public class DrawerActivity extends AppCompatActivity
     }
 
 
-    @Override
-    public void onArtistLongClick(Artist a) {
-        onArtistLongClicked(a);
-    }
 
     @Override
     protected void onStart() {
@@ -1277,18 +1277,18 @@ public class DrawerActivity extends AppCompatActivity
     }
 
     /* ---------- Show mixxer fragment ------------- */
-//    public void showMix(){
-//        Log.d(TAG, "Showing MIX fragment");
-//        if(mf != null && mf.isVisible() ) return;
-//        mf =  MixxerFragment.newInstance();
-//        showFragment(R.id.frame, mf, true);
-//    }
+    public void showMix(){
+        Log.d(TAG, "Showing MIX fragment");
+        if(mf != null && mf.isVisible() ) return;
+        mf =  MixxerFragment.newInstance();
+        showFragment(R.id.frame, mf, true);
+    }
     //show new kt mixer/fader
     public void showMixx(){
         Log.d(TAG, "Showing MIixX fragment");
-        if(mf != null && mf.isVisible() ) return;
-        mf =  MixFragment.Companion.newInstance();
-        showFragment(R.id.frame, mf, true);
+        if(mx != null && mx.isVisible() ) return;
+        mx =  MixFragment.Companion.newInstance();
+        showFragment(R.id.frame, mx, true);
     }
 
 
@@ -1343,6 +1343,10 @@ public class DrawerActivity extends AppCompatActivity
 
     }
 
+    @Override
+    public void onArtistLongClick(Artist a) {
+        onArtistLongClicked(a);
+    }
     @Override
     public void onAlbumClicked(Album mItem) {
         log("Album Selected: " + mItem.getAlbum() + " by " + mItem.getArtist());

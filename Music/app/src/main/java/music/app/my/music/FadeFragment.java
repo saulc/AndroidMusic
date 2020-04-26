@@ -11,10 +11,16 @@ import android.widget.CompoundButton;
 import android.widget.SeekBar;
 import android.widget.Switch;
 
+import music.app.my.music.helpers.FaderSettingListener;
 
+/*
+    original fade fragment for adjusting cross fade settings.
+    moving to kotlin from now on to infinity?
+    but not about to rewrite this shit again....again..
+ */
 public class FadeFragment extends Fragment {
 
-    private FaderListener mListener;
+    private FaderSettingListener mListener;
 
     private SeekBar s0, s1, s2, s3;
     private Switch mixSwitch, fadeSwitch;
@@ -156,8 +162,8 @@ public class FadeFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof FaderListener) {
-            mListener = (FaderListener) context;
+        if (context instanceof FaderSettingListener) {
+            mListener = (FaderSettingListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement FaderListener");
@@ -170,27 +176,4 @@ public class FadeFragment extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface FaderListener {
-        void mixSwitched(boolean b);
-
-        void fadeSwitched(boolean b);
-
-        void fadeInDurationChanged(int i);
-
-        void fadeOutDurationChanged(int i);
-
-        void fadeOutGapChanged(int i);
-
-        void fadeInGapChanged(int i);
-    }
 }

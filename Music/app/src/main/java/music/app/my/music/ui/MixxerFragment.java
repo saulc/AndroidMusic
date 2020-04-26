@@ -25,6 +25,13 @@ import music.app.my.music.player.myPlayer;
  * to handle interaction events.
  * Use the {@link MixxerFragment#newInstance} factory method to
  * create an instance of this fragment.
+ *
+ * shows status of 3 media players that make up
+ * the crossfading music player service core.
+ *
+ * created for debugging volume sync bug.
+ * sometimes the current track is faded out when it should be fading in...
+ * or shadow tracks playing when should be paused. (early bug)...
  */
 public class MixxerFragment extends Fragment {
 
