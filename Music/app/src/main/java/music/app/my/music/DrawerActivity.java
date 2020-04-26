@@ -1001,12 +1001,13 @@ public class DrawerActivity extends AppCompatActivity
             );
             findViewById(R.id.sidebar).setLayoutParams(param);
 
-            param = new LinearLayout.LayoutParams(
-                    DrawerLayout.LayoutParams.MATCH_PARENT,
-                    0,
-                    (showq < 3) ? 6.0f : 0.0f
-            );
-            findViewById(R.id.frame).setLayoutParams(param);
+
+                param = new LinearLayout.LayoutParams(
+                        DrawerLayout.LayoutParams.MATCH_PARENT,
+                        0,
+                        (showq < 3) ? 6.0f : 0.0f
+                );
+                findViewById(R.id.frame).setLayoutParams(param);
 
 
         }
@@ -1032,17 +1033,24 @@ public class DrawerActivity extends AppCompatActivity
             // return showq;
         }
         if (showq > 3) {
+            log("Hiding browser.");
             showq = 0;
+            log("Hiding fm.");
             if (showfmenu) hideFM();
             moveFab(true); //move menu back up
+            log("Hiding Queue.");
             hideQ();
+            log("Hiding sidebar....");
             closeSidebar();
             return showq;
         }
-        if (qf == null) qf = QueueFragment.newInstance();
-        expandSidebar();
-        showFragment(R.id.qframe, qf, false);
 
+        log("updating queue.");
+        if (qf == null) {
+            qf = QueueFragment.newInstance();
+            showFragment(R.id.qframe, qf, false);
+        }
+        expandSidebar();
         return showq;
     }
 
