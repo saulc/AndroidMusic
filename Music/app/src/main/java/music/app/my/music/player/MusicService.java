@@ -746,13 +746,13 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 		log("fg: " + g);
 		if(g > 7) {
 			//for max fade, cutout last 33%
-			g = (int) (d * .7);
 
 			if(g > 10) g = (int) (d * .33);
 			else if(g > 9) g = (int) (d * .22);
 			else if(g > 8) g = (int) (d * .11);
+			else g = (int) (d * .07);
 
-			if (d <= 33) g = 3;
+//			if (d <= 33) g = 3;
 		}
 			log("song length: " + d);
 			log("Setting Fade in: " + g + " seconds remaining.");
@@ -769,12 +769,12 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 		int d =  player.getQueue().getCurrentSong().getDuration() ;
 		if(g > 7) {
 			//for max fade, cutout last 33%
-			g = (int) (d * .7);
 			if(g > 10) g = (int) (d * .33);
 			else if(g > 9) g = (int) (d * .22);
 			else if(g > 8) g = (int) (d * .11);
+			else g = (int) (d * .07);
 
-			if (d <= 33) g = 4;
+			//if (d <= 33) g = 4;
 			log("song length: " + d);
 			log("Setting Fade out: " + g + " seconds remaining.");
 		}

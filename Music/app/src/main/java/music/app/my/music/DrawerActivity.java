@@ -354,8 +354,10 @@ public class DrawerActivity extends AppCompatActivity
             showFragment(R.id.frame, f, true);
 
         } else if (id == R.id.nav_songs) {
-            Fragment f = SongFragment.newInstance();
-            showFragment(R.id.frame, f, true);
+//            Fragment f = SongFragment.newInstance();
+//            showFragment(R.id.frame, f, true);
+            log("Songs clicked. loading Query page.");
+            doMySearch("");
 
 
         } else if (id == R.id.nav_settings) {
@@ -644,6 +646,7 @@ public class DrawerActivity extends AppCompatActivity
         searchActive = false;
     }
 
+    //load all songs ready for search keyword. in title, artist, album.
     private void doMySearch(String q) {
         log("Searching for: " + q);
 
@@ -1288,6 +1291,7 @@ public class DrawerActivity extends AppCompatActivity
         if(mf != null && mf.isVisible() ) return;
         mf =  MixxerFragment.newInstance();
         showFragment(R.id.frame, mf, true);
+
     }
     //show new kt mixer/fader
     public void showMixx(){
@@ -1822,7 +1826,7 @@ public class DrawerActivity extends AppCompatActivity
     //updates seekbar and fader cue at 1hz
     /* ---------- Music Serice Callbacks UpdateUI ------------- */
     public void updateProgress(MusicPlayer player){
-//        if(mixxerReadyForUpdates) mf.updateMixxerPlayer(player);
+        if(mixxerReadyForUpdates) mf.updateMixxerPlayer(player);
         if(nowShowing) nf.updateProgressBar(player);
         if(controlsVisible)
         {
@@ -1835,7 +1839,7 @@ public class DrawerActivity extends AppCompatActivity
     /* ---------- Music Serice Callbacks UpdateUI ------------- */
     public void updateCurrentInfo(Song s){
 
-//        if(mixxerReadyForUpdates) mf.updateMP(mService.getPlayer());
+        if(mixxerReadyForUpdates) mf.updateMP(mService.getPlayer());
 
         if(vf != null) vf.setAid(mService.getPlayer().getAID());
         if(nf != null && nowShowing) nf.updateSongInfo(s);

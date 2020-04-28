@@ -56,8 +56,8 @@ class MixFragment : Fragment() {
         if(mixOn){
             s0?.progress = s0!!.max
             s1?.progress = s1!!.max
-            s2?.progress = s2!!.max
-            s3?.progress = s3!!.max
+            s2?.progress = 8
+            s3?.progress = 9
 
         } else {
 
