@@ -43,10 +43,15 @@ import android.widget.TextSwitcher;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
+
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 import music.app.my.music.helpers.FabDoubleTapGS;
 import music.app.my.music.helpers.FaderSettingListener;
+import music.app.my.music.helpers.PlaylistFilemaker;
 import music.app.my.music.helpers.PlaylistHelper;
 import music.app.my.music.helpers.QueueListener;
 import music.app.my.music.player.MediaControlReceiver;
@@ -450,7 +455,20 @@ public class DrawerActivity extends AppCompatActivity
             Uri uri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
 
             log("Type: ===>> " + type);
-            log("Oh its audio!!" + uri.toString());
+
+            String shortname = uri.getEncodedPath();
+            log("Shared item Location?: " + shortname );
+            try {
+                File f = new File(shortname);
+
+                Scanner myReader = new Scanner(f);
+                while (myReader.hasNextLine()) {
+                    String data = myReader.nextLine();
+                    log(data);
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
 
             String id = uri.toString().substring(uri.toString().lastIndexOf('/'), uri.toString().length());
             //shared = new Song("Shared Song", id );
@@ -651,7 +669,6 @@ public class DrawerActivity extends AppCompatActivity
         log("Searching for: " + q);
 
         if (!searchActive) {
-            searchActive = true;
             sf = (SongFragment) SongFragment.newInstance();
 
             Bundle b = new Bundle();
@@ -660,6 +677,7 @@ public class DrawerActivity extends AppCompatActivity
             b.putString("Query", q);
             sf.setArguments(b);
             showFragment(R.id.frame, sf, true);
+            searchActive = true;
         }
 
     }
@@ -1395,7 +1413,9 @@ public class DrawerActivity extends AppCompatActivity
     @Override
     public void nameEnted(String name, boolean isQ) {
         Log.d(TAG, "Playlist  name entered: " + name);
-        PlaylistHelper.newPlaylist(getApplicationContext(), name);
+//        PlaylistHelper.newPlaylist(getApplicationContext(), name);
+         PlaylistFilemaker pl = new PlaylistFilemaker();
+         pl.newPlaylist(getApplicationContext(), name);
         Toast.makeText(mService, "Created Playlist: " + name, Toast.LENGTH_SHORT).show();
         if(isQ)  saveQueueAsPlaylist(name);
     }

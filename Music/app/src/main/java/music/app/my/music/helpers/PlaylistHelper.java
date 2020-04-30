@@ -119,23 +119,23 @@ public class PlaylistHelper {
     }
 
 
-
-    public static void newPlaylist(Context context, String name){
-        Log.i("m6", "Saving playlist "+ name);
-        Uri uri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
-        ContentValues values = new ContentValues();
-        values.put(MediaStore.Audio.Playlists.NAME, name);
-        ContentResolver resolver = context.getContentResolver();
-        resolver.insert(uri, values);
-        long id = findPlaylistId(context, name);
-        if( id > 0){
-            Log.i("m6", name + " Playlist saved sucessful id: "+ id);
-
-
-        }
-
-    }
-
+//
+//    public static void newPlaylist(Context context, String name){
+//        Log.i("m6", "Saving playlist "+ name);
+//        Uri uri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
+//        ContentValues values = new ContentValues();
+//        values.put(MediaStore.Audio.Playlists.NAME, name);
+//        ContentResolver resolver = context.getContentResolver();
+//        resolver.insert(uri, values);
+//        long id = findPlaylistId(context, name);
+//        if( id > 0){
+//            Log.i("m6", name + " Playlist saved sucessful id: "+ id);
+//
+//
+//        }
+//
+//    }
+//
 
 
     //get id from playlist name.

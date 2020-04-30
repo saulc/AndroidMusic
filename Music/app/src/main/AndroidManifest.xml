@@ -32,6 +32,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
 
                 <data android:mimeType="audio/*" />
+                <data android:mimeType="application/m3u" />
             </intent-filter>
         </activity>
 
