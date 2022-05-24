@@ -78,7 +78,16 @@ public class AlbumFragment  extends baseListFragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_baselist, container, false);
 
-        updateHeader(view);
+        View header =  view.findViewById(R.id.header);
+        TextView t = (TextView) header.findViewById(R.id.content);
+        infoText = (TextView) header.findViewById(R.id.line2);
+        infoText.setText("...");
+
+        String a = "All Albums";
+        t.setText(a);
+
+        updateHeader( );
+
         View v = view.findViewById(R.id.list);
         // Set the adapter
         if (v instanceof FastScrollRecyclerView) {
@@ -109,15 +118,11 @@ public class AlbumFragment  extends baseListFragment {
     }
 
     private  TextView infoText;
-    private void updateHeader(View v){
 
-        View header =  v.findViewById(R.id.header);
-        TextView t = (TextView) header.findViewById(R.id.content);
-        infoText = (TextView) header.findViewById(R.id.line2);
-        infoText.setText("...");
-
-        String a = "All Albums";
-        t.setText(a);
+    private void updateHeader( ){
+        if(infoText == null) return;
+        String s = items.size() + " Albums" +  ( (items.size()==1) ? "" : "s");
+        infoText.setText(s);
     }
 
     @Override
@@ -135,7 +140,7 @@ public class AlbumFragment  extends baseListFragment {
         log("found " + p.size() + " album(s)");
         items = p;
         updateAdapter();
-
+        updateHeader();
     }
 
 

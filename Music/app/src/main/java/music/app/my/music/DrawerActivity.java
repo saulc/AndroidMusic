@@ -1491,7 +1491,7 @@ public class DrawerActivity extends AppCompatActivity
     @Override
     public void onPlaylistNextUpClicked(int position, String pid) {
         Log.d(TAG, "Playlist next up clicked");
-        //play list?
+        //play list to xml for real saving...
     }
 
     public void addToPlaylistCanceled(){

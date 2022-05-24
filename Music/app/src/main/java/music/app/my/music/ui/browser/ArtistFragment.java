@@ -62,7 +62,16 @@ public class ArtistFragment extends baseListFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_baselist, container, false);
-        updateHeader(view);
+        View header =  view.findViewById(R.id.header);
+        TextView t = (TextView) header.findViewById(R.id.content);
+        infoText = (TextView) header.findViewById(R.id.line2);
+        infoText.setText("...");
+
+        String a = "All Artists";
+        t.setText(a);
+
+        updateHeader( );
+
         View v = view.findViewById(R.id.list);
         // Set the adapter
         if (v instanceof RecyclerView) {
@@ -76,15 +85,12 @@ public class ArtistFragment extends baseListFragment {
         return view;
     }
 
-    private void updateHeader(View v){
+    private  TextView infoText;
 
-        View header =  v.findViewById(R.id.header);
-        TextView t = (TextView) header.findViewById(R.id.content);
-        TextView infoText = (TextView) header.findViewById(R.id.line2);
-        infoText.setText("...");
-
-        String a = "All Artists";
-        t.setText(a);
+    private void updateHeader( ){
+        if(infoText == null) return;
+        String s = items.size() + " Artist" +  ( (items.size()==1) ? "" : "s");
+        infoText.setText(s);
     }
 
 
@@ -114,6 +120,7 @@ public class ArtistFragment extends baseListFragment {
         items = p;
         if(mAdapter != null)
         updateAdapter();
+        updateHeader();
 
     }
 

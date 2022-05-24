@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 import music.app.my.music.types.Song;
 
-public class PlaylistHelper {
+public class  PlaylistHelper {
 
     private static final String TAG = "PlaylistHelper";
     private static void log(String s){

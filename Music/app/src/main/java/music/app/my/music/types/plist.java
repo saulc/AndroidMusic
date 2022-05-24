@@ -5,6 +5,11 @@ import java.util.Collections;
 
 import music.app.my.music.types.Song;
 
+/*
+	main queue playlist
+	manage arraylist(vector) of songs
+	handles playback repeat, shuffle...
+ */
 
 public class plist extends Qbase{
 

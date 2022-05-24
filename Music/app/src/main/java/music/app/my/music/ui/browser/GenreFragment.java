@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.simplecityapps.recyclerview_fastscroll.interfaces.OnFastScrollStateChangeListener;
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
@@ -52,6 +53,7 @@ public class GenreFragment extends baseListFragment {
 
     }
 
+    private TextView countline;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -68,8 +70,18 @@ public class GenreFragment extends baseListFragment {
 //                recyclerView.setLayoutManager(new GridLayoutManager(context, 2));
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
             updateAdapter();
+            View header =  view.findViewById(R.id.header);
+            TextView t = (TextView) header.findViewById(R.id.content);
+            t.setText(" Genre ");
+            countline = (TextView) header.findViewById(R.id.line2);
+            updatecount();
         }
         return view;
+    }
+    private void updatecount(){
+        if(countline == null) return;
+        String sl = items.size() + " Genre" +  ( (items.size()==1) ? "" : "s");
+        countline.setText(sl);
     }
 
     public void updateAdapter(){
@@ -81,7 +93,7 @@ public class GenreFragment extends baseListFragment {
         log("Updating adapter");
         mAdapter.notifyDataSetChanged();
         log("items:" + items.size());
-
+        updatecount();
     }
 
     @Override

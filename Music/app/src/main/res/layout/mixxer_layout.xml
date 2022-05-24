@@ -6,6 +6,12 @@
     android:padding="@dimen/text_margin"
     android:background="?colorPrimaryDark">
 
+        <include layout="@layout/fragment_fade"
+            android:id="@+id/fade"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
         <include layout="@layout/mixxer_control"
             android:id="@+id/deck0"
             android:layout_width="match_parent"
