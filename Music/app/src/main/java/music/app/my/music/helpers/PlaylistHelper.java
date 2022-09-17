@@ -37,8 +37,10 @@ public class  PlaylistHelper {
         //ids already has our new items at the top, just add the old ones to it
         // if adding to the end, just insert the old items. at 0
         cur.moveToFirst();
+        ArrayList<Long> old = new ArrayList<>();
         while(cur.moveToNext()){
             long l = Long.parseLong(cur.getString(1));
+            old.add(l);
             if(top) ids.add(0, l);
             else ids.add( l );
 
@@ -47,8 +49,14 @@ public class  PlaylistHelper {
         log("songs added to playlist Ids: " + ids.size());
 
         //todo delete old items
+//        int p=0;
+        for(long l : old) {
+            String[] arg = {l+""};//, p++ + ""};
+            String where = MediaStore.Audio.Playlists.Members.AUDIO_ID + "=? ";//AND " +
+//                    MediaStore.Audio.Playlists.Members.PLAY_ORDER + "=?";
+            resolver.delete(uri, where, arg);
+        }
         //add the all the items in the new order
-
 
         for(int i=0; i<ids.size(); i++) {
             values = new ContentValues();
@@ -76,6 +84,9 @@ public class  PlaylistHelper {
             base = cur.getInt(0);
             base += 1;
             String id = cur.getString(1);
+        }
+        else {
+            cur.moveToFirst();
         }
         cur.close();
         log("adding item --->>>>>base: " + base + " to " + pname);
@@ -119,23 +130,23 @@ public class  PlaylistHelper {
     }
 
 
-//
-//    public static void newPlaylist(Context context, String name){
-//        Log.i("m6", "Saving playlist "+ name);
-//        Uri uri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
-//        ContentValues values = new ContentValues();
-//        values.put(MediaStore.Audio.Playlists.NAME, name);
-//        ContentResolver resolver = context.getContentResolver();
-//        resolver.insert(uri, values);
-//        long id = findPlaylistId(context, name);
-//        if( id > 0){
-//            Log.i("m6", name + " Playlist saved sucessful id: "+ id);
-//
-//
-//        }
-//
-//    }
-//
+
+    public static void newPlaylist(Context context, String name){
+        Log.i("m6", "Saving playlist "+ name);
+        Uri uri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Audio.Playlists.NAME, name);
+        ContentResolver resolver = context.getContentResolver();
+        resolver.insert(uri, values);
+        long id = findPlaylistId(context, name);
+        if( id > 0){
+            Log.i("m6", name + " Playlist saved sucessful id: "+ id);
+
+
+        }
+
+    }
+
 
 
     //get id from playlist name.

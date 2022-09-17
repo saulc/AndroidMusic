@@ -61,6 +61,7 @@ public class QueueAdapter extends BaseAdapter implements UndoAdapter , Swappable
     public Object getItem(int position) {
         if(repeatMode == 1 && current < mValues.size()) return mValues.get(current);
         int s = mValues.size();
+
         if(repeatMode == 2) return mValues.get(position % s);
 
        // if(repeatMode == 0)

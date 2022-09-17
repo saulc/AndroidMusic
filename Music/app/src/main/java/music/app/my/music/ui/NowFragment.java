@@ -474,11 +474,11 @@ public class NowFragment extends ControlFragment {
             case 0: //no repeat
                 repeat.setBackgroundResource(R.drawable.boarder); break;
             case 1: // single repeat
-                repeat.setBackgroundResource(R.drawable.gradientcircle);
+                repeat.setBackgroundResource(R.drawable.gradientbox);
                 repeat.setImageResource(R.drawable.repeatone128);
                 break;
             case 2: //repeat all
-                repeat.setBackgroundResource(R.drawable.gradientcircle);
+                repeat.setBackgroundResource(R.drawable.gradientbox);
                 repeat.setImageResource(R.drawable.repeat128);
                 break;
         }
@@ -491,7 +491,7 @@ public class NowFragment extends ControlFragment {
 
     private  void setShuffleRes(boolean on){
         //set the clear board if now shuffle. set gradient if shuffle
-        if(on) shuffle.setBackgroundResource(R.drawable.gradientcircle);
+        if(on) shuffle.setBackgroundResource(R.drawable.gradientbox);
         else shuffle.setBackgroundResource(R.drawable.boarder);
     }
 

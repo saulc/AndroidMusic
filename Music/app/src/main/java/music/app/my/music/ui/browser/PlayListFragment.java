@@ -18,6 +18,7 @@ import java.util.ArrayList;
 
 import music.app.my.music.R;
 import music.app.my.music.adapters.PlaylistAdapter;
+import music.app.my.music.helpers.PlaylistFilemaker;
 import music.app.my.music.types.Playlist;
 
 import music.app.my.music.types.Song;
@@ -117,6 +118,13 @@ public class PlayListFragment extends baseListFragment {
         return view;
     }
 
+    public void exportPlaylist(String name, String id){
+        log("playlist export, opening playlist: " + name);
+        int s = items.size();
+        log("checking playlists... found: " + s);
+//        PlaylistFilemaker pf = new PlaylistFilemaker();
+//        pf.exportPlaylist(name, id, items);
+    }
 
     @Override
     public void updateAdapter(){

@@ -101,6 +101,8 @@ public class DrawerActivity extends AppCompatActivity
 
     private VisualizerDialogFragment vf = null;
 
+    //fragments that need callbacks. send info/triggers to fragments
+    private PlayListFragment playlistFrag = null;
     private FadeFragment fader = null;
     private MixxerFragment mf = null;
     private MixFragment mx = null;
@@ -141,6 +143,12 @@ public class DrawerActivity extends AppCompatActivity
 
     private MediaControlReceiver myEventReceiver;
     private AudioManager am;
+
+    private boolean playlistExport = false;
+
+    private String pid = null;
+    private String pname = null;
+
 
   //  private NotificationHelper noti;
 
@@ -267,7 +275,8 @@ public class DrawerActivity extends AppCompatActivity
 //        if(controlsVisible)
 //            showControls();
 
-        showNow();
+        showNow(); //update queue when its loaded
+
         // showBubbles();
 
         handleStartIntents(); //search media share....
@@ -508,6 +517,13 @@ public class DrawerActivity extends AppCompatActivity
         super.onResume();
 
         log("Resume activity.");
+        if(playlistExport) {
+            if(pname != null)
+            log("Playlist save flag. " + pname);
+            exportPlaylist();
+            //do the work.
+//            playlistExport = false;
+        }
     }
 
 
@@ -789,10 +805,11 @@ public class DrawerActivity extends AppCompatActivity
             public boolean onLongClick(View v) {
                 Log.d(TAG, "Fab 2 Long Clicked: play/pause");
 
+                playPauseLongClicked(); //trigger the fade in also.
                 //mini q
                 showq = 0;
                 showQ();
-                showNow();
+//                showNow();
                 return true;
             }
         });
@@ -1119,7 +1136,7 @@ public class DrawerActivity extends AppCompatActivity
             } else if(nowShowing && nf != null){
                 //if the now frag was show. kill it. so it can show the actionbar.
                     nf.onDestroy();
-            }
+            }else if(f instanceof PlayListFragment) playlistFrag = (PlayListFragment) f;
             //other fragments. just make sure the mainframe is visible
             if (showq > 2) {
                 showq = 1;
@@ -1267,6 +1284,7 @@ public class DrawerActivity extends AppCompatActivity
                 if (mService != null)
                     if (nf.isVisible() || cf.isVisible())
                         if (mService.getQueue().getSize() > 0) {
+                            updateQueueFrag( mService.getQueue() );
                             updateCurrentInfo(mService.getCurrentSong());
                             updateNowButtons(mService.getQueue());
                             nf.setupVolbar(getMaxVol(), getVol());
@@ -1413,9 +1431,9 @@ public class DrawerActivity extends AppCompatActivity
     @Override
     public void nameEnted(String name, boolean isQ) {
         Log.d(TAG, "Playlist  name entered: " + name);
-//        PlaylistHelper.newPlaylist(getApplicationContext(), name);
-         PlaylistFilemaker pl = new PlaylistFilemaker();
-         pl.newPlaylist(getApplicationContext(), name);
+        PlaylistHelper.newPlaylist(getApplicationContext(), name);
+//         PlaylistFilemaker pl = new PlaylistFilemaker();
+//         pl.newPlaylist(getApplicationContext(), name);
         Toast.makeText(mService, "Created Playlist: " + name, Toast.LENGTH_SHORT).show();
         if(isQ)  saveQueueAsPlaylist(name);
     }
@@ -1467,6 +1485,7 @@ public class DrawerActivity extends AppCompatActivity
             if(mService!=null) {
                 mService.pauseRequest();
                 mService.getQueue().clearQueue();
+                updateQueueFrag(mService.getQueue());
 
                 Toast.makeText(mService, "Cleared Now playing: " + name + " : " + pid, Toast.LENGTH_SHORT).show();
             }
@@ -1478,8 +1497,10 @@ public class DrawerActivity extends AppCompatActivity
     }
 
     /*
-    add song to playlist
+    add song to playlist  end
      */
+
+    //playlist option add == delete playlist confirm dialog
     @Override
     public void onPlaylistOptionClicked(int position, String pid, String name) {
         //confirm first! important! double confirm?
@@ -1488,10 +1509,35 @@ public class DrawerActivity extends AppCompatActivity
 
     }
 
+    private void exportPlaylist(){
+        if(playlistFrag == null){
+            log("null fragment...");
+
+//            return;
+        }
+//        playlistFrag.exportPlaylist(pname, pid);
+        log("Writing playlist data to file..");
+        //fuck you android. now my moto g stylus saves m3u files in internal /music
+
+//        PlaylistFilemaker pl = new PlaylistFilemaker();
+//         pl.exportPlaylist(pname, pid);
+//         log("playlist export complete.");
+    }
+
+    //save playlist to xml file
     @Override
-    public void onPlaylistNextUpClicked(int position, String pid) {
+    public void onPlaylistNextUpClicked(int position, String id, String name) {
         Log.d(TAG, "Playlist next up clicked");
         //play list to xml for real saving...
+
+         PlaylistFilemaker pl = new PlaylistFilemaker();
+
+         Intent i = pl.newPlaylist(getApplicationContext(), name);
+          playlistExport = true;
+          pid = id;
+          pname = name;
+          startActivity(i);
+        Toast.makeText(mService, "Saving Playlist: " + name + ".m3u", Toast.LENGTH_SHORT).show();
     }
 
     public void addToPlaylistCanceled(){
@@ -1575,7 +1621,7 @@ public class DrawerActivity extends AppCompatActivity
     @Override
     public void onNextLongClicked(Song song) {
         Log.d(TAG, "Option long clicked, add to top of playlist");
-        DialogFragment c = ChoosePlaylistDialogFragment.newInstance(song.getTitle(), song.getId(), false, false, null);
+        DialogFragment c = ChoosePlaylistDialogFragment.newInstance(song.getTitle(), song.getId(), true, false, null);
         c.show(getSupportFragmentManager(), song.getId());
     }
 

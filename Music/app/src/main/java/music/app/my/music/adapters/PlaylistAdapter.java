@@ -74,7 +74,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
         holder.nextbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mListener.onPlaylistNextUpClicked(position, mValues.get(position).getId());
+                mListener.onPlaylistNextUpClicked(position, mValues.get(position).getId(), mValues.get(position).getName());
             }
         });
 

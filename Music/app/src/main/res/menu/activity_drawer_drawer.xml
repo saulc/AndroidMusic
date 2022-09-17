@@ -45,19 +45,19 @@
                 android:id="@+id/new_playlist"
                 android:icon="@android:drawable/ic_input_add"
                 android:title="New Playlist" />
-            <item
-                android:id="@+id/nav_eq"
-                android:icon="@android:drawable/ic_menu_add"
-                android:title="EQ!" />
+        <item
+            android:id="@+id/nav_mix"
+            android:icon="@android:drawable/ic_dialog_alert"
+            android:title="Fader" />
+        <item
+            android:id="@+id/nav_eq"
+            android:icon="@android:drawable/stat_sys_headset"
+            android:title="EQ!" />
             <item
                 android:id="@+id/bluetooth"
                 android:icon="@android:drawable/stat_sys_data_bluetooth"
                 android:title="Bluetooth" />
-            <item
-                android:id="@+id/nav_mix"
-                android:icon="@android:drawable/ic_dialog_alert"
-                android:title="MIiIXX" />
-            <item
+        <item
                 android:id="@+id/nav_settings"
                 android:icon="@android:drawable/ic_menu_preferences"
                 android:title="Settings" />

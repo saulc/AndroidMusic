@@ -328,7 +328,9 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 
 	    	mHandler.postDelayed(volCheck, getFadeInDuration()+100);
 	    	//fix annoying problem where current player is faded out
-			//can't find the cause. must have a solve anyway.
+
+			//try to catch it early, hopefully before its audible.
+			mHandler.postDelayed(volCheck2,  88);
 
 	    }
 	
@@ -344,14 +346,32 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 			log("Checking volume levels.");
 			myPlayer p = player.get(currentPlayer);
 			if(!p.isPaused() && p.isPlaying()){
-				if(p.getVolumeValue() <= .1f){
-					log("Fading in...");
+				float v = p.getVolumeValue();
+				if(v <= .1f){
+					log("Using volume fix: " + v + " Fading in...");
 					p.fadeIn();
-				}
+				}else log("Volume ok. " + v);
 			}
 
 		}
 	};
+
+	private Runnable volCheck2 = new Runnable() {
+		@Override
+		public void run() {
+			log("Checking fade in...");
+			myPlayer p = player.get(currentPlayer);
+			if(!p.isPaused() && p.isPlaying()){
+				float v = p.getVolumeValue();
+				if(v >= .8f){
+					log("Fade out caught. " + v + " applying fix...");
+					p.fadeIn();
+				}else log("fade in ok. " + v);
+			}
+
+		}
+	};
+
 
 
 	public int getAID(){

@@ -42,6 +42,7 @@ public class myPlayer extends MediaPlayer
 		paused = false;
 		start();
 		setVol(0);
+		mCurrentStep = 1;
 		mHandler.post(fadeInVolume);
 		
 	}
