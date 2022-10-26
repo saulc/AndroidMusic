@@ -6,7 +6,9 @@
         <entry key="app/src/main/res/drawable/boarder.xml" value="0.2545" />
         <entry key="app/src/main/res/drawable/gradientbox.xml" value="0.2545" />
         <entry key="app/src/main/res/drawable/gradientcircle.xml" value="0.2545" />
+        <entry key="app/src/main/res/layout/activity_drawer.xml" value="0.25493421052631576" />
         <entry key="app/src/main/res/layout/albumfragment_listitem.xml" value="0.21822916666666667" />
+        <entry key="app/src/main/res/layout/app_bar_drawer.xml" value="0.25493421052631576" />
         <entry key="app/src/main/res/layout/content_drawer.xml" value="0.67" />
         <entry key="app/src/main/res/layout/fragment_baselist.xml" value="0.5259320068359375" />
         <entry key="app/src/main/res/layout/fragment_baselistitem.xml" value="0.37441050211588545" />
@@ -21,7 +23,7 @@
         <entry key="app/src/main/res/layout/mixxer_layout.xml" value="0.6121031746031746" />
         <entry key="app/src/main/res/layout/now_layout.xml" value="0.6121031746031746" />
         <entry key="app/src/main/res/layout/qlist.xml" value="0.19375" />
-        <entry key="app/src/main/res/menu/activity_drawer_drawer.xml" value="0.96875" />
+        <entry key="app/src/main/res/menu/activity_drawer_drawer.xml" value="0.25493421052631576" />
         <entry key="app/src/main/res/menu/drawer_actions.xml" value="0.96875" />
       </map>
     </option>

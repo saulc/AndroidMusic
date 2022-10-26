@@ -61,12 +61,13 @@
         <item name="android:colorForeground">@color/darksideca</item>
     </style>
 
-    <style name="AppThemeJarvis" parent="Theme.AppCompat.Light.NoActionBar" >
+    <style name="AppThemeJarvis" parent="Theme.AppCompat.NoActionBar" >
         <item name="colorPrimary">@color/jarviscp</item>
         <item name="colorPrimaryDark">@color/jarviscd</item>
         <item name="colorAccent">@color/jarvisca</item>
         <item name="android:colorBackground">?attr/colorPrimaryDark</item>
-        <item name="android:colorForeground">?attr/colorPrimary</item>
+        <item name="android:colorForeground">@color/jarvisca</item>
+
     </style>
 
 

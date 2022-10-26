@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#400066</color>
+    <color name="colorPrimary">#3E0163</color>
     <color name="colorPrimaryDark">#000000</color>
     <color name="colorAccent">#dcfd22</color>
     <color name="background_material_dark">#49484a</color>
@@ -12,11 +12,11 @@
     <color name="darksidecp">#000000</color>
     <color name="darksidecd">#af9c1111</color>
     <color name="darksideca">#ffffffff</color>
-    <color name="colorsca">#aa01ff</color>
-    <color name="colorscd">#a001d3de</color>
+    <color name="colorsca">#7C7C7C</color>
+    <color name="colorscd">#A02FF5FF</color>
     <color name="colorscp">#e91e63</color>
-    <color name="jarvisca">#ef4001</color>
-    <color name="jarviscd">#0a6796</color>
-    <color name="jarviscp">#e91e63</color>
+    <color name="jarvisca">#EA467E</color>
+    <color name="jarviscd">#2E2E2E</color>
+    <color name="jarviscp">#5E5D5D</color>
     <color name="secondary_text_material_light">?colorPrimaryDark</color>
 </resources>
