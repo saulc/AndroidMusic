@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/AndroidMusic.Music.iml" filepath="$PROJECT_DIR$/.idea/modules/AndroidMusic.Music.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/Music.iml" filepath="$PROJECT_DIR$/.idea/Music.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Music.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Music.app.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Music.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Music.app.androidTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Music.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Music.app.main.iml" />

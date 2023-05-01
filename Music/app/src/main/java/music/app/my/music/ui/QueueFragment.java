@@ -131,6 +131,7 @@ public class QueueFragment extends baseListFragment {
     public void updateAdapter(){
         if(items == null) {
             items = new ArrayList<>();
+            return;
         }
 
         mAdapter = new QueueAdapter(items, (QueueListener) getActivity());

@@ -57,7 +57,7 @@
         <item name="colorPrimary">@color/colorscp</item>
         <item name="colorPrimaryDark">@color/colorscd</item>
         <item name="colorAccent">@color/colorsca</item>
-        <item name="android:colorBackground">?colorPrimaryDark</item>
+        <item name="android:colorBackground">@color/jarviscp</item>
         <item name="android:colorForeground">@color/darksideca</item>
     </style>
 

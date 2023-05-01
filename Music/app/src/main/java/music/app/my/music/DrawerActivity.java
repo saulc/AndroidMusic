@@ -503,6 +503,7 @@ public class DrawerActivity extends AppCompatActivity
         }
 
         super.finish();
+        System.exit(0);
     }
 
     @Override
@@ -1428,6 +1429,8 @@ public class DrawerActivity extends AppCompatActivity
 
     }
 
+
+
     @Override
     public void nameEnted(String name, boolean isQ) {
         Log.d(TAG, "Playlist  name entered: " + name);
@@ -1484,6 +1487,7 @@ public class DrawerActivity extends AppCompatActivity
 
             if(mService!=null) {
                 mService.pauseRequest();
+                hideQ();
                 mService.getQueue().clearQueue();
                 updateQueueFrag(mService.getQueue());
 

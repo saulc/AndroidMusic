@@ -72,17 +72,17 @@ class MixFragment : Fragment() {
     }
     fun setMixMode(mixOn: Boolean){
         if(mixOn){
-            s2?.progress = 10
+            s2?.progress = 9
             s3?.progress = 9
             s0?.progress = 7
             s1?.progress = s1!!.max
 
         } else {
 
-            s0?.progress = 6
-            s1?.progress = 7
+            s0?.progress = 7
+            s1?.progress = 4
             s2?.progress = 3
-            s3?.progress = 5
+            s3?.progress = 8
         }
 
     }
