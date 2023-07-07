@@ -240,6 +240,8 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 		player.get(auxPlayer).stop();
 		player.get(auxPlayer).reset();
 
+
+
 		incrementPlayers(); //move each player role to the next step. cur -> next - > aux -> cur *
 
 		//first try 3 player loop. wtf was i thinking? lol
