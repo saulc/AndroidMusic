@@ -419,7 +419,7 @@ public class NowFragment extends ControlFragment {
                 else setBg(d);
 
             } catch (IOException e) {
-                throw new RuntimeException(e);
+//                throw new RuntimeException(e);
             }
 //
 //            String p = findAlbumArt(s.getAlbumId());

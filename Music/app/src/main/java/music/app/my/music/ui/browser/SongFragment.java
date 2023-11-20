@@ -220,7 +220,7 @@ public class   SongFragment extends baseListFragment implements MediaHelperListe
                     bigIcon.setImageDrawable(d);
 
                     } catch (IOException e) {
-                        throw new RuntimeException(e);
+//                        throw new RuntimeException(e);
                     }
 
 //                    ImageView bigIcon = (ImageView) view.findViewById(R.id.bigIcon);

@@ -1,13 +1,22 @@
 package music.app.my.music.adapters;
 
+import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.Build;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.v7.widget.RecyclerView;
+import android.util.Size;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +28,7 @@ import android.widget.TextView;
 import com.simplecityapps.recyclerview_fastscroll.interfaces.OnFastScrollStateChangeListener;
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -87,7 +97,18 @@ public class AlbumAdapter   extends  RecyclerView.Adapter<AlbumAdapter.ViewHolde
         cc.drawText(msg, width/3, height*.7f, p);
         return rc;
     }
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private Bitmap getAlbumArtwork(ContentResolver resolver, long albumId) throws IOException {
+        Uri contentUri = ContentUris.withAppendedId(
+                MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
+                albumId
+        );
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            return resolver.loadThumbnail(contentUri, new Size(640, 480), null);
+        }
+        return null;
+    }
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
@@ -101,16 +122,21 @@ public class AlbumAdapter   extends  RecyclerView.Adapter<AlbumAdapter.ViewHolde
 
         holder.mLine2.setText(t);
 
-        if(mValues.get(position).getArt() != null) {
+        if(mValues.get(position).getId() != null) {
             try {
-                Drawable d = Drawable.createFromPath(mValues.get(position).getArt());
-                holder.mIcon.setImageDrawable(d);
+                long p = Long.parseLong(mValues.get(position).getId());
+                Bitmap b =  getAlbumArtwork( context.getContentResolver() , p);
+                holder.mIcon.setImageBitmap(b);
+//                Drawable d = new BitmapDrawable(Resources.getSystem(), b);
+
+//                Drawable d = Drawable.createFromPath(mValues.get(position).getArt());
+//                holder.mIcon.setImageDrawable(d);
             } catch (Exception e) {
-                e.printStackTrace();
+//                e.printStackTrace();
+                holder.mIcon.setImageBitmap(createAlbumBit(holder.mItem.getAlbum().charAt(0)+""));
             }
 
-        }else
-            holder.mIcon.setImageBitmap(createAlbumBit(holder.mItem.getAlbum().charAt(0)+""));
+        } //else
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
