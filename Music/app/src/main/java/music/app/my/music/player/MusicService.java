@@ -744,7 +744,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 		int g = player.getFadeInGap()/1000;
 		int d =  player.getQueue().getCurrentSong().getDuration() ;
 		log("fg: " + g);
-		if(g > 7) {
+		if(g > 7 & g < 11) {
 			//for max mix, cutout last 33%
 
 			if(g > 10) g = (int) (d * .33);
@@ -767,7 +767,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 		log("fade out Gap");
 		int g = player.getFadeOutGap()/1000;
 		int d =  player.getQueue().getCurrentSong().getDuration() ;
-		if(g > 7) {
+		if(g > 7 & g < 11) {
 			//for mix, cutout last 33%
 			if(g > 10) g = (int) (d * .33);
 			else if(g > 9) g = (int) (d * .22);
