@@ -1,7 +1,10 @@
 package music.app.my.music.ui;
 
 import android.animation.LayoutTransition;
+import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -9,9 +12,14 @@ import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatDelegate;
 import android.util.Log;
+import android.util.Size;
 import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -26,6 +34,8 @@ import android.widget.SeekBar;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
+
+import java.io.IOException;
 
 import music.app.my.music.DrawerActivity;
 import music.app.my.music.R;
@@ -370,7 +380,18 @@ public class NowFragment extends ControlFragment {
 
         // log("Control fragment updating");
     }
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private Bitmap getAlbumArtwork(ContentResolver resolver, long albumId) throws IOException {
+        Uri contentUri = ContentUris.withAppendedId(
+                MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
+                albumId
+        );
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            return resolver.loadThumbnail(contentUri, new Size(640, 480), null);
+        }
+        return null;
+    }
 
     @Override
     public void updateSongInfo(Song s) {
@@ -386,37 +407,50 @@ public class NowFragment extends ControlFragment {
         line2.setText(s.getArtist());
         line3.setText(s.getAlbum());
         if (s.getAlbumId() != null) {
-            String p = findAlbumArt(s.getAlbumId());
 
-            log("Now fragment updating albumart: " + p);
+            try {
+                String aa= s.getAlbumId();
+                log("Now fragment updating albumart: " + aa);
+                long p = Long.parseLong(aa);
+                Bitmap b =  getAlbumArtwork( getContext().getContentResolver() , p);
 
-            Drawable d = Drawable.createFromPath(p);
-
-            if (d != null) {
-                log("Drawable created.");
-                Bitmap bitmap = ((BitmapDrawable) d).getBitmap();
-                bitmap = Bitmap.createScaledBitmap(bitmap, 600, 600, true);
-
-                //if(rc != null) rc.recycle();
-                rc = Bitmap.createBitmap(600  , 600, Bitmap.Config.ARGB_8888);
-                Canvas cc = new Canvas((rc));
-                Paint pt = new Paint();
-                pt.setAlpha(100);
-                cc.drawBitmap(bitmap, 0, 0, pt);
-                // Scale it to 50 x 50
-                log("Bitmap created.");
-                d = new BitmapDrawable(getResources(), rc);
-                log("Bitmap scaled");
-
-
+                Drawable d = new BitmapDrawable(getResources(), b);
                 if(isMini) icon.setImageDrawable(d);
                 else setBg(d);
 
-                bitmap.recycle();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+//
+//            String p = findAlbumArt(s.getAlbumId());
+//
+//            log("Now fragment updating albumart: " + p);
+//
+//            Drawable d = Drawable.createFromPath(p);
+//
+//            if (d != null) {
+//                log("Drawable created.");
+//                Bitmap bitmap = ((BitmapDrawable) d).getBitmap();
+//                bitmap = Bitmap.createScaledBitmap(bitmap, 600, 600, true);
+//
+//                //if(rc != null) rc.recycle();
+//                rc = Bitmap.createBitmap(600  , 600, Bitmap.Config.ARGB_8888);
+//                Canvas cc = new Canvas((rc));
+//                Paint pt = new Paint();
+//                pt.setAlpha(100);
+//                cc.drawBitmap(bitmap, 0, 0, pt);
+//                // Scale it to 50 x 50
+//                log("Bitmap created.");
+//                d = new BitmapDrawable(getResources(), rc);
+//                log("Bitmap scaled");
+
+
+
+//                bitmap.recycle();
                // rc.recycle(); //free up memory
             } else if(isMini) icon.setImageResource(R.drawable.android_icon32a5);
                     else setBg(R.drawable.android_icon32a5);
-        }
+//        }
     }
 
     private void setBg(int r ) {

@@ -80,9 +80,9 @@ class MixFragment : Fragment() {
         } else {
 
             s0?.progress = 7
-            s1?.progress = 4
-            s2?.progress = 3
-            s3?.progress = 8
+            s1?.progress = 11
+            s2?.progress = 7
+            s3?.progress = 7
         }
 
     }
