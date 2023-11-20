@@ -126,7 +126,7 @@ public class AlbumAdapter   extends  RecyclerView.Adapter<AlbumAdapter.ViewHolde
             try {
                 long p = Long.parseLong(mValues.get(position).getId());
                 Bitmap b =  getAlbumArtwork( context.getContentResolver() , p);
-                holder.mIcon.setImageBitmap(b);
+                holder.mIcon.setImageBitmap(Bitmap.createScaledBitmap(b, 60, 60, true));
 //                Drawable d = new BitmapDrawable(Resources.getSystem(), b);
 
 //                Drawable d = Drawable.createFromPath(mValues.get(position).getArt());

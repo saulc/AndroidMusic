@@ -51,7 +51,7 @@ public class QueueFragment extends baseListFragment {
     private ArrayList<Song> items;
     private DynamicListView mListView;
     private TextSwitcher qHeader;
-    private int headerMode = 0; //song count only, 1 = seconds. 2 = full count, 3 remaining playtime
+    private int headerMode = 1; //song count only, 1 = seconds. 2 = full count, 3 remaining playtime
 
     //private MediaStoreHelper msHelper;
     //private RecyclerView.Adapter mAdapter;
@@ -196,7 +196,7 @@ public class QueueFragment extends baseListFragment {
 
     private  void updateHeader(){
         int s = items.size();
-        String m = "Now playing queue contains: " + s + " song" + ( (s >1) ? "s": "");
+        String m = "Now playing queue: " + s + " song" + ( (s >1) ? "s": "");
 
         //song count only, 1 = seconds. 2 = full count, 3 remaining playtime
         if (headerMode > 1) {
@@ -205,7 +205,7 @@ public class QueueFragment extends baseListFragment {
             long td = 0;     //total duration in seconds
             for (int i=current; i< items.size(); i++) td += items.get(i).getDuration();
 
-            if(headerMode == 2) m +=  td + "Seconds ";   //seconds only
+            if(headerMode == 2) m +=  td + " Seconds ";   //seconds only
             else m += secToString(td);      //long version.
 
         }
@@ -214,6 +214,7 @@ public class QueueFragment extends baseListFragment {
             long td = 0;     //total duration in seconds
             for (Song i : items) td += i.getDuration();
             m += " Total Playtime: " + secToString(td);
+            m += " / " + td + " Seconds" ;
         }
         qHeader.setText( m );
     }

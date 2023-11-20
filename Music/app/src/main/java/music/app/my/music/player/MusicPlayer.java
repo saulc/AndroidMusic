@@ -42,7 +42,7 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 	private int fadeInDuration = 1000, fadeOutDuration = 2000, fadeOutGap = 4000, fadeInGap = 1000;
 
 	private void log(String s){
-		Log.d(getClass().getSimpleName(), s);
+		Log.i(getClass().getSimpleName(), s);
 	}
 	
 	public MusicPlayer(MusicPlayerStateListener l){
@@ -328,11 +328,11 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 	    	player.get(currentPlayer).playAndFadeIn();
 	    	setState(MUSICPLAYER_STATE.PLAYING);
 
-	    	mHandler.postDelayed(volCheck, getFadeInDuration()+100);
+	    	mHandler.postDelayed(volCheck, getFadeInDuration()+120);
 	    	//fix annoying problem where current player is faded out
 
 			//try to catch it early, hopefully before its audible.
-			mHandler.postDelayed(volCheck2,  88);
+//			mHandler.postDelayed(volCheck2,  99);
 
 	    }
 	
@@ -365,7 +365,7 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 			myPlayer p = player.get(currentPlayer);
 			if(!p.isPaused() && p.isPlaying()){
 				float v = p.getVolumeValue();
-				if(v >= .8f){
+				if(v >= .7f){
 					log("Fade out caught. " + v + " applying fix...");
 					p.fadeIn();
 				}else log("fade in ok. " + v);
