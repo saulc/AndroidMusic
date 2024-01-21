@@ -111,6 +111,35 @@
             android:text="mix data"
             android:textAlignment="center" />
 
+
+        <TextView
+            android:id="@+id/f1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="mix data"
+            android:textAlignment="center" />
+
+        <TextView
+            android:id="@+id/f2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="mix data"
+            android:textAlignment="center" />
+
+        <TextView
+            android:id="@+id/f3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="mix data"
+            android:textAlignment="center" />
+
+        <TextView
+            android:id="@+id/f4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="mix data"
+            android:textAlignment="center" />
+
     </LinearLayout>
 
 

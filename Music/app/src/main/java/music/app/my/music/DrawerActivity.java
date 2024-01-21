@@ -226,6 +226,8 @@ public class DrawerActivity extends AppCompatActivity
             }
         });
 
+
+
         FabDoubleTapGS dt = new FabDoubleTapGS();
         dt.setDoubleTapListener(this);
         final GestureDetector gestureDetector = new GestureDetector(dt);
@@ -606,7 +608,12 @@ public class DrawerActivity extends AppCompatActivity
         } else if (id == R.id.repeat) {
             onRepeatClicked();
             return true;
-        } else if (id == R.id.mix) {
+        } else if (id == R.id.mixxer) {
+            log("Show Fade Settings...");
+
+            showMixx();
+            return true;
+        }else if (id == R.id.mix) {
             log("Mix clicked");
             Song s = PlaylistHelper.getRandomSong(getApplicationContext());
             String b = "Mix: " + s.getTitle() + " by " + s.getArtist() + " added to Queue.";

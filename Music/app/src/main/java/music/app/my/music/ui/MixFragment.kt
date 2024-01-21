@@ -44,9 +44,15 @@ class MixFragment : Fragment() {
             }
         })
 
+        fadein = v.findViewById(R.id.f1)
+        fadeingap = v.findViewById(R.id.f3)
+        fadeout = v.findViewById(R.id.f2)
+        fadeoutgap = v.findViewById(R.id.f4)
+
+
 
         iniBars()
-
+        updateData()
         return v
     }
 
@@ -66,21 +72,26 @@ class MixFragment : Fragment() {
 
         var t :String = "Mix in: " + cvtdata(ig!!)
         t +=  " out: " + cvtdata(og!! )
-        t += "   Fade in/out: " + fi + "/" + fo + " Secs"
+        t += "\n   Fade in/out: " + fi + "/" + fo + " Secs"
         dataText?.setText(t)
+
+        fadein?.text = "Fade in: " + fi
+        fadeingap?.text = "Fade in Gap: " + ig
+        fadeout?.text = "Fade Out: " + fo
+        fadeoutgap?.text = "Fade Out Gap: " + og
 
     }
     fun setMixMode(mixOn: Boolean){
         if(mixOn){
-            s2?.progress = 9
+            s2?.progress = 10
             s3?.progress = 9
             s0?.progress = 7
             s1?.progress = s1!!.max
 
         } else {
 
-            s0?.progress = 7
-            s1?.progress = 11
+            s0?.progress = 4
+            s1?.progress = 7
             s2?.progress = 7
             s3?.progress = 7
         }
@@ -111,6 +122,11 @@ class MixFragment : Fragment() {
     }
 
     private var mListener: FaderSettingListener? = null
+
+    private var fadein: TextView? = null
+    private var fadeout: TextView? = null
+    private var fadeingap: TextView? = null
+    private var fadeoutgap: TextView? = null
 
     private var dataText: TextView? = null
     private var s0: SeekBar? = null

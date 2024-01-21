@@ -128,7 +128,7 @@ public  class VisualizerDialogFragment extends Fragment implements Visualizer.On
     public int getHeight(){ return height; }
     private int width, height;
     private Bitmap oldbit;
-    private  int mode = 0, modes = 6;
+    private  int mode = 4, modes = 6;
 
     public void clicked(){
         if(++mode >= modes) mode = 0;

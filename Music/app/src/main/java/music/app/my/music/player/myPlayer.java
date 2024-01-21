@@ -108,7 +108,7 @@ public class myPlayer extends MediaPlayer
 
 			if(isPlaying()){
 			volumeValue = v;
-			setVolume(v, v);
+			setVolume(v, v);  //balance slider goes here...
 			//Log.i("MyPlayer", "volume at " + volumeValue);
 			}
 		} catch (IllegalStateException e) {
