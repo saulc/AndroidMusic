@@ -29,7 +29,9 @@ class LoggerFragment : Fragment() {
     }
     public fun updateLog(log: ArrayList<String> ){
         var s = ""
-        for(t in log) s += t + "\n"
+
+        for( i in log.size-1 downTo 0  ) s += log.get(i) + "\n"
+//        for(t in log) s += t + "\n"
         logText.text = s
     }
     override fun onActivityCreated(savedInstanceState: Bundle?) {
