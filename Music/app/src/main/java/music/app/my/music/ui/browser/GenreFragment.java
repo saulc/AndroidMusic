@@ -19,6 +19,7 @@ import java.util.ArrayList;
 
 import music.app.my.music.R;
 import music.app.my.music.adapters.GenreAdapter;
+import music.app.my.music.helpers.Logger;
 import music.app.my.music.types.Genre;
 
 /*
@@ -30,7 +31,8 @@ public class GenreFragment extends baseListFragment {
 
     private final String TAG = getClass().getSimpleName();
     private void log(String s){
-        Log.d(TAG, s);
+//        Log.d(TAG, s);
+        Logger.log(getClass().getSimpleName(), s);
     }
 
 

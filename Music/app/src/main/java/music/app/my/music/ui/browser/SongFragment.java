@@ -35,8 +35,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
+import music.app.my.music.DrawerActivity;
 import music.app.my.music.R;
 import music.app.my.music.adapters.SongAdapter;
+import music.app.my.music.helpers.Logger;
 import music.app.my.music.helpers.MediaHelperListener;
 import music.app.my.music.types.Playlist;
 
@@ -46,14 +48,21 @@ import music.app.my.music.ui.ControlFragment;
 /**
  * Created by saul on 7/26/16.
  */
-public class   SongFragment extends baseListFragment implements MediaHelperListener {
+public class   SongFragment extends baseListFragment implements MediaHelperListener , DrawerActivity.mFabListener {
+
+    @Override
+    public void onMove(float x, float y) {
+        log("move called:" + x + " " + y);
+
+    }
 
     public enum SF_TYPE {QUEUE, PLAYLISTITEMS, SONGS, ALBUMS, ARTISTS, GENRE, QUERY, BUBBLE };
     private SF_TYPE myType = SF_TYPE.SONGS;
 
     private final String TAG = getClass().getSimpleName();
     private void log(String s){
-        Log.d(TAG, s);
+//        Log.d(TAG, s);
+        Logger.log(getClass().getSimpleName(), s);
     }
 
    // private MediaStoreHelper msHelper;
@@ -201,6 +210,7 @@ public class   SongFragment extends baseListFragment implements MediaHelperListe
             songbar.setProgress(songprogress);
             songbar.setMax(100);
 
+//            recyclerView.scrollBy();
 
             mhandler = new Handler();
             mhandler.postDelayed(updatesongbar, 10);

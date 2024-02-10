@@ -39,6 +39,7 @@ import java.io.IOException;
 
 import music.app.my.music.DrawerActivity;
 import music.app.my.music.R;
+import music.app.my.music.helpers.Logger;
 import music.app.my.music.player.MusicPlayer;
 import music.app.my.music.types.Artist;
 import music.app.my.music.types.Song;
@@ -84,7 +85,8 @@ public class NowFragment extends ControlFragment {
     private final String TAG = getClass().getSimpleName();
 
     private void log(String s) {
-        Log.d(TAG, s);
+//        Log.d(TAG, s);
+        Logger.log(getClass().getSimpleName(), s);
     }
 
 

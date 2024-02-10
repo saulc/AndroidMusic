@@ -12,6 +12,7 @@ import android.util.Log;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import music.app.my.music.helpers.Logger;
 import music.app.my.music.types.Song;
 import music.app.my.music.types.plist;
 
@@ -42,7 +43,8 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 	private int fadeInDuration = 1000, fadeOutDuration = 2000, fadeOutGap = 4000, fadeInGap = 1000;
 
 	private void log(String s){
-		Log.i(getClass().getSimpleName(), s);
+//		Log.i(getClass().getSimpleName(), s);
+		Logger.log(getClass().getSimpleName(), s);
 	}
 	
 	public MusicPlayer(MusicPlayerStateListener l){
@@ -283,11 +285,11 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 	//this should never be called!!
 	@Override
 	public void onCompletion(MediaPlayer mp) {
-		Log.i("Music Service", mp + " player completed! wft!!! <<------");
+		log( mp + " player completed! wft!!! <<------");
 		((myPlayer)mp).removeCallbacks();
 
 		int i = ((myPlayer)mp).getId();
-		Log.i("Music Service", "PLayer completed: " + i);
+		log( "PLayer completed: " + i);
 		player.remove(i);
 		myPlayer rp = new myPlayer();
 		rp.setId(i);
@@ -302,7 +304,7 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 		mp.release();
 		mp = null;
 
-		Log.i("Music Service", mp + "Get ready...Crunch? --->>>");
+		log( mp + "Get ready...Crunch? --->>>");
 	}
 
 

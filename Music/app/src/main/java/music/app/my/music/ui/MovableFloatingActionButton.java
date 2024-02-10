@@ -8,6 +8,8 @@ import android.util.AttributeSet;
         import android.view.View;
         import android.view.ViewGroup;
 
+import music.app.my.music.DrawerActivity;
+
 //        import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class MovableFloatingActionButton extends FloatingActionButton implements View.OnTouchListener {
@@ -16,7 +18,7 @@ public class MovableFloatingActionButton extends FloatingActionButton implements
 
     private float downRawX, downRawY;
     private float dX, dY;
-
+    private DrawerActivity activity;
     public MovableFloatingActionButton(Context context) {
         super(context);
         init();
@@ -31,9 +33,26 @@ public class MovableFloatingActionButton extends FloatingActionButton implements
         super(context, attrs, defStyleAttr);
         init();
     }
-
+    public void setCallback( DrawerActivity act){
+        activity = act;
+    }
     private void init() {
         setOnTouchListener(this);
+    }
+    public void setButtonStartPos(){
+        View view = this;
+        int viewWidth = view.getWidth();
+        int viewHeight = view.getHeight();
+
+        ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams)view.getLayoutParams();
+
+        View viewParent = (View)view.getParent();
+        int parentWidth = viewParent.getWidth();
+        int parentHeight = viewParent.getHeight();
+        view.animate().x(parentWidth - viewWidth - layoutParams.rightMargin)
+                .y((parentHeight- layoutParams.bottomMargin)/2)
+                .setDuration(1)
+                .start();
     }
 
     @Override
@@ -75,9 +94,11 @@ public class MovableFloatingActionButton extends FloatingActionButton implements
                     .setDuration(0)
                     .start();
 
+            //update function here...
+//            if(activity!= null)
+            activity.fabMove(newX, newY);
 
-
-            return true; // Consumed
+            return false; // Consumed
 
         }
         else if (action == MotionEvent.ACTION_UP) {

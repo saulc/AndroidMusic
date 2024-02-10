@@ -19,6 +19,7 @@ import java.util.ArrayList;
 
 import music.app.my.music.R;
 import music.app.my.music.adapters.AlbumAdapter;
+import music.app.my.music.helpers.Logger;
 import music.app.my.music.types.Album;
 
 public class AlbumFragment  extends baseListFragment {
@@ -27,8 +28,10 @@ public class AlbumFragment  extends baseListFragment {
 
     private final String TAG = getClass().getSimpleName();
     private void log(String s){
-        Log.d(TAG, s);
+//        Log.d(TAG, s);
+        Logger.log(TAG, s);
     }
+
 
     //private MediaStoreHelper msHelper;
     //private RecyclerView.Adapter mAdapter;

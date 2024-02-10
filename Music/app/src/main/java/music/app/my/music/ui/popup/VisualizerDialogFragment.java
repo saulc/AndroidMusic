@@ -128,7 +128,7 @@ public  class VisualizerDialogFragment extends Fragment implements Visualizer.On
     public int getHeight(){ return height; }
     private int width, height;
     private Bitmap oldbit;
-    private  int mode = 4, modes = 6;
+    private  int mode = 4, modes = 7;
 
     public void clicked(){
         if(++mode >= modes) mode = 0;
@@ -245,6 +245,14 @@ public  class VisualizerDialogFragment extends Fragment implements Visualizer.On
             p.setAlpha(255);
 
             switch (mode) {
+                case 6:
+                    p.setAlpha(150);
+//                    float r = 220.0f;
+//                    cc.rotate(j*15);
+//                    cc.drawRect(width / 2 + r, height / 2 + r,width / 2 - r, height / 2 - r, p);
+                    cc.drawRect(j*space, 0, j*space*2, j*space, p);
+                    break;
+
                 case 5:
                     cc.drawLine(width / 2 + x * amp, height / 2 + y * amp,
                             width / 2 + x * w * af, height / 2 + y * w * af, p);
@@ -253,7 +261,7 @@ public  class VisualizerDialogFragment extends Fragment implements Visualizer.On
                 case 4:
                     p.setAlpha(150);
                     cc.drawCircle(j * space, height / 2, w, p);
-
+//                    cc.drawRect(j*space, 0, j*space*2, j*space, p);
 //                    p.setColor(Color.WHITE);
 //                    cc.drawCircle( j*space, height / 2  , w-5 , p);
                     break;

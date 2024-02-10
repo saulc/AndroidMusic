@@ -29,6 +29,7 @@ import android.util.Log;
 import music.app.my.music.DrawerActivity;
 import music.app.my.music.Dream;
 import music.app.my.music.R;
+import music.app.my.music.helpers.Logger;
 import music.app.my.music.helpers.NotificationHelper;
 import music.app.my.music.types.Song;
 import music.app.my.music.types.plist;
@@ -77,7 +78,8 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
    private NotificationHelper noti;
 
 	private void log(String s){
-		Log.d(getClass().getSimpleName(), s);
+//		Log.d(getClass().getSimpleName(), s);
+		Logger.log(getClass().getSimpleName(), s);
 	}
 
    @Override
@@ -180,7 +182,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
     */
    public class LocalBinder extends Binder {
        public MusicService getService() {
-       	Log.i("Music Service", "Service binded");
+		   log( "Service binded");
            // Return this instance of LocalService so clients can call public methods
            return MusicService.this;
        }
@@ -334,7 +336,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
     * user as a notification. That's why we create the notification here.
     */
    private void setUpAsForeground(String text) {
-	   Log.i("Music Service", "Setting service as Foreground");
+	   log("Setting service as Foreground");
 
 	   NotificationCompat.Builder nb = null;
 
@@ -422,7 +424,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
 										  String key) {
-		Log.i("Music Service", "Preferences changed");
+		log( "Preferences changed");
 //		   if (key.equals("pref_crossfade_in")) {
 //			   fadeInDuration = Integer.parseInt(sharedPreferences.getString(key, "1"));
 //			   player.setFadeInDuration(fadeInDuration);
@@ -546,12 +548,12 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 
 			if( remainingTime <= endSpace ) {
 
-				Log.i("Music Service", "Playing next song based on progress...");
+				log( "Playing next song based on progress...");
 				nextRequest();
 
 				//if its the last song, wait till the end.
 				if (!getQueue().hasNext() && (getDuration() - (player.getCurrentPosition() / 1000) < 1)){
-					Log.i("Music Service", "No song up next, pausing player.");
+					log("No song up next, pausing player.");
 
 					mHandler.removeCallbacks(updateUi);
 					//player.removeCallbacks();
@@ -571,7 +573,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 * Save/load queue when closing.
 */
 	public void saveQueue(){
-		Log.i("m6", "Saving Queue");
+		log("Saving Queue");
 		Uri uri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
 		ContentValues values = new ContentValues();
 		values.put(MediaStore.Audio.Playlists.NAME, queuePlaylist);
@@ -587,13 +589,13 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 			cur.moveToFirst();
 			final int base = cur.getInt(0);
 			cur.close();
-			Log.d("Music service", "base: " + base);
+			log( "base: " + base);
 
 			int i =0;
 			for(Song t : player.getQueue().getArray()){
 				values = new ContentValues();
 				int songid = Integer.parseInt(t.getId());
-				Log.d("Music service", i +" saving song: " + t.getTitle() + songid);
+				log( i +" saving song: " + t.getTitle() + songid);
 				values.put(MediaStore.Audio.Playlists.Members.PLAY_ORDER,  i++ );
 				values.put(MediaStore.Audio.Playlists.Members.AUDIO_ID, songid);
 				resolver.insert(uri, values);
@@ -607,7 +609,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 
 		//if(queuePlaylistId == 0)
 		if(findQueuePlaylist()){
-			Log.d("M6", "Loading queue playlist");
+			log("Loading queue playlist");
 			ContentResolver resolver = this.getApplicationContext().getContentResolver();
 			String[] memberProjection = {
 					MediaStore.Audio.Playlists.Members.TITLE,
@@ -626,7 +628,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 			Cursor cursor = resolver.query(memebersUri, memberProjection, null, null, sort);
 			//  ArrayList<Song> songs = new ArrayList<Song>();
 			while(cursor.moveToNext()){
-				Log.d("Music service", "Adding song: " + cursor.getString(0) + cursor.getString(5));
+				log("Adding song: " + cursor.getString(0) + cursor.getString(5));
 				player.addSong(new Song(cursor.getString(0), cursor.getString(1),
 						cursor.getString(2), cursor.getString(3), cursor.getString(4)
 						, cursor.getString(5), cursor.getString(6), cursor.getString(7), cursor.getString(8)));
@@ -635,12 +637,12 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 
 			//Uri uri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
 			//this.getApplicationContext().getContentResolver().delete(uri, MediaStore.Audio.Playlists._ID +" = "+queuePlaylistId, null);
-		} else Log.i("Music Service", "no saved queue found");
+		} else log( "no saved queue found");
 		// addGroupToQueue(songs);
 	}
 
 	public boolean findQueuePlaylist(){
-		Log.d("M6", "seting up queue playlist");
+		log( "seting up queue playlist");
 		ContentResolver resolver = this.getApplicationContext().getContentResolver();
 		String[] playlistProjection = { MediaStore.Audio.Playlists.NAME,
 				MediaStore.Audio.Playlists._ID};
@@ -650,7 +652,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 		while(cur.moveToNext()){
 			if(cur.getString(0).equals(queuePlaylist)){
 				queuePlaylistId = Long.parseLong(cur.getString(1));
-				Log.d("m6", "queue playlist id: " + cur.getString(1));
+				log( "queue playlist id: " + cur.getString(1));
 				return true;
 			}
 		}

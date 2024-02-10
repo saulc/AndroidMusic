@@ -18,6 +18,7 @@ import java.util.ArrayList;
 
 import music.app.my.music.R;
 import music.app.my.music.adapters.ArtistAdapter;
+import music.app.my.music.helpers.Logger;
 import music.app.my.music.types.Artist;
 
 /**
@@ -29,7 +30,8 @@ public class ArtistFragment extends baseListFragment {
 
     private final String TAG = getClass().getSimpleName();
     private void log(String s){
-        Log.d(TAG, s);
+//        Log.d(TAG, s);
+        Logger.log(getClass().getSimpleName(), s);
     }
 
     //private MediaStoreHelper msHelper;

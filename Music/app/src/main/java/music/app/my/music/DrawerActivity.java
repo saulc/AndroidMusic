@@ -21,7 +21,9 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatDelegate;
+import android.util.AttributeSet;
 import android.util.Log;
+import android.view.DragEvent;
 import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.MenuInflater;
@@ -51,6 +53,7 @@ import java.util.Scanner;
 
 import music.app.my.music.helpers.FabDoubleTapGS;
 import music.app.my.music.helpers.FaderSettingListener;
+import music.app.my.music.helpers.Logger;
 import music.app.my.music.helpers.PlaylistFilemaker;
 import music.app.my.music.helpers.PlaylistHelper;
 import music.app.my.music.helpers.QueueListener;
@@ -63,8 +66,10 @@ import music.app.my.music.types.Genre;
 import music.app.my.music.types.plist;
 import music.app.my.music.types.Playlist;
 import music.app.my.music.types.Song;
+import music.app.my.music.ui.LoggerFragment;
 import music.app.my.music.ui.MixFragment;
 import music.app.my.music.ui.MixxerFragment;
+import music.app.my.music.ui.MovableFloatingActionButton;
 import music.app.my.music.ui.browser.AlbumFragment;
 import music.app.my.music.ui.browser.ArtistFragment;
 import music.app.my.music.ui.browser.BubbleFragment;
@@ -96,7 +101,7 @@ public class DrawerActivity extends AppCompatActivity
         FaderSettingListener,
         SecretFragment.SecretListener,
         FabDoubleTapGS.DoubleTapListener,
-        Toolbar.OnMenuItemClickListener {
+        Toolbar.OnMenuItemClickListener , Logger.LogCallback {
 
 
     private VisualizerDialogFragment vf = null;
@@ -111,12 +116,15 @@ public class DrawerActivity extends AppCompatActivity
     private ControlFragment cf = null;
     private PlaceholderFragment pf = null;
     private SongFragment sf = null; //search fragment
+    private SongFragment sFrag = null; //song fragment
+    private LoggerFragment logFrag = null;
 
     private boolean searchActive = false;
     private FloatingActionButton fab3;
     private FloatingActionButton fab2;
     private FloatingActionButton fab1;
     private FloatingActionButton fab;
+    private MovableFloatingActionButton mfab;
 
     private boolean autoCloseDrawer = true;
     private boolean showfmenu = false; //show/hide floating control buttons.
@@ -125,7 +133,8 @@ public class DrawerActivity extends AppCompatActivity
     private final String TAG = getClass().getSimpleName();
 
     private void log(String s) {
-        Log.i(TAG, s);
+        Logger.log(TAG, s);
+//        Log.i(TAG, s);
     }
 
     private MusicService mService;
@@ -207,17 +216,36 @@ public class DrawerActivity extends AppCompatActivity
         iniFM();
         moveFab(true);
 
+        mfab = (MovableFloatingActionButton) findViewById(R.id.mfab);
+        mfab.setCallback(this);
+//        mfab.setButtonStartPos();
+        mfab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "mFab Clicked: " + showq);
+                showQ();
+            }
+        });
         fab.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public boolean onLongClick(View v) {
-                //mService.duck();
-                Log.d(TAG, "Fab Long Clicked: " + showfmenu);
-                if (!showfmenu) showFM();
-                else hideFM();
-
+            public boolean onLongClick(View view) {
+                showLogs();
                 return true;
             }
         });
+
+
+//        fab.setOnLongClickListener(new View.OnLongClickListener() {
+//            @Override
+//            public boolean onLongClick(View v) {
+//                //mService.duck();
+//                Log.d(TAG, "Fab Long Clicked: " + showfmenu);
+//                if (!showfmenu) showFM();
+//                else hideFM();
+//
+//                return true;
+//            }
+//        });
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -284,7 +312,10 @@ public class DrawerActivity extends AppCompatActivity
         handleStartIntents(); //search media share....
 
     }
-
+//    public View onCreateView(String name, Context context, AttributeSet attrs) {
+//        log("onCreateView event");
+//        return super.onCreateView(name, context, attrs);
+//    }
 //    @Override
 //    public void showNoti(String msg){
 //        int id = 0;
@@ -298,6 +329,31 @@ public class DrawerActivity extends AppCompatActivity
 
     /* -----------------------------------   onCreate over.   ----------------------------------- */
 
+
+    public void showLogs(){
+        log("Showing Log Fragment");
+
+        logFrag = LoggerFragment.Companion.newInstance();
+        getSupportFragmentManager().beginTransaction().replace(R.id.qframe, logFrag).commit();
+        Logger.setListener(this);
+    }
+
+    @Override
+    public void updateLogs(ArrayList<String> log) {
+        if(logFrag != null)
+        logFrag.updateLog(log);
+    }
+
+
+    public interface mFabListener{
+        void onMove(float x, float y);
+    }
+
+    public void fabMove(float x, float y){
+        log("fab Moving " + x + " " + y + " sfrag " + (sFrag == null));
+        if(sFrag != null)
+            sFrag.onMove(x, y );
+    }
 
     /* ---------- Main side drawer_actions navigation menu ------------- */
     @SuppressWarnings("StatementWithEmptyBody")
@@ -519,6 +575,7 @@ public class DrawerActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
 
+//        mfab.setButtonStartPos();
         log("Resume activity.");
         if(playlistExport) {
             if(pname != null)
@@ -1145,12 +1202,14 @@ public class DrawerActivity extends AppCompatActivity
                 //if the now frag was show. kill it. so it can show the actionbar.
                     nf.onDestroy();
             }else if(f instanceof PlayListFragment) playlistFrag = (PlayListFragment) f;
+            else if( f instanceof SongFragment)  sFrag = (SongFragment) f;
             //other fragments. just make sure the mainframe is visible
             if (showq > 2) {
                 showq = 1;
                 showQ();
                 showControls();
             }
+
         }
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
