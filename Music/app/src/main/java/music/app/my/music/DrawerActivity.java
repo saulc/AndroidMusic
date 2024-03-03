@@ -1,6 +1,7 @@
 package music.app.my.music;
 
 import android.animation.LayoutTransition;
+import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -14,6 +15,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -101,7 +103,7 @@ public class DrawerActivity extends AppCompatActivity
         FaderSettingListener,
         SecretFragment.SecretListener,
         FabDoubleTapGS.DoubleTapListener,
-        Toolbar.OnMenuItemClickListener , Logger.LogCallback {
+        Toolbar.OnMenuItemClickListener , Logger.LogCallback , LoggerFragment.LogFragListener {
 
 
     private VisualizerDialogFragment vf = null;
@@ -117,6 +119,7 @@ public class DrawerActivity extends AppCompatActivity
     private PlaceholderFragment pf = null;
     private SongFragment sf = null; //search fragment
     private SongFragment sFrag = null; //song fragment
+    private mFabListener mfabLis = null;
     private LoggerFragment logFrag = null;
 
     private boolean searchActive = false;
@@ -129,7 +132,7 @@ public class DrawerActivity extends AppCompatActivity
     private boolean autoCloseDrawer = true;
     private boolean showfmenu = false; //show/hide floating control buttons.
     private int showq = 0; //0 == hidden, 1 = miniplayer q, 2 = half, 3 = full screen, todo 4 edit plist
-
+    private int showlog = 1;
     private final String TAG = getClass().getSimpleName();
 
     private void log(String s) {
@@ -226,26 +229,26 @@ public class DrawerActivity extends AppCompatActivity
                 showQ();
             }
         });
-        fab.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                showLogs();
-                return true;
-            }
-        });
-
-
 //        fab.setOnLongClickListener(new View.OnLongClickListener() {
 //            @Override
-//            public boolean onLongClick(View v) {
-//                //mService.duck();
-//                Log.d(TAG, "Fab Long Clicked: " + showfmenu);
-//                if (!showfmenu) showFM();
-//                else hideFM();
-//
+//            public boolean onLongClick(View view) {
+//                showLogs();
 //                return true;
 //            }
 //        });
+
+
+        fab.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                //mService.duck();
+                Log.d(TAG, "Fab Long Clicked: " + showfmenu);
+                if (!showfmenu) showFM();
+                else hideFM();
+
+                return true;
+            }
+        });
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -298,6 +301,7 @@ public class DrawerActivity extends AppCompatActivity
         previousIntent = new Intent(getApplicationContext(), MusicService.class);
         previousIntent.setAction(MusicService.ACTION_PREVIOUS);
 
+
         log("Starting service");
         startService(startIntent);
 
@@ -311,6 +315,7 @@ public class DrawerActivity extends AppCompatActivity
 
         handleStartIntents(); //search media share....
 
+        handleSearchIntents();
     }
 //    public View onCreateView(String name, Context context, AttributeSet attrs) {
 //        log("onCreateView event");
@@ -332,9 +337,10 @@ public class DrawerActivity extends AppCompatActivity
 
     public void showLogs(){
         log("Showing Log Fragment");
-
+        expandLog();
         logFrag = LoggerFragment.Companion.newInstance();
-        getSupportFragmentManager().beginTransaction().replace(R.id.qframe, logFrag).commit();
+        logFrag.setListener(this);
+        getSupportFragmentManager().beginTransaction().replace(R.id.logframe, logFrag).commit();
         Logger.setListener(this);
     }
 
@@ -350,9 +356,9 @@ public class DrawerActivity extends AppCompatActivity
     }
 
     public void fabMove(float x, float y){
-        log("fab Moving " + x + " " + y + " sfrag " + (sFrag == null));
-        if(sFrag != null)
-            sFrag.onMove(x, y );
+        log("fab Moving " + x + " " + y + " sfrag " + (mfabLis == null));
+        if(mfabLis != null)
+            mfabLis.onMove(x, y );
     }
 
     /* ---------- Main side drawer_actions navigation menu ------------- */
@@ -504,6 +510,26 @@ public class DrawerActivity extends AppCompatActivity
 
 
     /* -----------------------------------  start    ----------------------------------- */
+    public void handleSearchIntents() {
+        Intent intent = this.getIntent();
+        if (intent.getAction().compareTo(MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH) == 0) {
+
+            String mediaFocus = intent.getStringExtra(MediaStore.EXTRA_MEDIA_FOCUS);
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            if (query.isEmpty()) {
+                log("no query found");
+            } else {
+                log("query: " + query);
+            }
+            // Some of these extras might not be available depending on the search mode.
+            String album = intent.getStringExtra(MediaStore.EXTRA_MEDIA_ALBUM);
+            String artist = intent.getStringExtra(MediaStore.EXTRA_MEDIA_ARTIST);
+            String genre = intent.getStringExtra("android.intent.extra.genre");
+            String playlist = intent.getStringExtra("android.intent.extra.playlist");
+            String title = intent.getStringExtra(MediaStore.EXTRA_MEDIA_TITLE);
+        }
+    }
+
 
     private void handleStartIntents() {
 
@@ -549,6 +575,7 @@ public class DrawerActivity extends AppCompatActivity
 
     }
 
+
     @Override
     public void finish() {
         //startService(new Intent(MusicService.ACTION_STOP));
@@ -577,6 +604,7 @@ public class DrawerActivity extends AppCompatActivity
 
 //        mfab.setButtonStartPos();
         log("Resume activity.");
+        showLogs();
         if(playlistExport) {
             if(pname != null)
             log("Playlist save flag. " + pname);
@@ -762,6 +790,8 @@ public class DrawerActivity extends AppCompatActivity
         }
 
     }
+
+
 
 
     /* ---------- Daydream ------------- */
@@ -1080,7 +1110,44 @@ public class DrawerActivity extends AppCompatActivity
             //main frame
         }
     }
+    @Override
+    public void onLogClick(){
+        log("Log Clicked " + showlog);
 
+                if(showlog++ > 2){
+                    showlog = 0;
+//                    getSupportFragmentManager().beginTransaction().remove(logFrag).commit();
+                }//else
+                    showLogs();
+//                expandLog();
+
+    }
+    public void expandLog(){
+        log("Expanding q frame");
+        int orientation = getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            // In landscape
+
+            LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
+                    0,
+                    DrawerLayout.LayoutParams.MATCH_PARENT,
+                    1.0f
+            );
+            findViewById(R.id.logframe).setLayoutParams(param);
+
+        } else {
+            // In portrait
+            LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
+                    DrawerLayout.LayoutParams.MATCH_PARENT,
+                    0,
+                    (showlog==0? .5f : showlog )
+            );
+            findViewById(R.id.logframe).setLayoutParams(param);
+
+
+        }
+
+    }
     public void expandSidebar() {
         log("Expanding q frame");
         int orientation = getResources().getConfiguration().orientation;
@@ -1201,8 +1268,9 @@ public class DrawerActivity extends AppCompatActivity
             } else if(nowShowing && nf != null){
                 //if the now frag was show. kill it. so it can show the actionbar.
                     nf.onDestroy();
-            }else if(f instanceof PlayListFragment) playlistFrag = (PlayListFragment) f;
-            else if( f instanceof SongFragment)  sFrag = (SongFragment) f;
+            }else if( f instanceof mFabListener)  mfabLis = (mFabListener) f;
+            else if(f instanceof PlayListFragment) playlistFrag = (PlayListFragment) f;
+
             //other fragments. just make sure the mainframe is visible
             if (showq > 2) {
                 showq = 1;

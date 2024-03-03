@@ -17,12 +17,20 @@ import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.util.ArrayList;
 
+import music.app.my.music.DrawerActivity;
 import music.app.my.music.R;
 import music.app.my.music.adapters.AlbumAdapter;
 import music.app.my.music.helpers.Logger;
 import music.app.my.music.types.Album;
 
-public class AlbumFragment  extends baseListFragment {
+public class AlbumFragment  extends baseListFragment  implements DrawerActivity.mFabListener {
+
+    public void onMove(float x, float y) {
+        log("move called:" + x + " " + y);
+//            int sy = (int) (y/10);
+        log("scroll by:" + y);
+        recyclerView.scrollBy(0, (int) y);
+    }
 
     protected ArrayList<Album> items;
 

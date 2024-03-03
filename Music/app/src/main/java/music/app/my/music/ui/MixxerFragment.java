@@ -143,8 +143,8 @@ public class MixxerFragment extends Fragment {
             player = mp;
             if(role == 0)  mixText0.setTextColor(Color.GREEN);
             else mixText0.setTextColor(Color.RED);
-
-            mixText0.setText(getRoleText() + getInfo(mp));
+            try {
+                mixText0.setText(getRoleText() + getInfo(mp));
 
 
             if(mp.getmPlayers().get(index).isPaused()) pause.setBackgroundColor(Color.GREEN);
@@ -155,22 +155,28 @@ public class MixxerFragment extends Fragment {
 
             if(mp.getmPlayers().get(index).isPrepared()) reset.setBackgroundColor(Color.GREEN);
             else reset.setBackgroundColor(Color.RED);
-
+            }catch(IllegalStateException e){
+                log(e.toString());
+            }
 
 
         }
         public void update(myPlayer p){
 
             volbar.setProgress( (int)(p.getVolumeValue()*100) );
-            posText.setText( " pos: " + ( p.getCurrentPosition() / 1000 ) );
-            if(p.isPrepared() && !p.isPaused()) {
+            try {
+                posText.setText(" pos: " + (p.getCurrentPosition() / 1000));
+                if (p.isPrepared() && !p.isPaused()) {
 
-                double d = p.getDuration();
-                double e = p.getCurrentPosition();
-                double f = (e / d * 100);
-                //log(" d: " + d + " pos: " + e + " pro: " + f);
-                posbar.setProgress((int)f);
-            }
+                    double d = p.getDuration();
+                    double e = p.getCurrentPosition();
+                    double f = (e / d * 100);
+                    //log(" d: " + d + " pos: " + e + " pro: " + f);
+                    posbar.setProgress((int) f);
+                }
+            } catch(IllegalStateException e){
+                log(e.toString());
+                }
 
         }
 

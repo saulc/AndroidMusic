@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <capability android:name="actions.media.action.MEDIA_PLAY_FROM_SEARCH">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="music.app.my.music.DrawerActivity"
+            android:targetPackage="music">
+            <parameter
+                android:name="exercise.name"
+                android:key="exerciseType"
+                android:required="true"
+                />
+        </intent>
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="music.app.my.music.DrawerActivity">
+        </intent>
+    </capability>
+</shortcuts>

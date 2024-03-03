@@ -53,7 +53,9 @@ public class   SongFragment extends baseListFragment implements MediaHelperListe
     @Override
     public void onMove(float x, float y) {
         log("move called:" + x + " " + y);
-
+//            int sy = (int) (y/10);
+        log("scroll by:" + y);
+            recyclerView.scrollBy(0, (int) y);
     }
 
     public enum SF_TYPE {QUEUE, PLAYLISTITEMS, SONGS, ALBUMS, ARTISTS, GENRE, QUERY, BUBBLE };

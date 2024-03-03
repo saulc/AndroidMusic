@@ -44,6 +44,11 @@
             android:layout_height="0dp"
             android:layout_weight="5" />
 
+            <FrameLayout
+                android:id="@+id/logframe"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0" />
         <TextSwitcher
             android:id="@+id/nextText"
             android:layout_width="wrap_content"

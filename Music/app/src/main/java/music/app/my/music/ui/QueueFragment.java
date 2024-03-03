@@ -19,7 +19,7 @@ import com.nhaarman.listviewanimations.appearance.simple.SwingLeftInAnimationAda
 import com.nhaarman.listviewanimations.itemmanipulation.DynamicListView;
 import com.nhaarman.listviewanimations.itemmanipulation.dragdrop.TouchViewDraggableManager;
 import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.OnDismissCallback;
-import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.undo.SimpleSwipeUndoAdapter;
+import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.SwipeDismissAdapter;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -28,6 +28,7 @@ import java.util.Date;
 
 import music.app.my.music.R;
 import music.app.my.music.adapters.QueueAdapter;
+import music.app.my.music.helpers.Logger;
 import music.app.my.music.helpers.QueueListener;
 import music.app.my.music.types.Song;
 import music.app.my.music.types.plist;
@@ -149,21 +150,41 @@ public class QueueFragment extends baseListFragment {
         mListView.enableDragAndDrop();
         mListView.setDraggableManager(new TouchViewDraggableManager(R.id.content));
 
-        SimpleSwipeUndoAdapter swipeUndoAdapter = new SimpleSwipeUndoAdapter(alphaAdapter, getContext(),
-                new OnDismissCallback() {
-                    @Override
-                    public void onDismiss(@NonNull final ViewGroup listView, @NonNull final int[] reverseSortedPositions) {
-                        for (int position : reverseSortedPositions) {
+//        SimpleSwipeUndoAdapter swipeUndoAdapter = new SimpleSwipeUndoAdapter(alphaAdapter, getContext(),
+//                new OnDismissCallback() {
+//                    @Override
+//                    public void onDismiss(@NonNull final ViewGroup listView, @NonNull final int[] reverseSortedPositions) {
+//                        for (int position : reverseSortedPositions) {
+//                            mListener.onItemSwiped(items.get(position), position);
+//                            mAdapter.notifyDataSetChanged();
+//                        }
+//                    }
+//                }
+//        );
+
+        SwipeDismissAdapter swipeAdapter = new SwipeDismissAdapter(alphaAdapter, new OnDismissCallback() {
+            @Override
+            public void onDismiss(@NonNull ViewGroup viewGroup, @NonNull int[] ints) {
+                for (int position : ints) {
                             mListener.onItemSwiped(items.get(position), position);
                             mAdapter.notifyDataSetChanged();
                         }
-                    }
-                }
-        );
+            }
+        });
 
-        swipeUndoAdapter.setAbsListView(mListView);
-        mListView.setAdapter(swipeUndoAdapter);
-        mListView.enableSimpleSwipeUndo();
+        swipeAdapter.setAbsListView(mListView);
+        mListView.setAdapter(swipeAdapter);
+        mListView.enableSwipeToDismiss(new OnDismissCallback() {
+            @Override
+            public void onDismiss(@NonNull ViewGroup viewGroup, @NonNull int[] ints) {
+                for (int position : ints) {
+                    log("p: "+ position);
+                    mListener.onItemSwiped(items.get(position), position);
+                    mAdapter.notifyDataSetChanged();
+                }
+            }
+        });
+//        mListView.enableSimpleSwipeUndo();
         mListView.setFastScrollEnabled(true);
 
         mAdapter.setCurrent(current);
@@ -253,7 +274,8 @@ public class QueueFragment extends baseListFragment {
     }
 
     private void log(String s){
-        Log.d(getClass().getSimpleName(), s);
+//        Log.d(getClass().getSimpleName(), s);
+        Logger.log(getClass().getSimpleName(), s);
     }
 
 

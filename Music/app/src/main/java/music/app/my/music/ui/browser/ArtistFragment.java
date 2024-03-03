@@ -16,6 +16,7 @@ import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.util.ArrayList;
 
+import music.app.my.music.DrawerActivity;
 import music.app.my.music.R;
 import music.app.my.music.adapters.ArtistAdapter;
 import music.app.my.music.helpers.Logger;
@@ -24,8 +25,14 @@ import music.app.my.music.types.Artist;
 /**
  * Created by saul on 7/26/16.
  */
-public class ArtistFragment extends baseListFragment {
+public class ArtistFragment extends baseListFragment implements DrawerActivity.mFabListener {
 
+    public void onMove(float x, float y) {
+        log("move called:" + x + " " + y);
+//            int sy = (int) (y/10);
+        log("scroll by:" + y);
+        recyclerView.scrollBy(0, (int) y);
+    }
     protected ArrayList<Artist> items;
 
     private final String TAG = getClass().getSimpleName();

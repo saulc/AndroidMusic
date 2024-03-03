@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import kotlinx.android.synthetic.main.fragment_logger.logText
+import music.app.my.music.DrawerActivity
 import music.app.my.music.R
 import music.app.my.music.helpers.Logger
 
@@ -17,6 +18,15 @@ class LoggerFragment : Fragment() {
         fun newInstance() = LoggerFragment()
     }
 
+    public interface LogFragListener{
+        public fun onLogClick();
+    }
+
+    public fun setListener(ml: LogFragListener){
+        mlistener = ml
+    }
+    private var mlistener: LogFragListener? = null
+
     private lateinit var viewModel: LoggerViewModel
     private lateinit var logText : TextView
     override fun onCreateView(
@@ -25,6 +35,9 @@ class LoggerFragment : Fragment() {
     ): View? {
         var v =  inflater.inflate(R.layout.fragment_logger, container, false);
         logText = v.findViewById(R.id.logText)
+        logText.setOnClickListener( View.OnClickListener {
+            mlistener?.onLogClick();
+        });
         return v;
     }
     public fun updateLog(log: ArrayList<String> ){
@@ -41,9 +54,7 @@ class LoggerFragment : Fragment() {
             ViewModelProvider.NewInstanceFactory()
         ).get(LoggerViewModel::class.java)
         var logs = Logger.getLogs()
-       var s = ""
-        for(t in logs) s += t + "\n"
-        logText.text = s
+        updateLog(logs)
     }
 
 }

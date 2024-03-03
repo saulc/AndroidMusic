@@ -73,14 +73,14 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 			nextPlayer = 1;
 			auxPlayer = 2;
 
-			myPlayer temp = new myPlayer();
-			temp.setId(0);
+			myPlayer temp = new myPlayer(0);
+//			temp.setId(0);
 			player.add(temp);
-			temp = new myPlayer();
-			temp.setId(1);
+			temp = new myPlayer(1);
+//			temp.setId(1);
 			player.add(temp);
-			temp = new myPlayer();
-			temp.setId(2);
+			temp = new myPlayer(2);
+//			temp.setId(2);
 			player.add(temp);
 
 
@@ -288,11 +288,11 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 		log( mp + " player completed! wft!!! <<------");
 		((myPlayer)mp).removeCallbacks();
 
-		int i = ((myPlayer)mp).getId();
+		int i = currentPlayer; //((myPlayer)mp).getId();
 		log( "PLayer completed: " + i);
 		player.remove(i);
-		myPlayer rp = new myPlayer();
-		rp.setId(i);
+		myPlayer rp = new myPlayer(i);
+//		rp.setId(i);
 		player.add(i,  rp);
 		updateFader();
 
@@ -330,11 +330,11 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 	    	player.get(currentPlayer).playAndFadeIn();
 	    	setState(MUSICPLAYER_STATE.PLAYING);
 
-	    	mHandler.postDelayed(volCheck, getFadeInDuration()+120);
+	    	mHandler.postDelayed(volCheck, getFadeInDuration()*2);
 	    	//fix annoying problem where current player is faded out
 
 			//try to catch it early, hopefully before its audible.
-//			mHandler.postDelayed(volCheck2,  99);
+//			mHandler.postDelayed(volCheck2,  getFadeInDuration()+320);
 
 	    }
 	
@@ -351,10 +351,18 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 			myPlayer p = player.get(currentPlayer);
 			if(!p.isPaused() && p.isPlaying()){
 				float v = p.getVolumeValue();
-				if(v <= .1f){
+				for(int i=0; i<1000; i++);
+
+				if(v < p.getVolumeValue() || v < .05f){
 					log("Using volume fix: " + v + " Fading in...");
 					p.fadeIn();
-				}else log("Volume ok. " + v);
+				}else if(v < .75f){
+					log("Volume ok. " + v +" " + p.getVolumeValue());
+
+					mHandler.postDelayed(volCheck, 100);
+				}else
+					log("Volume ok. " + v +" " + p.getVolumeValue());
+
 			}
 
 		}
@@ -367,7 +375,7 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 			myPlayer p = player.get(currentPlayer);
 			if(!p.isPaused() && p.isPlaying()){
 				float v = p.getVolumeValue();
-				if(v >= .7f){
+				if(v < .7f){
 					log("Fade out caught. " + v + " applying fix...");
 					p.fadeIn();
 				}else log("fade in ok. " + v);

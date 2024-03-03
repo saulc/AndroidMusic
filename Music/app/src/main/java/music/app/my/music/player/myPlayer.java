@@ -13,12 +13,15 @@ public class myPlayer extends MediaPlayer
 	private boolean paused = true;
 	private int fadeInDuration = 1000, fadeOutDuration = 2000, fadeOutGap = 4000, startGap = 0;
 	private int mCurrentStep = 1;
+	private float lastvol = 0f;
+
     private float duckVolume = .1f;
     private boolean isPrepared = false;
 	private int id = -1;
 
-    public myPlayer(){
+    public myPlayer(int i){
     	super();
+		setId(i);
     	
     }
  
@@ -127,15 +130,28 @@ public class myPlayer extends MediaPlayer
 	    {
 	    	if(!fadingIn) fadingIn = true;
 
+				float temp = lastvol;
+				lastvol = (float) ( Math.pow(mCurrentStep, 2) / Math.pow((fadeInDuration / 50), 2) );
+				if(lastvol < temp){
+					Log.d("myPlayer", "Found audio bug...." + mCurrentStep +" " + fadeInDuration);
+					setVol(0);
+					mHandler.removeCallbacks(fadeInVolume);
+					mCurrentStep = 1;
+					fadingIn = false;
+
+					mHandler.postDelayed(fadeInVolume, 200);
+					return;
+				}
 	    		//setVol( (float) ( Math.log( mCurrentStep + 1) / (Math.log( (fadeInDuration/20)) )) );
-	    		setVol( (float) ( Math.pow(mCurrentStep, 2) / Math.pow((fadeInDuration / 50), 2) ) );
+	    		setVol( lastvol );
 	    		//Log.d("Myplayer", mCurrentStep + " fading in: " + volumeValue);
 	    		//setVol( (float) ( Math.pow( ( mCurrentStep - (fadeOutDuration/20)), 2) / Math.pow( mCurrentStep + (fadeOutDuration/20), 2) ) );
 
 	    		mCurrentStep++;
+				Log.d("myPlayer", "plyer step fadeing in: "+mCurrentStep);
 	      // if (mCurrentStep++ > (fadeInDuration/20)) {
-	    		if(volumeValue >= .98){
-	        	setVol(1);
+	    		if(volumeValue >= .98f){
+	        	setVol(1f);
 	        	mHandler.removeCallbacks(fadeInVolume);
 	        	mCurrentStep = 1;
 	        	fadingIn = false;

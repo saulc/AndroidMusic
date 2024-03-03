@@ -24,7 +24,7 @@ public class Logger {
 //        if(logs == null)
 //            logs = new ArrayList<>();
         logs.add(tag + " :" + s);
-        //add normally, print backwards. faster.
+        //add normally, print backwards. faster.?
 //        logs.add(0, tag + " : " + s);
         //keep 1000 logs?
         if(logs.size() > 500){

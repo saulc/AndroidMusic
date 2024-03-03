@@ -96,7 +96,7 @@ public class MovableFloatingActionButton extends FloatingActionButton implements
 
             //update function here...
 //            if(activity!= null)
-            activity.fabMove(newX, newY);
+            activity.fabMove(newX, newY- (parentHeight - viewHeight -layoutParams.bottomMargin)/2);
 
             return false; // Consumed
 
