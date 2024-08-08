@@ -1797,21 +1797,27 @@ public class DrawerActivity extends AppCompatActivity
 
     @Override
     public void addSongsToQueue(ArrayList<Song> items, boolean play) {
-    log("Group header clicked. adding group to queue and playing...");
 
         plist p = mService.getQueue(); //new plist();
-        if(p.getSize() > 0) {
-            p.addToTop(items);
-            if(play)
-            mService.nextRequest();
-        }
-        else{
-            p.addTo(items);
-            if(play)
-            startService(playIntent);
+        if(play) {
+            log("Group header clicked. adding group to queue and playing...");
+
+            if(p.getSize() > 0) {
+                p.addToTop(items);
+                startService(playIntent);
+            }
+            else {
+                p.addTo(items);
+                mService.nextRequest();
+            }
+            showNow();     //on header clicked.
         }
 
-        if(play) showNow();     //on header clicked.
+        else{
+            log("Group ops clicked. adding group to queue...");
+            p.addTo(items);
+        }
+
         updateQueueFrag(p);
 
 //        updateNextSongInfo();
