@@ -1802,15 +1802,15 @@ public class DrawerActivity extends AppCompatActivity
         if(play) {
             log("Group header clicked. adding group to queue and playing...");
 
+            showNow();     //on header clicked.
             if(p.getSize() > 0) {
                 p.addToTop(items);
-                startService(playIntent);
+                mService.nextRequest();
             }
             else {
                 p.addTo(items);
-                mService.nextRequest();
+                startService(playIntent);
             }
-            showNow();     //on header clicked.
         }
 
         else{
