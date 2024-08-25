@@ -2140,6 +2140,18 @@ public class DrawerActivity extends AppCompatActivity
             log("Volume up button clicked.");
 //            nextPressed();
             am.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, 0);
+        }else if ((keyCode == KeyEvent.KEYCODE_MEDIA_PREVIOUS)){
+            //Do something
+            log("Previous Media button clicked.");
+            prevPressed();
+        }else if ((keyCode == KeyEvent.KEYCODE_MEDIA_NEXT)){
+            //Do something
+            log("Next Media button clicked.");
+            nextPressed();
+        }else if ((keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE)){
+            //Do something
+            log("Play/pause Media button clicked.");
+            playPausePressed();
         }
 
         //show the change on the now fragment if its showing.
