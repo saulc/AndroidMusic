@@ -544,7 +544,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 			 long gap =  (player.getmPlayers().get(player.getCurrentPlayer()).getFadeOutGap()/1000 );
 
 			// log("Fade out needs at least: " + endSpace + " seconds. + gap: " + gap + " remainingTime: " + remainingTime);
-			 endSpace += gap;
+			 endSpace += gap + 1;
 
 			if( remainingTime <= endSpace ) {
 

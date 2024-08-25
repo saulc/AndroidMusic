@@ -131,7 +131,7 @@ public class myPlayer extends MediaPlayer
 	    	if(!fadingIn) fadingIn = true;
 
 				float temp = lastvol;
-				lastvol = (float) ( Math.pow(mCurrentStep, 2) / Math.pow((fadeInDuration / 50), 2) );
+				lastvol = (float) ( Math.pow(mCurrentStep, 2) / Math.pow((fadeInDuration / 50.), 2) );
 				if(lastvol < temp){
 					Log.d("myPlayer", "Found audio bug...." + mCurrentStep +" " + fadeInDuration);
 					setVol(0);
@@ -169,12 +169,13 @@ public class myPlayer extends MediaPlayer
 	    		//setVol((float) ( Math.log( (fadeOutDuration/20) - mCurrentStep + 1) / (Math.log( (fadeOutDuration/20) ) ) ) );
 //	    		setVol( (float) ( ( ( (fadeOutDuration/50) - mCurrentStep) * ( (fadeOutDuration/50) - mCurrentStep) ) 
 //	    				/( (fadeOutDuration/50) * (fadeOutDuration/50) ) ) );
-	    		setVol( (float) ( Math.pow((fadeOutDuration / 50) - mCurrentStep, 2) / Math.pow(fadeOutDuration / 50, 2) ) );
+	    		setVol( (float) ( Math.pow((fadeOutDuration / 50.) - mCurrentStep, 2) / Math.pow(fadeOutDuration / 50., 2) ) );
 	    		//Log.d("Myplayer", mCurrentStep + " fading out: " + volumeValue);
 
-	    		mCurrentStep++;
-	    //    if (mCurrentStep++ > (fadeOutDuration/20)) {  || (getCurrentPosition() >= getDuration()) 
-	    		if((volumeValue <= 0.05) ){
+//	    		mCurrentStep++;
+			Log.d("Myplayer", "fade out current step: " + mCurrentStep );
+	    //    if (mCurrentStep++ > (fadeOutDuration/20)) {  || (getCurrentPosition() >= getDuration())
+	    		if((fadeOutDuration / 50. <= mCurrentStep++) ){
 	        	setVol(0f);
 	        	mHandler.removeCallbacks(fadeOutVolume);
 	        	mCurrentStep = 1;
