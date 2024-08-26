@@ -5,8 +5,9 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Environment
 import android.provider.DocumentsContract
-import music.app.my.music.types.Song
+import android.util.Log
 import java.io.File
+
 
 class PlaylistFilemaker() {
     companion object {
@@ -35,6 +36,7 @@ class PlaylistFilemaker() {
             return intent;
 //            ctx.startActivity(intent)
         }
+
 
     fun exportPlaylist( name: String, id :String){ //}, items: ArrayList<Song>){
 

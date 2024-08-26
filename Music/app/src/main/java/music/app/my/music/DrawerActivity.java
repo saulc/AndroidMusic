@@ -76,6 +76,7 @@ import music.app.my.music.ui.browser.AlbumFragment;
 import music.app.my.music.ui.browser.ArtistFragment;
 import music.app.my.music.ui.browser.BubbleFragment;
 import music.app.my.music.ui.browser.HeaderFragment;
+import music.app.my.music.ui.browser.PlaylistFileFragment;
 import music.app.my.music.ui.popup.ChoosePlaylistDialogFragment;
 import music.app.my.music.ui.popup.ChooseThemeDialogFragment;
 import music.app.my.music.ui.popup.ConfirmDeleteDialogFragment;
@@ -441,7 +442,9 @@ public class DrawerActivity extends AppCompatActivity
         } else if (id == R.id.nav_settings) {
             log("Settings clicked.");
 
-            showMix();
+//            showMix();
+            Fragment f = PlaylistFileFragment.newInstance();
+            showFragment(R.id.frame, f, true);
 //            Fragment f = (Fragment) HeaderFragment.newInstance("", "");
 //            showFragment(R.id.frame, f, true);
         } else if (id == R.id.nav_mix) {
