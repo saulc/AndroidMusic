@@ -1840,6 +1840,11 @@ public class DrawerActivity extends AppCompatActivity
         showFragment(R.id.frame, f, true);
     }
 
+    @Override
+    public void onPlaylistFClicked(Playlist item) {
+                PlaylistHelper.viewPlaylist(getApplicationContext(), item.getName());
+    }
+
 
     @Override
     public void onSongNextupClicked(int position, Song item) {

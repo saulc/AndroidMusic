@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import music.app.my.music.DrawerActivity;
 import music.app.my.music.R;
 import music.app.my.music.adapters.PlaylistAdapter;
+import music.app.my.music.adapters.PlaylistFileAdapter;
 import music.app.my.music.helpers.Logger;
 import music.app.my.music.helpers.PlaylistHelper;
 import music.app.my.music.types.Playlist;
@@ -134,7 +135,7 @@ public class PlaylistFileFragment extends baseListFragment implements DrawerActi
 
     @Override
     public void updateAdapter(){
-        mAdapter = new PlaylistAdapter(items
+        mAdapter = new PlaylistFileAdapter(items
                 , ( OnListFragmentInteractionListener) getActivity() );
     if(recyclerView == null) return;
         recyclerView.setAdapter(mAdapter);

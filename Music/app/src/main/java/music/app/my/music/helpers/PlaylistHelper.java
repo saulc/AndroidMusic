@@ -9,8 +9,15 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 import music.app.my.music.types.Playlist;
 import music.app.my.music.types.Song;
@@ -215,13 +222,46 @@ public class  PlaylistHelper {
         File directory = new File(path);
         File[] files = directory.listFiles();
         Log.d("Files", "Size: "+ files.length);
-        ArrayList<Playlist> r = new ArrayList<>();
+        ArrayList<String> s = new ArrayList<>();
         for (int i = 0; i < files.length; i++)
         {
             Log.d("Files", "FileName:" + files[i].getName());
-            r.add(new Playlist(files[i].getName(), i+""));
+            if(files[i].getName().contains(".m3u"))
+                s.add(files[i].getName().substring(0, files[i].getName().length()-4 ));
         }
+        Collections.sort(s);
+        ArrayList<Playlist> r = new ArrayList<>();
+
+        for (int i = 0; i < s.size(); i++)
+            r.add(new Playlist(s.get(i), i+""));
+
         return r;
 }
 
+    public static void viewPlaylist(Context context, String pname){
+
+        String path = Environment.getExternalStorageDirectory().toString()+"/Music/"+pname+".m3u";
+        Log.d("Files", "Path: " + path);
+//        File f = new File(path);
+        String aBuffer = "";
+        ArrayList<String> dat = new ArrayList<>();
+        try {
+            File myFile = new File(path);
+            FileInputStream fIn = new FileInputStream(myFile);
+            BufferedReader myReader = new BufferedReader(new InputStreamReader(fIn));
+            String aDataRow = "";
+            while ((aDataRow = myReader.readLine()) != null) {
+//                aBuffer += aDataRow;
+                dat.add(aDataRow);
+            }
+            myReader.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        for(String l : dat)
+            log(l);
+
+    }
 }

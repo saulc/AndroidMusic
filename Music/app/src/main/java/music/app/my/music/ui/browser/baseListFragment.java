@@ -231,6 +231,7 @@ public  class baseListFragment extends Fragment  implements MediaHelperListener 
         // TODO: Update argument type and name
         void onListFragmentInteraction(DummyItem item);
         void onPlaylistClicked(Playlist item);
+        void onPlaylistFClicked(Playlist item);
         void onSongClicked(Song item);
 
         void onArtistClicked(Artist mItem);
