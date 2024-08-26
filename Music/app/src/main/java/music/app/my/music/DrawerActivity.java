@@ -1809,7 +1809,8 @@ public class DrawerActivity extends AppCompatActivity
             }
             else {
                 p.addTo(items);
-                startService(playIntent);
+                mService.playSongFromQueue(0);
+//                startService(playIntent);
             }
         }
 
