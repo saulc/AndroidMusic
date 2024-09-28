@@ -4,6 +4,7 @@ package music.app.my.music.player;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -25,6 +26,8 @@ import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.service.dreams.DreamService;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 import music.app.my.music.DrawerActivity;
 import music.app.my.music.Dream;
@@ -36,7 +39,8 @@ import music.app.my.music.types.plist;
 
 
 
-public class MusicService extends Service implements OnSharedPreferenceChangeListener, MusicPlayer.MusicPlayerStateListener{
+public class MusicService extends Service implements OnSharedPreferenceChangeListener,
+						MusicPlayer.MusicPlayerStateListener {
 
 	final static int myID = 1234;
 	private static final int NOTIFICATION_ID = 1;
@@ -66,7 +70,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 	private boolean dreaming = false;
 
 	private RemoteControlClientCompat mRemoteControlClientCompat;
-   private MediaControlReceiver mediaReceiver;
+   private BroadcastReceiver mediaReceiver;
 //   private NotificationCompat.Builder mBuilder;
 //   private NotificationManager mNotificationManager;
  //  MyNoisyAudioStreamReceiver mNoisyAudioReceiver;
@@ -76,6 +80,9 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
    private String queuePlaylist = "QUEUE";
    private long queuePlaylistId =  0;
    private NotificationHelper noti;
+
+	private PlaybackStateCompat.Builder stateBuilder;
+	private MediaSessionCompat mediaSession;
 
 	private void log(String s){
 //		Log.d(getClass().getSimpleName(), s);
@@ -95,17 +102,56 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
          audioFocus = new AudioFocusHelper(this);
          audioFocus.requestFocus();
 
-         myEventReceiver = new ComponentName(getPackageName(),  MediaControlReceiver.class.getName());
+//         myEventReceiver = new ComponentName(getPackageName(),  MediaControlReceiver.class.getName());
 
          //register mediareceiver to get media button intents and "noisy" intent/headphone disconnected
-         mediaReceiver = new MediaControlReceiver();
+//         mediaReceiver = new MediaControlReceiver();
+		 mediaReceiver = new BroadcastReceiver(){
+			 @Override
+			 public void onReceive(Context context, Intent intent) {
+				 log("Device disconnected. Pausing music.");
+				 pauseRequest();
+			 }
+		 };
          IntentFilter noisyAudioIntentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
-         noisyAudioIntentFilter.addAction(Intent.ACTION_MEDIA_BUTTON);
+//         noisyAudioIntentFilter.addAction(Intent.ACTION_MEDIA_BUTTON);
          registerReceiver(mediaReceiver,noisyAudioIntentFilter);
 
-         am.registerMediaButtonEventReceiver(myEventReceiver);
+//         am.registerMediaButtonEventReceiver(myEventReceiver);
 
-         setupRemoteControls();
+	    mediaSession = new MediaSessionCompat(getApplicationContext(), "remote");
+//		mediaSession.setMediaButtonReceiver();
+	   mediaSession.setFlags(
+			   MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
+					   MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
+	   // Set an initial PlaybackState with ACTION_PLAY, so media buttons can start the player
+	   stateBuilder = new PlaybackStateCompat.Builder()
+			   .setActions(PlaybackStateCompat.ACTION_PLAY |
+					   PlaybackStateCompat.ACTION_SKIP_TO_NEXT| PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS);
+	   mediaSession.setPlaybackState(stateBuilder.build());
+
+	   mediaSession.setCallback(new MediaSessionCompat.Callback() {
+		   @Override
+		   public void onPlay() {
+//			   super.onPause();
+			   log("play/pause caught!");
+			   togglePlaybackRequest();
+		   }
+		   @Override
+		   public void onSkipToNext() {
+//			   super.onFastForward();
+			   log("next caught!");
+			   nextRequest();
+		   }
+		   @Override
+		   public void onSkipToPrevious() {
+//			   super.onRewind();
+			   log("previous caught!");
+			   previousRequest();
+		   }
+	   });
+	   mediaSession.setActive(true);
+//         setupRemoteControls();
 
          loadQueue();
 
@@ -247,6 +293,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 		log("Music Service is Destroying.");
 		removeFromForeground();  //remove notification
 		//saveQueue();
+		mediaSession.setActive(false);
 		unregisterReceiver(mediaReceiver);
 		audioFocus.abandonFocus();
 		mHandler.removeCallbacks(updateUi);

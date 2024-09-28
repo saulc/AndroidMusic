@@ -11,6 +11,7 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
 import android.media.AudioManager;
+import android.media.session.MediaSession;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -162,6 +163,7 @@ public class DrawerActivity extends AppCompatActivity
     private String pid = null;
     private String pname = null;
 
+    private MediaSession mediaSession;
 
   //  private NotificationHelper noti;
 
