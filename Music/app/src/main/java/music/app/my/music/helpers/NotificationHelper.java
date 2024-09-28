@@ -31,6 +31,7 @@ import music.app.my.music.DrawerActivity;
 import music.app.my.music.R;
 import music.app.my.music.player.MusicService;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.media.session.MediaSessionCompat;
 
 /**
  * Helper class to manage notification channels, and create notifications.
@@ -40,14 +41,15 @@ public class NotificationHelper extends ContextWrapper {
     private NotificationManager manager;
     public static final String PRIMARY_CHANNEL = "default";
     public static final String SECONDARY_CHANNEL = "second";
-
+    private MediaSessionCompat mediaSession;
     /**
      * Registers notification channels, which can be used later by individual notifications.
      *
      * @param ctx The application context
      */
-    public NotificationHelper(Context ctx) {
+    public NotificationHelper(Context ctx, MediaSessionCompat media) {
         super(ctx);
+        mediaSession = media;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel chan1 = new NotificationChannel(PRIMARY_CHANNEL,
@@ -107,8 +109,11 @@ public class NotificationHelper extends ContextWrapper {
         return new NotificationCompat.Builder(getApplicationContext(), PRIMARY_CHANNEL)
                  .setContentTitle(title)
                 .setColor(Color.GREEN)
+                .setSmallIcon(getSmallIcon()).setContentIntent(resultPendingIntent).setOngoing(true)
                  .setContentText(body).addAction(previous).addAction(pp).addAction(next)
-                 .setSmallIcon(getSmallIcon()).setContentIntent(resultPendingIntent).setOngoing(true);
+                .setStyle(new android.support.v4.media.app.NotificationCompat.MediaStyle()
+                        .setMediaSession(mediaSession.getSessionToken())
+                        .setShowActionsInCompactView(0));
                //  .setAutoCancel(true);
     }
 

@@ -39,8 +39,8 @@ public class PlayListFragment extends baseListFragment implements DrawerActivity
     }
     private final String TAG = getClass().getSimpleName();
     private void log(String s){
-//        Log.d(TAG, s);
-        Logger.log(getClass().getSimpleName(), s);
+        Log.d(TAG, s);
+//        Logger.log(getClass().getSimpleName(), s);
     }
 
     private TextView countline;

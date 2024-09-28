@@ -38,8 +38,8 @@ public class GenreFragment extends baseListFragment implements DrawerActivity.mF
 
     private final String TAG = getClass().getSimpleName();
     private void log(String s){
-//        Log.d(TAG, s);
-        Logger.log(getClass().getSimpleName(), s);
+        Log.d(TAG, s);
+//        Logger.log(getClass().getSimpleName(), s);
     }
 
 

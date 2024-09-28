@@ -55,6 +55,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="0"
             android:fontFamily="monospace"
+            android:textSize="10dp"
             android:text="Up Next:"
             android:typeface="monospace"
             android:visibility="gone" />

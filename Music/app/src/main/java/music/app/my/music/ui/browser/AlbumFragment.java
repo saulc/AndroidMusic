@@ -36,8 +36,8 @@ public class AlbumFragment  extends baseListFragment  implements DrawerActivity.
 
     private final String TAG = getClass().getSimpleName();
     private void log(String s){
-//        Log.d(TAG, s);
-        Logger.log(TAG, s);
+        Log.d(TAG, s);
+//        Logger.log(TAG, s);
     }
 
 

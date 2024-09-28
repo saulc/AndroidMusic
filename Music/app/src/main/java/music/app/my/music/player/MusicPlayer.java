@@ -43,8 +43,8 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 	private int fadeInDuration = 1000, fadeOutDuration = 2000, fadeOutGap = 4000, fadeInGap = 1000;
 
 	private void log(String s){
-//		Log.i(getClass().getSimpleName(), s);
-		Logger.log(getClass().getSimpleName(), s);
+//        Logger.log(TAG, s);
+		Log.i(getClass().getSimpleName(), s);
 	}
 	
 	public MusicPlayer(MusicPlayerStateListener l){

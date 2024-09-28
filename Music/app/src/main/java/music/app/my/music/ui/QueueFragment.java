@@ -217,7 +217,7 @@ public class QueueFragment extends baseListFragment {
 
     private  void updateHeader(){
         int s = items.size();
-        String m = "Now playing queue: " + s + " song" + ( (s >1) ? "s": "");
+        String m = "Now playing: " + s + " song" + ( (s >1) ? "s": "");
 
         //song count only, 1 = seconds. 2 = full count, 3 remaining playtime
         if (headerMode > 1) {
@@ -234,7 +234,7 @@ public class QueueFragment extends baseListFragment {
             //long version
             long td = 0;     //total duration in seconds
             for (Song i : items) td += i.getDuration();
-            m += " Total Playtime: " + secToString(td);
+            m += " Playtime: " + secToString(td);
             m += " / " + td + " Seconds" ;
         }
         qHeader.setText( m );
@@ -274,8 +274,8 @@ public class QueueFragment extends baseListFragment {
     }
 
     private void log(String s){
-//        Log.d(getClass().getSimpleName(), s);
-        Logger.log(getClass().getSimpleName(), s);
+        Log.d(getClass().getSimpleName(), s);
+//        Logger.log(getClass().getSimpleName(), s);
     }
 
 

@@ -85,8 +85,8 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 	private MediaSessionCompat mediaSession;
 
 	private void log(String s){
-//		Log.d(getClass().getSimpleName(), s);
-		Logger.log(getClass().getSimpleName(), s);
+		Log.d(getClass().getSimpleName(), s);
+//		Logger.log(getClass().getSimpleName(), s);
 	}
 
    @Override
@@ -156,7 +156,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
          loadQueue();
 
 
-	   noti = new NotificationHelper(this);
+	   noti = new NotificationHelper(this, mediaSession);
 
        //  eq = new Equalizer(100, player.getAudioSessionId());
        //  setupEq();

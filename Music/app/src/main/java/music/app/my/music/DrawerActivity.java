@@ -105,8 +105,8 @@ public class DrawerActivity extends AppCompatActivity
         FaderSettingListener,
         SecretFragment.SecretListener,
         FabDoubleTapGS.DoubleTapListener,
-        Toolbar.OnMenuItemClickListener , Logger.LogCallback , LoggerFragment.LogFragListener {
-
+        Toolbar.OnMenuItemClickListener  {
+//    Logger.LogCallback , LoggerFragment.LogFragListener
 
     private VisualizerDialogFragment vf = null;
 
@@ -138,8 +138,8 @@ public class DrawerActivity extends AppCompatActivity
     private final String TAG = getClass().getSimpleName();
 
     private void log(String s) {
-        Logger.log(TAG, s);
-//        Log.i(TAG, s);
+//        Logger.log(TAG, s);
+        Log.i(TAG, s);
     }
 
     private MusicService mService;
@@ -340,18 +340,18 @@ public class DrawerActivity extends AppCompatActivity
 
     public void showLogs(){
         log("Showing Log Fragment");
-        expandLog();
-        logFrag = LoggerFragment.Companion.newInstance();
-        logFrag.setListener(this);
-        getSupportFragmentManager().beginTransaction().replace(R.id.logframe, logFrag).commit();
-        Logger.setListener(this);
+//        expandLog();
+//        logFrag = LoggerFragment.Companion.newInstance();
+//        logFrag.setListener(this);
+//        getSupportFragmentManager().beginTransaction().replace(R.id.logframe, logFrag).commit();
+//        Logger.setListener(this);
     }
 
-    @Override
-    public void updateLogs(ArrayList<String> log) {
-        if(logFrag != null)
-        logFrag.updateLog(log);
-    }
+//    @Override
+//    public void updateLogs(ArrayList<String> log) {
+//        if(logFrag != null)
+//        logFrag.updateLog(log);
+//    }
 
 
     public interface mFabListener{
@@ -517,21 +517,26 @@ public class DrawerActivity extends AppCompatActivity
     /* -----------------------------------  start    ----------------------------------- */
     public void handleSearchIntents() {
         Intent intent = this.getIntent();
-        if (intent.getAction().compareTo(MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH) == 0) {
 
-            String mediaFocus = intent.getStringExtra(MediaStore.EXTRA_MEDIA_FOCUS);
-            String query = intent.getStringExtra(SearchManager.QUERY);
-            if (query.isEmpty()) {
-                log("no query found");
-            } else {
-                log("query: " + query);
+        try {
+            if (intent.getAction().compareTo(MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH) == 0) {
+
+                String mediaFocus = intent.getStringExtra(MediaStore.EXTRA_MEDIA_FOCUS);
+                String query = intent.getStringExtra(SearchManager.QUERY);
+                if (query.isEmpty()) {
+                    log("no query found");
+                } else {
+                    log("query: " + query);
+                }
+                // Some of these extras might not be available depending on the search mode.
+                String album = intent.getStringExtra(MediaStore.EXTRA_MEDIA_ALBUM);
+                String artist = intent.getStringExtra(MediaStore.EXTRA_MEDIA_ARTIST);
+                String genre = intent.getStringExtra("android.intent.extra.genre");
+                String playlist = intent.getStringExtra("android.intent.extra.playlist");
+                String title = intent.getStringExtra(MediaStore.EXTRA_MEDIA_TITLE);
             }
-            // Some of these extras might not be available depending on the search mode.
-            String album = intent.getStringExtra(MediaStore.EXTRA_MEDIA_ALBUM);
-            String artist = intent.getStringExtra(MediaStore.EXTRA_MEDIA_ARTIST);
-            String genre = intent.getStringExtra("android.intent.extra.genre");
-            String playlist = intent.getStringExtra("android.intent.extra.playlist");
-            String title = intent.getStringExtra(MediaStore.EXTRA_MEDIA_TITLE);
+        } catch (Exception e) {
+            log(e.toString());
         }
     }
 
@@ -609,7 +614,7 @@ public class DrawerActivity extends AppCompatActivity
 
 //        mfab.setButtonStartPos();
         log("Resume activity.");
-        showLogs();
+//        showLogs();
         if(playlistExport) {
             if(pname != null)
             log("Playlist save flag. " + pname);
@@ -698,12 +703,14 @@ public class DrawerActivity extends AppCompatActivity
         } else if (id == R.id.repeat) {
             onRepeatClicked();
             return true;
-        } else if (id == R.id.mixxer) {
-            log("Show Fade Settings...");
-
-            showMixx();
-            return true;
-        }else if (id == R.id.mix) {
+        }
+//        else if (id == R.id.mixxer) {
+//            log("Show Fade Settings...");
+//
+//            showMixx();
+//            return true;
+//        }
+        else if (id == R.id.mix) {
             log("Mix clicked");
             Song s = PlaylistHelper.getRandomSong(getApplicationContext());
             String b = "Mix: " + s.getTitle() + " by " + s.getArtist() + " added to Queue.";
@@ -1115,18 +1122,18 @@ public class DrawerActivity extends AppCompatActivity
             //main frame
         }
     }
-    @Override
-    public void onLogClick(){
-        log("Log Clicked " + showlog);
-
-                if(showlog++ > 2){
-                    showlog = 0;
-//                    getSupportFragmentManager().beginTransaction().remove(logFrag).commit();
-                }//else
-                    showLogs();
-//                expandLog();
-
-    }
+//    @Override
+//    public void onLogClick(){
+//        log("Log Clicked " + showlog);
+//
+////                if(showlog++ > 2){
+////                    showlog = 0;
+//////                    getSupportFragmentManager().beginTransaction().remove(logFrag).commit();
+////                }//else
+////                    showLogs();
+////                expandLog();
+//
+//    }
     public void expandLog(){
         log("Expanding q frame");
         int orientation = getResources().getConfiguration().orientation;
@@ -1432,7 +1439,7 @@ public class DrawerActivity extends AppCompatActivity
                 Log.d(TAG, "Now updating..");
                 h.removeCallbacks(this);
             }
-        }, 300);
+        }, 400);
 
 
     }

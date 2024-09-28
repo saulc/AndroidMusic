@@ -37,8 +37,8 @@ public class ArtistFragment extends baseListFragment implements DrawerActivity.m
 
     private final String TAG = getClass().getSimpleName();
     private void log(String s){
-//        Log.d(TAG, s);
-        Logger.log(getClass().getSimpleName(), s);
+        Log.d(TAG, s);
+//        Logger.log(getClass().getSimpleName(), s);
     }
 
     //private MediaStoreHelper msHelper;
