@@ -835,6 +835,7 @@ public class DrawerActivity extends AppCompatActivity
         Intent intent = getIntent();
         String action = intent.getAction();
         log("Theme Got intent! action: " + action);
+//        if(action == null) return;
         if (actionSetTheme.equals(action)) {
             int r = intent.getIntExtra("THEME", -22);
             if (r == -22) {  //if there was no extra,
@@ -849,7 +850,7 @@ public class DrawerActivity extends AppCompatActivity
             editor.putInt(getString(R.string.saved_theme), currentTheme);
             editor.commit();
 
-        } else if (Intent.ACTION_MAIN.equals(action)) {
+        } else{ // if (Intent.ACTION_MAIN.equals(action)) {
             //regular start.
             log("Setting default Theme.");
             SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);

@@ -7,6 +7,7 @@ import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -14,21 +15,29 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.MediaMetadataRetriever;
 import android.media.RemoteControlClient;
 import android.net.Uri;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.service.dreams.DreamService;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
+import android.util.Size;
+
+import java.io.IOException;
+
 import music.app.my.music.DrawerActivity;
 import music.app.my.music.Dream;
 import music.app.my.music.R;
@@ -377,6 +386,18 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 
 	}
 
+	@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+	private Bitmap getAlbumArtwork(ContentResolver resolver, long albumId) throws IOException {
+		Uri contentUri = ContentUris.withAppendedId(
+				MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
+				albumId
+		);
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+			return resolver.loadThumbnail(contentUri, new Size(640, 480), null);
+		}
+		return null;
+	}
 	   /**
     * Configures service as a foreground service. A foreground service is a service that's doing
     * something the user is actively aware of (such as playing music), and must appear to the
@@ -388,8 +409,19 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 	   NotificationCompat.Builder nb = null;
 
 	   Song s = getQueue().getCurrentSong();
-	   nb = noti.getNotification1(s.getTitle() + " (" + text + ") ", s.getArtist() +
-			   " - " + s.getAlbum());
+	   MediaMetadataCompat.Builder mediaMetaData_builder = new MediaMetadataCompat.Builder();
+	   mediaMetaData_builder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, s.getDuration() );
+	   mediaSession.setMetadata(mediaMetaData_builder.build());
+
+       Bitmap ab = null;
+       try {
+           ab = getAlbumArtwork(getContentResolver(), Long.parseLong(s.getAlbumId()) );
+       } catch (IOException e) {
+           log(e.toString());
+       }
+       nb = noti.getNotification1(s.getTitle() + " (" + text + ") ",
+			   s.getArtist() + " - " + s.getAlbum(),
+			   ab);
 
 
 	   if (nb != null) {
@@ -397,9 +429,9 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 		  mNotification =  noti.notify(NOTIFICATION_ID, nb);
 
 	   }
-	if(mNotification !=null)
-   		startForeground(NOTIFICATION_ID, mNotification);
-   }
+		if(mNotification !=null)
+			startForeground(NOTIFICATION_ID, mNotification);
+	   }
 
 
 //			   mBuilder =  new NotificationCompat.Builder(this);

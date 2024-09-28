@@ -24,6 +24,7 @@ import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Build;
 
@@ -77,7 +78,7 @@ public class NotificationHelper extends ContextWrapper {
      * @param body the body text for the notification
      * @return the builder as it keeps a reference to the notification (since API 24)
     */
-    public NotificationCompat.Builder getNotification1(String title, String body) {
+    public NotificationCompat.Builder getNotification1(String title, String body, Bitmap albumart) {
         Intent resultIntent = new Intent(this, DrawerActivity.class);
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
         stackBuilder.addNextIntentWithParentStack(resultIntent);
@@ -107,13 +108,14 @@ public class NotificationHelper extends ContextWrapper {
 
 //
         return new NotificationCompat.Builder(getApplicationContext(), PRIMARY_CHANNEL)
-                 .setContentTitle(title)
+                .setContentTitle(title)
                 .setColor(Color.GREEN)
+                .setLargeIcon(albumart)
                 .setSmallIcon(getSmallIcon()).setContentIntent(resultPendingIntent).setOngoing(true)
-                 .setContentText(body).addAction(previous).addAction(pp).addAction(next)
+                .setContentText(body).addAction(previous).addAction(pp).addAction(next)
                 .setStyle(new android.support.v4.media.app.NotificationCompat.MediaStyle()
                         .setMediaSession(mediaSession.getSessionToken())
-                        .setShowActionsInCompactView(0));
+                        .setShowActionsInCompactView(0,1,2));
                //  .setAutoCancel(true);
     }
 

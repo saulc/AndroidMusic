@@ -416,9 +416,9 @@ public class NowFragment extends ControlFragment {
                 long p = Long.parseLong(aa);
                 Bitmap b =  getAlbumArtwork( getContext().getContentResolver() , p);
 
-                Drawable d = new BitmapDrawable(getResources(), b);
-                if(isMini) icon.setImageDrawable(d);
-                else setBg(d);
+//                Drawable d = new BitmapDrawable(getResources(), b);
+                if(isMini) icon.setImageBitmap(b);
+                else setBg( new BitmapDrawable(getResources(), b));
 
             } catch (IOException e) {
 //                throw new RuntimeException(e);
