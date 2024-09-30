@@ -14,6 +14,9 @@ public class myPlayer extends MediaPlayer
 	private int fadeInDuration = 1000, fadeOutDuration = 2000, fadeOutGap = 4000, startGap = 0;
 	private int mCurrentStep = 1;
 	private float lastvol = 0f;
+	private float maxVol = 1f;
+	private float stepVol = .5f;
+
 
     private float duckVolume = .1f;
     private boolean isPrepared = false;
@@ -32,6 +35,12 @@ public class myPlayer extends MediaPlayer
     	fadeOutGap = outg;
     	startGap = startg;
     }
+	public void setVolStep(boolean active){
+		if(active) maxVol = stepVol;
+		else maxVol = 1f;
+		setVol((maxVol));
+	}
+
 
     public void setId(int i){
     	id = i;

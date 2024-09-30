@@ -880,7 +880,9 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 		player.setFadeOutGap(i);
 	}
 
-
+	public void setVolStep(boolean active){
+		player.setVolStep(active);
+	}
 }
 
 

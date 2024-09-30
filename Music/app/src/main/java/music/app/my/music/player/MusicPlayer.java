@@ -46,7 +46,11 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 //        Logger.log(TAG, s);
 		Log.i(getClass().getSimpleName(), s);
 	}
-	
+
+	public void setVolStep(boolean active){
+		for(int i=0; i <player.size(); i++)
+			player.get(i).setVolStep(active);
+	}
 	public MusicPlayer(MusicPlayerStateListener l){
 		iniPlayer();
 		sListener = l;

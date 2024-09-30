@@ -1,5 +1,7 @@
 package music.app.my.music;
 
+import static java.lang.Math.round;
+
 import android.animation.LayoutTransition;
 import android.app.SearchManager;
 import android.content.ComponentName;
@@ -2120,27 +2122,42 @@ public class DrawerActivity extends AppCompatActivity
     @Override
     public int getMaxVol() {
         int max = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-        return max;
+        return max*2;
     }
 
+    private void volUp(){
+        int v = getVol();
+        if(v < getMaxVol()) onVolChanged(v+1);
+    }
+
+    private void volDown(){
+        int v = getVol();
+        if(v > 0) onVolChanged(v-1);
+    }
+    private int hvol = -1;
     @Override
     public int getVol() {
-        return am.getStreamVolume(AudioManager.STREAM_MUSIC);
+        if(hvol < 0) hvol = am.getStreamVolume(AudioManager.STREAM_MUSIC);
+
+        return hvol;
 
     }
 
     @Override
     public void onVolChanged(int i) {
-        log("Vol changed: "+ i);
-        int max = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+        int max = getMaxVol();
+        log("Vol changed: "+ i +" max: " + max);
         if(i > max) i = max;
-        else if(i < 0) i = 0;
-
+        else if(i < 1) i = 0;
+        hvol = i;
+//        if(i %2 == 0)
         am.setStreamVolume(
                 AudioManager.STREAM_MUSIC, // Stream type
-                i, // Index
+                round(i/2), // Index
                 0 //AudioManager.FLAG_SHOW_UI // Flags
         );
+        log("is half set active: " + (i%2==0) + " " + round(i/2) );
+        mService.setVolStep(i%2==0);
     }
 
     @Override
@@ -2153,12 +2170,14 @@ public class DrawerActivity extends AppCompatActivity
             //Do something
             log("Volume down button clicked.");
 //            prevPressed();
-            am.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, 0);
+//            am.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, 0);
+              volDown();
         }else if ((keyCode == KeyEvent.KEYCODE_VOLUME_UP)){
             //Do something
             log("Volume up button clicked.");
 //            nextPressed();
-            am.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, 0);
+//            am.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, 0);
+             volUp();
         }else if ((keyCode == KeyEvent.KEYCODE_MEDIA_PREVIOUS)){
             //Do something
             log("Previous Media button clicked.");
