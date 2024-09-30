@@ -2138,7 +2138,11 @@ public class DrawerActivity extends AppCompatActivity
     @Override
     public int getVol() {
         if(hvol < 0) hvol = am.getStreamVolume(AudioManager.STREAM_MUSIC);
-
+        else {
+            int sv = am.getStreamVolume(AudioManager.STREAM_MUSIC);
+            log(sv +"  " + hvol/2);
+            if (sv != hvol/2) hvol = sv*2;
+        }
         return hvol;
 
     }
@@ -2163,7 +2167,7 @@ public class DrawerActivity extends AppCompatActivity
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         //just let the system do it if nowfrag is not visble
-        if(!nowShowing || nf == null) return super.onKeyDown(keyCode, event);
+//        if(!nowShowing || nf == null) return super.onKeyDown(keyCode, event);
 
 
         if ((keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)){
