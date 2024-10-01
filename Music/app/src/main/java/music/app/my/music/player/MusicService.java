@@ -409,21 +409,25 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 	   NotificationCompat.Builder nb = null;
 
 	   Song s = getQueue().getCurrentSong();
-	   MediaMetadataCompat.Builder mediaMetaData_builder = new MediaMetadataCompat.Builder();
-	   mediaMetaData_builder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, s.getDuration() );
-	   mediaSession.setMetadata(mediaMetaData_builder.build());
 
        Bitmap ab = null;
        try {
            ab = getAlbumArtwork(getContentResolver(), Long.parseLong(s.getAlbumId()) );
-       } catch (IOException e) {
-           log(e.toString());
-       }
+
        nb = noti.getNotification1(s.getTitle() + " (" + text + ") ",
 			   s.getArtist() + " - " + s.getAlbum(),
 			   ab);
+	   } catch (IOException e) {
+		   log(e.toString());
+	   }
 
-
+	   MediaMetadataCompat.Builder mediaMetaData_builder = new MediaMetadataCompat.Builder();
+	   mediaMetaData_builder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, s.getDuration() )
+			   .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, s.getArtist())
+			   .putString(MediaMetadataCompat.METADATA_KEY_TITLE, s.getTitle())
+			   .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, ab)
+	   ;
+	   mediaSession.setMetadata(mediaMetaData_builder.build());
 	   if (nb != null) {
 
 		  mNotification =  noti.notify(NOTIFICATION_ID, nb);

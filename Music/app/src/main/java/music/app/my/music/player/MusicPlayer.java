@@ -40,7 +40,7 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 	
 	private boolean CrossFadeEnabled = true;
 	private boolean playWhenPrepared = true;
-	private int fadeInDuration = 1000, fadeOutDuration = 2000, fadeOutGap = 4000, fadeInGap = 1000;
+	private int fadeInDuration = 7000, fadeOutDuration = 12000, fadeOutGap = 4000, fadeInGap = 1000;
 
 	private void log(String s){
 //        Logger.log(TAG, s);
@@ -243,8 +243,8 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 		//setup the new player, aux should be 2 songs previous. already faded out and done with.
 		//aux represents the player after next.
 		//we reset now. the next player will be reset when it becomes aux ie. after it has faded out.
-		player.get(auxPlayer).stop();
-		player.get(auxPlayer).reset();
+//		player.get(auxPlayer).stop();
+//		player.get(auxPlayer).reset();
 
 
 
@@ -315,7 +315,7 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 
 	public void playRequest() {
 
-
+//		updateFader();
 		log("Play requested");
 		if(queue.getSize() == 0) //play all songs
 		{
@@ -457,13 +457,15 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 	private void prepareSong() {
 		if(queue.getSize() > 0){
 			try {
-				
-		
+
+//			 player.get(currentPlayer).stop();
+			 player.get(currentPlayer).reset();
 			 player.get(currentPlayer).setDataSource(queue.nowPlayingPath());
 			 player.get(currentPlayer).setOnPreparedListener(this);
 			 player.get(currentPlayer).setOnCompletionListener(this);
 			 player.get(currentPlayer).prepareAsync();
 			 setState(MUSICPLAYER_STATE.PREPARING);
+
 			// player.get(currentPlayer).attachAuxEffect(eq.getId());
 			 
 			} catch (IllegalArgumentException e) {
