@@ -2122,7 +2122,7 @@ public class DrawerActivity extends AppCompatActivity
     @Override
     public int getMaxVol() {
         int max = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-        return max*2;
+        return max*2+1;
     }
 
     private void volUp(){
@@ -2155,13 +2155,14 @@ public class DrawerActivity extends AppCompatActivity
         else if(i < 1) i = 0;
         hvol = i;
 //        if(i %2 == 0)
+        log("is half set active: " + (i%2==0) + " " + round(i/2) );
+        mService.setVolStep(i%2==0);
         am.setStreamVolume(
                 AudioManager.STREAM_MUSIC, // Stream type
                 round(i/2), // Index
                 0 //AudioManager.FLAG_SHOW_UI // Flags
         );
-        log("is half set active: " + (i%2==0) + " " + round(i/2) );
-        mService.setVolStep(i%2==0);
+
     }
 
     @Override

@@ -176,11 +176,11 @@ public class myPlayer extends MediaPlayer
 	    	@Override
 	    public void run()
 	    {
-	    		
+	    		if(mCurrentStep == 1) isFading = true;
 	    		//setVol((float) ( Math.log( (fadeOutDuration/20) - mCurrentStep + 1) / (Math.log( (fadeOutDuration/20) ) ) ) );
 //	    		setVol( (float) ( ( ( (fadeOutDuration/50) - mCurrentStep) * ( (fadeOutDuration/50) - mCurrentStep) ) 
 //	    				/( (fadeOutDuration/50) * (fadeOutDuration/50) ) ) );
-	    		setVol( (float) ( Math.pow((fadeOutDuration / 50.) - mCurrentStep, 2) / Math.pow(fadeOutDuration / 50., 2) ) );
+	    		setVol( (float) (maxVol*( Math.pow((fadeOutDuration / 50.) - mCurrentStep, 2) / Math.pow(fadeOutDuration / 50., 2) )) );
 	    		//Log.d("Myplayer", mCurrentStep + " fading out: " + volumeValue);
 
 //	    		mCurrentStep++;
@@ -190,6 +190,7 @@ public class myPlayer extends MediaPlayer
 	        	setVol(0f);
 	        	mHandler.removeCallbacks(fadeOutVolume);
 	        	mCurrentStep = 1;
+				isFading = false;
 	        } else 	mHandler.postDelayed(fadeOutVolume, 50);
 	    }
 	    };

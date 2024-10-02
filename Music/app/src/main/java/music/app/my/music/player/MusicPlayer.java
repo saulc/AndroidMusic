@@ -334,7 +334,7 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 	    	player.get(currentPlayer).playAndFadeIn();
 	    	setState(MUSICPLAYER_STATE.PLAYING);
 
-	    	mHandler.postDelayed(volCheck, getFadeInDuration()*2);
+//	    	mHandler.postDelayed(volCheck, getFadeInDuration()*2);
 	    	//fix annoying problem where current player is faded out
 
 			//try to catch it early, hopefully before its audible.
