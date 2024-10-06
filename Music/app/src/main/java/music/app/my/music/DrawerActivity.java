@@ -185,7 +185,7 @@ public class DrawerActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         // Enable the Up button
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         //ini media events
         am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 //        myEventReceiver = new MediaControlReceiver();
@@ -2119,6 +2119,7 @@ public class DrawerActivity extends AppCompatActivity
 
     }
 
+//   override system volume and double the steps.
     @Override
     public int getMaxVol() {
         int max = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
@@ -2132,8 +2133,9 @@ public class DrawerActivity extends AppCompatActivity
 
     private void volDown(){
         int v = getVol();
-        if(v > 0) onVolChanged(v-1);
+        if(v > 1) onVolChanged(v-1);
     }
+
     private int hvol = -1;
     @Override
     public int getVol() {

@@ -414,12 +414,13 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
        try {
            ab = getAlbumArtwork(getContentResolver(), Long.parseLong(s.getAlbumId()) );
 
-       nb = noti.getNotification1(s.getTitle() + " (" + text + ") ",
-			   s.getArtist() + " - " + s.getAlbum(),
-			   ab);
 	   } catch (IOException e) {
 		   log(e.toString());
 	   }
+	   if(ab == null) ab = BitmapFactory.decodeResource(getResources(), R.drawable.android_icon32);
+	   nb = noti.getNotification1(s.getTitle() + " (" + text + ") ",
+			   s.getArtist() + " - " + s.getAlbum(),
+			   ab);
 
 	   MediaMetadataCompat.Builder mediaMetaData_builder = new MediaMetadataCompat.Builder();
 	   mediaMetaData_builder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, s.getDuration() )

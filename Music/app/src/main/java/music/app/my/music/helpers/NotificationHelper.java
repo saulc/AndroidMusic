@@ -106,7 +106,7 @@ public class NotificationHelper extends ContextWrapper {
 	   nexi.setAction(MusicService.ACTION_NEXT);
 	   PendingIntent nextpi = PendingIntent.getService(this, 23, nexi, PendingIntent.FLAG_UPDATE_CURRENT );
 	   NotificationCompat.Action next = new NotificationCompat.Action(android.R.drawable.ic_media_next, "Next", nextpi);
-        if(albumart == null) albumart = BitmapFactory.decodeResource(getResources(), R.drawable.android_icon32);
+
 //
         return new NotificationCompat.Builder(getApplicationContext(), PRIMARY_CHANNEL)
                 .setContentTitle(title)

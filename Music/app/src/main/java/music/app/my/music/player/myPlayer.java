@@ -39,8 +39,7 @@ public class myPlayer extends MediaPlayer
 	public void setVolStep(boolean active){
 		if(active) maxVol = stepVol;
 		else maxVol = 1f;
-		if(!isFading)
-		setVol((maxVol));
+		if(!isFading) setVol((maxVol));
 	}
 
 
