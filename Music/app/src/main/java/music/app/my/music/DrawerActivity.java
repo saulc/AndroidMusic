@@ -36,7 +36,11 @@ import android.widget.TextSwitcher;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
+import android.window.OnBackInvokedCallback;
+import android.window.OnBackInvokedDispatcher;
 
+import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
@@ -106,7 +110,7 @@ public class DrawerActivity extends AppCompatActivity
         FaderSettingListener,
         SecretFragment.SecretListener,
         FabDoubleTapGS.DoubleTapListener,
-        Toolbar.OnMenuItemClickListener  {
+        Toolbar.OnMenuItemClickListener {
 //    Logger.LogCallback , LoggerFragment.LogFragListener
 
     private VisualizerDialogFragment vf = null;
@@ -184,7 +188,25 @@ public class DrawerActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         // Enable the Up button
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+            @Override
+            public void handleOnBackPressed() {
+                // Handle the back button event
+                log("back press called?");
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                if (drawer.isDrawerOpen(GravityCompat.START)) {
+                    drawer.closeDrawer(GravityCompat.START);
+                } else {
+//                    super.onBackPressed();
+
+                }
+            }
+        };
+        getOnBackPressedDispatcher().addCallback(this, callback);
+
+//        registerOnBackInvokedCallback(priority, OnBackInvokedCallback);
+
         //ini media events
         am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 //        myEventReceiver = new MediaControlReceiver();
@@ -347,6 +369,21 @@ public class DrawerActivity extends AppCompatActivity
 //        getSupportFragmentManager().beginTransaction().replace(R.id.logframe, logFrag).commit();
 //        Logger.setListener(this);
     }
+//
+//    @Override
+//    public void onBackInvoked() {
+//        log("Back invoded!");
+//    }
+
+//    @Override
+//    public void registerOnBackInvokedCallback(int priority, @NonNull OnBackInvokedCallback callback) {
+//
+//    }
+//
+//    @Override
+//    public void unregisterOnBackInvokedCallback(@NonNull OnBackInvokedCallback callback) {
+//
+//    }
 
 //    @Override
 //    public void updateLogs(ArrayList<String> log) {
