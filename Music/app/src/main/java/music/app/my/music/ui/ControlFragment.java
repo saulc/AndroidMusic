@@ -10,9 +10,6 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +18,8 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+
+import androidx.fragment.app.Fragment;
 
 import java.util.ArrayList;
 
@@ -130,7 +129,7 @@ public class ControlFragment extends Fragment {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                     if(fromUser)
-                    mListener.seekBarChanged(progress);
+                        mListener.seekBarChanged(progress);
                 }
 
                 @Override

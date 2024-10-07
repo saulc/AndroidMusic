@@ -2,9 +2,7 @@ package music.app.my.music.ui.browser;
 
 import android.content.ContentResolver;
 import android.content.ContentUris;
-import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -13,10 +11,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
-import android.support.annotation.RequiresApi;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.Size;
 import android.view.LayoutInflater;
@@ -27,23 +21,23 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.annotation.RequiresApi;
+import androidx.recyclerview.widget.LinearLayoutManager;
+
 import com.simplecityapps.recyclerview_fastscroll.interfaces.OnFastScrollStateChangeListener;
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 
 import music.app.my.music.DrawerActivity;
 import music.app.my.music.R;
 import music.app.my.music.adapters.SongAdapter;
-import music.app.my.music.helpers.Logger;
 import music.app.my.music.helpers.MediaHelperListener;
 import music.app.my.music.types.Playlist;
 
 import music.app.my.music.types.Song;
-import music.app.my.music.ui.ControlFragment;
 
 /**
  * Created by saul on 7/26/16.
@@ -55,7 +49,7 @@ public class   SongFragment extends baseListFragment implements MediaHelperListe
         log("move called:" + x + " " + y);
 //            int sy = (int) (y/10);
         log("scroll by:" + y);
-            recyclerView.scrollBy(0, (int) y);
+//            recyclerView.scrollBy(0, (int) y);
     }
 
     public enum SF_TYPE {QUEUE, PLAYLISTITEMS, SONGS, ALBUMS, ARTISTS, GENRE, QUERY, BUBBLE };

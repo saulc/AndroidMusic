@@ -24,7 +24,7 @@
         android:layout_height="match_parent"
         android:orientation="horizontal">
 
-        <android.support.design.widget.NavigationView
+        <com.google.android.material.navigation.NavigationView
             android:id="@+id/menu_view"
             android:layout_width="@dimen/smenu_width"
             android:layout_height="match_parent"

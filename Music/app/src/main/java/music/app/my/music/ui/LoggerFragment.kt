@@ -1,14 +1,13 @@
 package music.app.my.music.ui
 
-import android.arch.lifecycle.ViewModelProvider
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import kotlinx.android.synthetic.main.fragment_logger.logText
-import music.app.my.music.DrawerActivity
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+
 import music.app.my.music.R
 import music.app.my.music.helpers.Logger
 
@@ -47,6 +46,7 @@ class LoggerFragment : Fragment() {
 //        for(t in log) s += t + "\n"
         logText.text = s
     }
+    @Deprecated("Deprecated in Java")
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProvider(

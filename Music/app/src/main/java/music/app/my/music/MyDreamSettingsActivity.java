@@ -15,9 +15,10 @@ import android.app.ActionBar;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.MenuItem;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 
 /**

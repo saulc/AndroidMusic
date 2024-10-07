@@ -1,6 +1,7 @@
 package music.app.my.music.ui
 
-import android.arch.lifecycle.ViewModel
+import androidx.lifecycle.ViewModel
+
 
 class LoggerViewModel : ViewModel() {
 

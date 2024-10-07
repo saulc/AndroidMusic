@@ -20,26 +20,12 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.provider.MediaStore;
 import android.provider.Settings;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatDelegate;
-import android.util.AttributeSet;
 import android.util.Log;
-import android.view.DragEvent;
 import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.MenuInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
@@ -51,6 +37,20 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -58,7 +58,6 @@ import java.util.Scanner;
 
 import music.app.my.music.helpers.FabDoubleTapGS;
 import music.app.my.music.helpers.FaderSettingListener;
-import music.app.my.music.helpers.Logger;
 import music.app.my.music.helpers.PlaylistFilemaker;
 import music.app.my.music.helpers.PlaylistHelper;
 import music.app.my.music.helpers.QueueListener;
@@ -185,7 +184,7 @@ public class DrawerActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         // Enable the Up button
-        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         //ini media events
         am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 //        myEventReceiver = new MediaControlReceiver();
@@ -619,7 +618,7 @@ public class DrawerActivity extends AppCompatActivity
 //        showLogs();
         if(playlistExport) {
             if(pname != null)
-            log("Playlist save flag. " + pname);
+                log("Playlist save flag. " + pname);
             exportPlaylist();
             //do the work.
 //            playlistExport = false;
@@ -1320,6 +1319,11 @@ public class DrawerActivity extends AppCompatActivity
 
     }
 
+    public boolean onSupportNavigateUp(){
+        log("up called.?");
+        onBackPressed();
+        return true;
+    }
 
 
     @Override
@@ -2051,7 +2055,7 @@ public class DrawerActivity extends AppCompatActivity
     @Override
     public void playPauseLongClicked() {
         if(mService != null)
-        mService.getPlayer().fadeIn();
+            mService.getPlayer().fadeIn();
     }
 
     //updates seekbar and fader cue at 1hz

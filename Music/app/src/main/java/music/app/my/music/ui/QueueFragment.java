@@ -3,7 +3,6 @@ package music.app.my.music.ui;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -12,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
+import androidx.annotation.NonNull;
 
 import com.nhaarman.listviewanimations.appearance.simple.AlphaInAnimationAdapter;
 import com.nhaarman.listviewanimations.appearance.simple.SwingBottomInAnimationAdapter;

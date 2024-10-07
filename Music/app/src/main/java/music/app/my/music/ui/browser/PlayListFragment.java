@@ -2,15 +2,14 @@ package music.app.my.music.ui.browser;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
@@ -19,8 +18,6 @@ import java.util.ArrayList;
 import music.app.my.music.DrawerActivity;
 import music.app.my.music.R;
 import music.app.my.music.adapters.PlaylistAdapter;
-import music.app.my.music.helpers.Logger;
-import music.app.my.music.helpers.PlaylistFilemaker;
 import music.app.my.music.types.Playlist;
 
 import music.app.my.music.types.Song;
@@ -139,7 +136,8 @@ public class PlayListFragment extends baseListFragment implements DrawerActivity
     public void updateAdapter(){
         mAdapter = new PlaylistAdapter(items
                 , ( baseListFragment.OnListFragmentInteractionListener) getActivity() );
-    if(recyclerView == null) return;
+        if(recyclerView == null) return;
+
         recyclerView.setAdapter(mAdapter);
         log("Updating adapter");
         mAdapter.notifyDataSetChanged();

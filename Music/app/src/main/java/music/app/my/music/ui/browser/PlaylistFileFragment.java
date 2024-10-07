@@ -2,12 +2,14 @@ package music.app.my.music.ui.browser;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
@@ -32,7 +34,7 @@ public class PlaylistFileFragment extends baseListFragment implements DrawerActi
         log("move called:" + x + " " + y);
 //            int sy = (int) (y/10);
         log("scroll by:" + y);
-        recyclerView.scrollBy(0, (int) y);
+//        recyclerView.scrollBy(0, (int) y);
     }
     private final String TAG = getClass().getSimpleName();
     private void log(String s){

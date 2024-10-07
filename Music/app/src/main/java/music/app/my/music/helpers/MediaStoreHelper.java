@@ -8,11 +8,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
-import android.support.v4.widget.CursorAdapter;
+
 import android.util.Log;
 
 
@@ -26,16 +22,23 @@ import music.app.my.music.types.Song;
 
 import static java.lang.Long.parseLong;
 
+import androidx.annotation.NonNull;
+import androidx.cursoradapter.widget.CursorAdapter;
+import androidx.fragment.app.Fragment;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.CursorLoader;
+import androidx.loader.content.Loader;
+
 /*
 	Media store helper handles query and loader response to android mediastore db.
  */
 
 public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
-	private static final int mLOADER = -12;
+	private static final int mLOADER = 12;
 
 
 
-	public  enum Media { songs, artists, playlists};
+//	public  enum Media { songs, artists, playlists};
 
 	private MediaHelperListener mListener;
 	private enum LOADER_TYPE {QUEUE,  PLAYLIST, PLAYLISTITEMS, SONGS, ALBUMS,ALBUMITEMS, ARTISTS,ARTISTITEMS, GENRE, GENREITEMS, QUERY };
@@ -56,6 +59,7 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
 	public MediaStoreHelper(Context c){
 		super();
 		mContext = c;
+
 	}
 
 
@@ -77,66 +81,81 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
 	public void search(String q){
 		myType = LOADER_TYPE.QUERY;
 		pname = q;
-
-		getLoaderManager().initLoader(mLOADER, null, this);
+		LoaderManager.getInstance(this).initLoader(mLOADER, null, this);
+//		getLoaderManager().initLoader(mLOADER, null, this);
 	}
+
 
 	public void loadSongs(){
 		myType = LOADER_TYPE.SONGS;
-		getLoaderManager().initLoader(mLOADER, null, this);
+
+		LoaderManager.getInstance(this).initLoader(mLOADER, null, this);
+//		getLoaderManager().initLoader(mLOADER, null, this);
 
 	}
 	public void loadQueue(){
 
         log("Loading Queue...");
 		myType = LOADER_TYPE.QUEUE;
-		getLoaderManager().initLoader(mLOADER, null, this);
+		LoaderManager.getInstance(this).initLoader(mLOADER, null, this);
+//		getLoaderManager().initLoader(mLOADER, null, this);
 
 	}
 	public void loadPlaylists(){
 
 		myType = LOADER_TYPE.PLAYLIST;
-		getLoaderManager().initLoader(mLOADER, null, this);
+		var lm = LoaderManager.getInstance(this);
+		log("lm ready...");
+		lm.initLoader(mLOADER, null, this);
+		log("playlist loader init.");
+//		getSupportLoaderManager().initLoader(mLOADER, null, this);
 		
 	}
 	public void loadGenres() {
 		myType = LOADER_TYPE.GENRE;
-		getLoaderManager().initLoader(mLOADER, null, this);
+		LoaderManager.getInstance(this).initLoader(mLOADER, null, this);
+//		getLoaderManager().initLoader(mLOADER, null, this);
 
 	}
 	public void loadGenreItems(String id) {
 		myType = LOADER_TYPE.GENREITEMS;
 		pid = id;
-		getLoaderManager().initLoader(mLOADER, null, this);
+		LoaderManager.getInstance(this).initLoader(mLOADER, null, this);
+//		getLoaderManager().initLoader(mLOADER, null, this);
 
 	}
 
     public void loadArtists() {
         myType = LOADER_TYPE.ARTISTS;
-        getLoaderManager().initLoader(mLOADER, null, this);
+		LoaderManager.getInstance(this).initLoader(mLOADER, null, this);
+//		getLoaderManager().initLoader(mLOADER, null, this);
 
     }
 	public void loadAlbums() {
 		myType = LOADER_TYPE.ALBUMS;
-		getLoaderManager().initLoader(mLOADER, null, this);
+		LoaderManager.getInstance(this).initLoader(mLOADER, null, this);
+//		getLoaderManager().initLoader(mLOADER, null, this);
 
 	}
 	public void loadAlbums(String artist) {
 		myType = LOADER_TYPE.ALBUMS;
 		pname = artist;
-		getLoaderManager().initLoader(mLOADER, null, this);
+		LoaderManager.getInstance(this).initLoader(mLOADER, null, this);
+//		getLoaderManager().initLoader(mLOADER, null, this);
 
 	}
 	public void loadGenreItems(String id, String pname) {
 		myType = LOADER_TYPE.GENREITEMS;
 		pid = id;
-		getLoaderManager().initLoader(mLOADER, null, this);
+		LoaderManager.getInstance(this).initLoader(mLOADER, null, this);
+//		getLoaderManager().initLoader(mLOADER, null, this);
 
 	}
 	public void loadAlbumItems(String id, String pname) {
 		myType = LOADER_TYPE.ALBUMITEMS;
 		pid = id;
-		getLoaderManager().initLoader(mLOADER, null, this);
+		LoaderManager.getInstance(this).initLoader(mLOADER, null, this);
+//		getLoaderManager().initLoader(mLOADER, null, this);
 
 	}
 
@@ -144,7 +163,8 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
 	public void loadArtistItems(String id, String pname) {
 		myType = LOADER_TYPE.ARTISTITEMS;
 		pid = id;
-		getLoaderManager().initLoader(mLOADER, null, this);
+		LoaderManager.getInstance(this).initLoader(mLOADER, null, this);
+//		getLoaderManager().initLoader(mLOADER, null, this);
 
 	}
 
@@ -153,13 +173,17 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
         myType = LOADER_TYPE.PLAYLISTITEMS;
 		pid = id;
 		pname = name;
-        getLoaderManager().initLoader(mLOADER, null, this);
+		LoaderManager.getInstance(this).initLoader(mLOADER, null, this);
+//		getLoaderManager().initLoader(mLOADER, null, this);
 
     }
 
 	@Override
 	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
+
+		log("mshelper loader created.");
         if(myType == LOADER_TYPE.PLAYLIST || myType == LOADER_TYPE.QUEUE) {
+			log("mshelper loading playlists/queue...");
             return new CursorLoader(mContext, playlistUri, playlistProjection, null, null, playlistSortOrder);
         }
         else  if(myType == LOADER_TYPE.PLAYLISTITEMS) {
@@ -187,7 +211,7 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
 		}
 		else if(myType == LOADER_TYPE.GENRE)
 		{
-			return new CursorLoader(mContext, genreUri, genreProjection, null, null, genreSortOrder);
+			return new CursorLoader(mContext, genreUri, genreProjection, null, null, null);
 		}
         else if(myType == LOADER_TYPE.ARTISTS)
         {
@@ -237,6 +261,9 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
 
 
 	}
+
+
+
 	public boolean findQueuePlaylist(){
 		Log.d("M6", "Looking for queue playlist");
 		ContentResolver resolver = mContext.getContentResolver();
@@ -267,7 +294,7 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
 
 
 	@Override
-	public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
+	public void onLoadFinished(@NonNull Loader<Cursor> arg0, Cursor cursor) {
 
 		if(myType == LOADER_TYPE.QUEUE){
 			if(qid.compareTo("") == 0)
@@ -288,7 +315,7 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
 		}
 		else if(myType == LOADER_TYPE.PLAYLIST)
 		{
-
+			log("playlists loaded.");
 			ArrayList<Playlist> pl = new ArrayList<Playlist>();
 		  while(cursor.moveToNext()){
 	    	  pl.add( new Playlist( cursor.getString(0), cursor.getString(1) ) );
@@ -448,9 +475,9 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
 	}
 
 	private Uri songUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-	private String defaultSort =  MediaStore.Audio.Media.TITLE + " COLLATE LOCALIZED ASC";
-	private String allAlbumSort =  MediaStore.Audio.Media.ALBUM + " COLLATE LOCALIZED ASC";
-	private String allArtistSort =  MediaStore.Audio.Media.ARTIST + " COLLATE LOCALIZED ASC";
+	private String defaultSort =  MediaStore.Audio.Media.TITLE + " ASC";
+	private String allAlbumSort =  MediaStore.Audio.Media.ALBUM + " ASC";
+	private String allArtistSort =  MediaStore.Audio.Media.ARTIST + " ASC";
 	private String defaultSelection = MediaStore.Audio.Media.IS_MUSIC + " != 0";
 	private String[] defaultProjection = {
             MediaStore.Audio.Media.TITLE,
@@ -472,7 +499,7 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
 	            MediaStore.Audio.Albums._ID
 	    };
 	   private Uri albumUri = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI;
-	   private String albumSort = MediaStore.Audio.Albums.ALBUM + " COLLATE LOCALIZED ASC";
+	   private String albumSort = MediaStore.Audio.Albums.ALBUM + " ASC";
 
 	   //for artist albums
 	private String albumSelection =  MediaStore.Audio.Albums.ARTIST + "=?";
@@ -490,14 +517,14 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
 			    MediaStore.Audio.Media.ARTIST_ID
 
 	   };
-	   private String albumMemeberSort =  MediaStore.Audio.Media.TRACK + " COLLATE LOCALIZED ASC";
+	   private String albumMemeberSort =  MediaStore.Audio.Media.TRACK + " ASC";
 	   private String albumMemberSelection =  MediaStore.Audio.Media.ALBUM_ID + "=?";
 
 
 	   private String artistMemberSelection =  MediaStore.Audio.Media.ARTIST_ID + "=?";
 
 	   private Uri artistUri = MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI;
-	   private String artistSortOrder = MediaStore.Audio.Artists.ARTIST   + " COLLATE LOCALIZED ASC";
+	   private String artistSortOrder = MediaStore.Audio.Artists.ARTIST   + " ASC";
 	   private String[] artistProjection = {
 				MediaStore.Audio.Artists._ID,
 				MediaStore.Audio.Artists.ARTIST,
@@ -519,17 +546,17 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
 
 	};
 
-	private String playlistMemberSort =  MediaStore.Audio.Playlists.Members.PLAY_ORDER + " COLLATE LOCALIZED ASC";
+	private String playlistMemberSort =  MediaStore.Audio.Playlists.Members.PLAY_ORDER + " ASC";
 
 
 	private  String[] playlistProjection = { MediaStore.Audio.Playlists.NAME,
 			MediaStore.Audio.Playlists._ID,
 	};
 	private Uri playlistUri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
-	private String playlistSortOrder = MediaStore.Audio.Playlists.NAME   + " COLLATE LOCALIZED ASC";
+	private String playlistSortOrder = MediaStore.Audio.Playlists.NAME   + " ASC";
 
 	private Uri genreUri = MediaStore.Audio.Genres.EXTERNAL_CONTENT_URI;
-	private String genreSortOrder = MediaStore.Audio.Genres.NAME   + " COLLATE LOCALIZED ASC";
+	private String genreSortOrder = MediaStore.Audio.Genres.NAME   + " ASC";
 	private String[] genreProjection = {
 			MediaStore.Audio.Genres.NAME,
 			MediaStore.Audio.Genres._ID
@@ -537,7 +564,7 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
 	};
 
 
-	private String genreMembersSortOrder = MediaStore.Audio.Genres.Members.ARTIST   + " COLLATE LOCALIZED ASC";
+	private String genreMembersSortOrder = MediaStore.Audio.Genres.Members.ARTIST   + " ASC";
 	private String[] genreMembersProjection = {
 			MediaStore.Audio.Genres.Members.TITLE,
 			MediaStore.Audio.Genres.Members.GENRE_ID,

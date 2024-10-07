@@ -1,14 +1,14 @@
 package music.app.my.music.ui
 
-import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
-import android.support.v4.app.Fragment
+
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.fragment.app.Fragment
 import music.app.my.music.R
 import music.app.my.music.helpers.FaderSettingListener
 
@@ -97,12 +97,12 @@ class MixFragment : Fragment() {
         }
 
     }
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-//        viewModel = ViewModelProviders.of(this).get(MixViewModel::class.java)
-
-//        loadValues()
-    }
+//    override fun onActivityCreated(savedInstanceState: Bundle?) {
+//        super.onActivityCreated(savedInstanceState)
+////        viewModel = ViewModelProviders.of(this).get(MixViewModel::class.java)
+//
+////        loadValues()
+//    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)

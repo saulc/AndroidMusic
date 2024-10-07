@@ -16,8 +16,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.annotation.RequiresApi;
-import android.support.v7.app.AppCompatDelegate;
+
 import android.util.Log;
 import android.util.Size;
 import android.view.GestureDetector;
@@ -34,6 +33,8 @@ import android.widget.SeekBar;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
+
+import androidx.annotation.RequiresApi;
 
 import java.io.IOException;
 

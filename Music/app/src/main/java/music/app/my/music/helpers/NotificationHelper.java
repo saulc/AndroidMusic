@@ -25,15 +25,16 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Build;
+import android.support.v4.media.session.MediaSessionCompat;
+
+import androidx.core.app.NotificationCompat;
 
 import music.app.my.music.DrawerActivity;
 import music.app.my.music.R;
 import music.app.my.music.player.MusicService;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.media.session.MediaSessionCompat;
+
 
 /**
  * Helper class to manage notification channels, and create notifications.
@@ -84,7 +85,7 @@ public class NotificationHelper extends ContextWrapper {
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
         stackBuilder.addNextIntentWithParentStack(resultIntent);
         PendingIntent resultPendingIntent =
-                stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+                stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE);
 
         int pr = android.R.drawable.ic_media_pause;
         if(title.contains("Paused"))
@@ -93,18 +94,18 @@ public class NotificationHelper extends ContextWrapper {
 
         Intent pi = new Intent(this, MusicService.class);
         pi.setAction(MusicService.ACTION_TOGGLE_PLAYBACK);
-        PendingIntent togglepi = PendingIntent.getService(this, 21, pi, PendingIntent.FLAG_UPDATE_CURRENT );
+        PendingIntent togglepi = PendingIntent.getService(this, 21, pi, PendingIntent.FLAG_UPDATE_CURRENT |PendingIntent.FLAG_IMMUTABLE);
         NotificationCompat.Action pp = new NotificationCompat.Action(pr, "Play/Pause", togglepi);
         //previous
 	   Intent prei = new Intent(this, MusicService.class);
 	   prei.setAction(MusicService.ACTION_PREVIOUS);
-	   PendingIntent prevpi = PendingIntent.getService(this, 22, prei, PendingIntent.FLAG_UPDATE_CURRENT );
+	   PendingIntent prevpi = PendingIntent.getService(this, 22, prei, PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE );
 	   NotificationCompat.Action previous = new NotificationCompat.Action(android.R.drawable.ic_media_previous, "Previous", prevpi);
 
 	   //next
 	   Intent nexi = new Intent(this, MusicService.class);
 	   nexi.setAction(MusicService.ACTION_NEXT);
-	   PendingIntent nextpi = PendingIntent.getService(this, 23, nexi, PendingIntent.FLAG_UPDATE_CURRENT );
+	   PendingIntent nextpi = PendingIntent.getService(this, 23, nexi, PendingIntent.FLAG_UPDATE_CURRENT |PendingIntent.FLAG_IMMUTABLE);
 	   NotificationCompat.Action next = new NotificationCompat.Action(android.R.drawable.ic_media_next, "Next", nextpi);
 
 //
@@ -114,7 +115,7 @@ public class NotificationHelper extends ContextWrapper {
                 .setLargeIcon(albumart)
                 .setSmallIcon(getSmallIcon()).setContentIntent(resultPendingIntent).setOngoing(true)
                 .setContentText(body).addAction(previous).addAction(pp).addAction(next)
-                .setStyle(new android.support.v4.media.app.NotificationCompat.MediaStyle()
+                .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
                         .setMediaSession(mediaSession.getSessionToken())
                         .setShowActionsInCompactView(0,1,2));
                //  .setAutoCancel(true);

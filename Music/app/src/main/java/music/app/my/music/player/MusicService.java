@@ -27,21 +27,19 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
-import android.service.dreams.DreamService;
-import android.support.annotation.RequiresApi;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 import android.util.Size;
 
+import androidx.annotation.RequiresApi;
+import androidx.core.app.NotificationCompat;
+
 import java.io.IOException;
 
-import music.app.my.music.DrawerActivity;
 import music.app.my.music.Dream;
 import music.app.my.music.R;
-import music.app.my.music.helpers.Logger;
 import music.app.my.music.helpers.NotificationHelper;
 import music.app.my.music.types.Song;
 import music.app.my.music.types.plist;

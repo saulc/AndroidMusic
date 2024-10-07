@@ -3,9 +3,11 @@ package music.app.my.music.helpers
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Environment
 import android.provider.DocumentsContract
 import android.util.Log
+import androidx.annotation.RequiresApi
 import java.io.File
 
 
@@ -22,6 +24,7 @@ class PlaylistFilemaker() {
         // Request code for creating a PDF document.
         val CREATE_FILE = 1
 
+        @RequiresApi(Build.VERSION_CODES.O)
         private fun createFile(pickerInitialUri: Uri, name: String, ctx: Context): Intent {
             val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
                 addCategory(Intent.CATEGORY_OPENABLE)

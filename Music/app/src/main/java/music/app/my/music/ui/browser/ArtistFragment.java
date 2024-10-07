@@ -2,14 +2,14 @@ package music.app.my.music.ui.browser;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.simplecityapps.recyclerview_fastscroll.interfaces.OnFastScrollStateChangeListener;
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
@@ -31,7 +31,7 @@ public class ArtistFragment extends baseListFragment implements DrawerActivity.m
         log("move called:" + x + " " + y);
 //            int sy = (int) (y/10);
         log("scroll by:" + y);
-        recyclerView.scrollBy(0, (int) y);
+//        recyclerView.scrollBy(0, (int) y);
     }
     protected ArrayList<Artist> items;
 
