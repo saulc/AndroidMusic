@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/g1"
+    app:startDestination="@id/albumFragment">
+
+    <fragment
+        android:id="@+id/playListFragment"
+        android:name="music.app.my.music.ui.browser.PlayListFragment"
+        android:label="PlayListFragment"
+        tools:layout="@layout/fragment_baselistitem_list"/>
+    <fragment
+        android:id="@+id/nowFragment"
+        android:name="music.app.my.music.ui.NowFragment"
+        android:label="NowFragment"
+        tools:layout="@layout/now_layout">
+        <argument
+            android:name="isMini"
+            app:argType="boolean"
+            android:defaultValue="false" />
+    </fragment>
+    <fragment
+        android:id="@+id/artistFragment"
+        android:name="music.app.my.music.ui.browser.ArtistFragment"
+        android:label="ArtistFragment"
+        tools:layout="@layout/fragment_baselistitem_list"/>
+    <fragment
+        android:id="@+id/albumFragment"
+        android:name="music.app.my.music.ui.browser.AlbumFragment"
+        android:label="AlbumFragment"
+        tools:layout="@layout/fragment_album">
+        <action
+            android:id="@+id/action_albumFragment_to_songFragment"
+            app:destination="@id/songFragment"
+            app:enterAnim="@anim/slidein_left"
+            app:exitAnim="@anim/slideout_right"
+            app:launchSingleTop="false"
+            app:popEnterAnim="@anim/slidein_right"
+            app:popExitAnim="@anim/slideout_left" />
+    </fragment>
+    <fragment
+        android:id="@+id/songFragment"
+        android:name="music.app.my.music.ui.browser.SongFragment"
+        android:label="SongFragment"
+        tools:layout="@layout/fragment_baselistitem_list"/>
+</navigation>

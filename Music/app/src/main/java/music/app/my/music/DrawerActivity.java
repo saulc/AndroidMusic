@@ -50,6 +50,10 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
@@ -170,6 +174,8 @@ public class DrawerActivity extends AppCompatActivity
 
     private MediaSession mediaSession;
 
+    private AppBarConfiguration mAppBarConfiguration;
+    private  NavController navController;
   //  private NotificationHelper noti;
 
     /* -----------------------------------   onCreate start.   ----------------------------------- */
@@ -186,6 +192,19 @@ public class DrawerActivity extends AppCompatActivity
         setContentView(R.layout.activity_drawer);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        // Passing each menu ID as a set of Ids because each
+        // menu should be considered as top level destinations.
+        mAppBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.nowFragment, R.id.playListFragment, R.id.artistFragment, R.id.albumFragment, R.id.songFragment)
+                .setOpenableLayout(drawer)
+                .build();
+        navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
+        NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
+        NavigationUI.setupWithNavController(navigationView, navController);
+
 
         // Enable the Up button
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
@@ -299,16 +318,16 @@ public class DrawerActivity extends AppCompatActivity
         };
         fab.setOnTouchListener(gestureListener);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
+//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+//        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+//                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+//        drawer.setDrawerListener(toggle);
+//        toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        if(navigationView != null)   navigationView.setNavigationItemSelectedListener(this);
-        NavigationView menuView = (NavigationView) findViewById(R.id.menu_view);
-        if(menuView != null)   menuView.setNavigationItemSelectedListener(this);
+//        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+//        if(navigationView != null)   navigationView.setNavigationItemSelectedListener(this);
+//        NavigationView menuView = (NavigationView) findViewById(R.id.menu_view);
+//        if(menuView != null)   menuView.setNavigationItemSelectedListener(this);
         //no nav view. for wide screens use persistent menu list
 
         int res  = getResources().getConfiguration().orientation;
@@ -335,7 +354,7 @@ public class DrawerActivity extends AppCompatActivity
 //        if(controlsVisible)
 //            showControls();
 
-        showNow(); //update queue when its loaded
+//        showNow(); //update queue when its loaded
 
         // showBubbles();
 
@@ -1277,7 +1296,7 @@ public class DrawerActivity extends AppCompatActivity
             qf = QueueFragment.newInstance();
             showFragment(R.id.qframe, qf, false);
         }
-        expandSidebar();
+//        expandSidebar();
         return showq;
     }
 
@@ -1463,7 +1482,7 @@ public class DrawerActivity extends AppCompatActivity
         if (nf == null) showNow();
 
         nowShowing = true;
-        getSupportActionBar().hide();
+//        getSupportActionBar().hide();
 
         // if(controlsVisible && cf != null && cf.isVisible()) {
         log("Now Fragment setting updater");
@@ -1588,15 +1607,15 @@ public class DrawerActivity extends AppCompatActivity
     public void onAlbumClicked(Album mItem) {
         log("Album Selected: " + mItem.getAlbum() + " by " + mItem.getArtist());
         log("Looking for album songs");
-
-        Fragment f =  (Fragment) SongFragment.newInstance();
-        Bundle b = new Bundle();
-        b.putString("SFTYPE", SongFragment.SF_TYPE.ALBUMS.toString());
-        b.putString("AlbumID", mItem.getId());
-        b.putString("AlbumName", mItem.getAlbum());
-        b.putString("AlbumArt", mItem.getArt());
-        f.setArguments(b);
-        showFragment(R.id.frame, f, true);
+        navController.navigate(R.id.action_albumFragment_to_songFragment);
+//        Fragment f =  (Fragment) SongFragment.newInstance();
+//        Bundle b = new Bundle();
+//        b.putString("SFTYPE", SongFragment.SF_TYPE.ALBUMS.toString());
+//        b.putString("AlbumID", mItem.getId());
+//        b.putString("AlbumName", mItem.getAlbum());
+//        b.putString("AlbumArt", mItem.getArt());
+//        f.setArguments(b);
+//        showFragment(R.id.frame, f, true);
     }
 
     @Override

@@ -128,6 +128,7 @@ public class NowFragment extends ControlFragment {
 
         isMini = getArguments().getBoolean("ISMINI");
         View view;
+
         if (isMini) view = inflater.inflate(R.layout.nowmini_layout, container, false);
         else view = inflater.inflate(R.layout.now_layout, container, false);
 
