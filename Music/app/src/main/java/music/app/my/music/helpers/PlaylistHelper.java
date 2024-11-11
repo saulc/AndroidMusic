@@ -185,7 +185,7 @@ public class  PlaylistHelper {
         ContentResolver resolver = context.getContentResolver();
 
         Uri songUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        String defaultSort = MediaStore.Audio.Media.TITLE + " COLLATE LOCALIZED ASC";
+        String defaultSort = MediaStore.Audio.Media.TITLE + " ASC";
         String defaultSelection = MediaStore.Audio.Media.IS_MUSIC + " != 0";
         String[] defaultProjection = {
                 MediaStore.Audio.Media.TITLE,
@@ -207,7 +207,7 @@ public class  PlaylistHelper {
                     , cursor.getString(5), cursor.getString(6), cursor.getString(7)));
         }
         cursor.close();
-        int i = ((int) (Math.random() * 100));
+        int i = ((int) (Math.random() * 50000));
         i = i % songs.size();
 
         Log.d("M6", " 'random' song: " + i);
