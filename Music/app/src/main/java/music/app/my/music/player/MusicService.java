@@ -273,7 +273,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 	   secs = secs * d;
 	   log("seekto " + secs + " m seconds");
 	   secs = secs / 100;
-	   log("seekto " + secs + " m seconds");
+	   log("seekto " + secs + " seconds");
 
 	   if(secs < getDuration() )
    		player.seekTo((int)(secs ));
