@@ -1,7 +1,9 @@
 package music.app.my.music;
 
+import static java.lang.Math.round;
+
 import android.animation.LayoutTransition;
-import android.app.ActionBar;
+import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -11,26 +13,19 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
 import android.media.AudioManager;
+import android.media.session.MediaSession;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
+import android.provider.MediaStore;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.GestureDetector;
+import android.view.KeyEvent;
 import android.view.MenuInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
@@ -41,9 +36,29 @@ import android.widget.TextSwitcher;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
+
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
+
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 import music.app.my.music.helpers.FabDoubleTapGS;
+import music.app.my.music.helpers.FaderSettingListener;
+import music.app.my.music.helpers.PlaylistFilemaker;
 import music.app.my.music.helpers.PlaylistHelper;
 import music.app.my.music.helpers.QueueListener;
 import music.app.my.music.player.MediaControlReceiver;
@@ -55,11 +70,15 @@ import music.app.my.music.types.Genre;
 import music.app.my.music.types.plist;
 import music.app.my.music.types.Playlist;
 import music.app.my.music.types.Song;
+import music.app.my.music.ui.LoggerFragment;
+import music.app.my.music.ui.MixFragment;
 import music.app.my.music.ui.MixxerFragment;
+import music.app.my.music.ui.MovableFloatingActionButton;
 import music.app.my.music.ui.browser.AlbumFragment;
 import music.app.my.music.ui.browser.ArtistFragment;
 import music.app.my.music.ui.browser.BubbleFragment;
 import music.app.my.music.ui.browser.HeaderFragment;
+import music.app.my.music.ui.browser.PlaylistFileFragment;
 import music.app.my.music.ui.popup.ChoosePlaylistDialogFragment;
 import music.app.my.music.ui.popup.ChooseThemeDialogFragment;
 import music.app.my.music.ui.popup.ConfirmDeleteDialogFragment;
@@ -84,35 +103,44 @@ public class DrawerActivity extends AppCompatActivity
         ControlFragment.ControlFragmentListener,
         NewPlaylistDialog.OnDialogInteractionListener ,
         MixxerFragment.MixxerListener,
-        FadeFragment.FaderListener,
+        FaderSettingListener,
         SecretFragment.SecretListener,
         FabDoubleTapGS.DoubleTapListener,
-        Toolbar.OnMenuItemClickListener {
-
+        Toolbar.OnMenuItemClickListener  {
+//    Logger.LogCallback , LoggerFragment.LogFragListener
 
     private VisualizerDialogFragment vf = null;
 
+    //fragments that need callbacks. send info/triggers to fragments
+    private PlayListFragment playlistFrag = null;
     private FadeFragment fader = null;
     private MixxerFragment mf = null;
+    private MixFragment mx = null;
     private NowFragment nf = null;
     private QueueFragment qf = null;
     private ControlFragment cf = null;
     private PlaceholderFragment pf = null;
     private SongFragment sf = null; //search fragment
+    private SongFragment sFrag = null; //song fragment
+    private mFabListener mfabLis = null;
+    private LoggerFragment logFrag = null;
 
     private boolean searchActive = false;
     private FloatingActionButton fab3;
     private FloatingActionButton fab2;
     private FloatingActionButton fab1;
     private FloatingActionButton fab;
+    private MovableFloatingActionButton mfab;
 
+    private boolean autoCloseDrawer = true;
     private boolean showfmenu = false; //show/hide floating control buttons.
     private int showq = 0; //0 == hidden, 1 = miniplayer q, 2 = half, 3 = full screen, todo 4 edit plist
-
+    private int showlog = 1;
     private final String TAG = getClass().getSimpleName();
 
     private void log(String s) {
-        Log.d(TAG, s);
+//        Logger.log(TAG, s);
+        Log.i(TAG, s);
     }
 
     private MusicService mService;
@@ -131,6 +159,15 @@ public class DrawerActivity extends AppCompatActivity
     private MediaControlReceiver myEventReceiver;
     private AudioManager am;
 
+    private boolean playlistExport = false;
+
+    private String pid = null;
+    private String pname = null;
+
+    private MediaSession mediaSession;
+
+  //  private NotificationHelper noti;
+
     /* -----------------------------------   onCreate start.   ----------------------------------- */
 
     @Override
@@ -146,6 +183,8 @@ public class DrawerActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // Enable the Up button
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         //ini media events
         am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 //        myEventReceiver = new MediaControlReceiver();
@@ -184,6 +223,25 @@ public class DrawerActivity extends AppCompatActivity
         iniFM();
         moveFab(true);
 
+        mfab = (MovableFloatingActionButton) findViewById(R.id.mfab);
+        mfab.setCallback(this);
+//        mfab.setButtonStartPos();
+        mfab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "mFab Clicked: " + showq);
+                showQ();
+            }
+        });
+//        fab.setOnLongClickListener(new View.OnLongClickListener() {
+//            @Override
+//            public boolean onLongClick(View view) {
+//                showLogs();
+//                return true;
+//            }
+//        });
+
+
         fab.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
@@ -202,6 +260,8 @@ public class DrawerActivity extends AppCompatActivity
                 showQ();
             }
         });
+
+
 
         FabDoubleTapGS dt = new FabDoubleTapGS();
         dt.setDoubleTapListener(this);
@@ -224,8 +284,13 @@ public class DrawerActivity extends AppCompatActivity
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        if(navigationView != null)   navigationView.setNavigationItemSelectedListener(this);
+        NavigationView menuView = (NavigationView) findViewById(R.id.menu_view);
+        if(menuView != null)   menuView.setNavigationItemSelectedListener(this);
+        //no nav view. for wide screens use persistent menu list
 
+        int res  = getResources().getConfiguration().orientation;
+        autoCloseDrawer = ( res != Configuration.ORIENTATION_LANDSCAPE );
 
         startIntent = new Intent(getApplicationContext(), MusicService.class);
         startIntent.setAction(MusicService.ACTION_BLANK);
@@ -240,23 +305,67 @@ public class DrawerActivity extends AppCompatActivity
         previousIntent = new Intent(getApplicationContext(), MusicService.class);
         previousIntent.setAction(MusicService.ACTION_PREVIOUS);
 
+
         log("Starting service");
         startService(startIntent);
+
+       // noti = new NotificationHelper(this);
 //        if(controlsVisible)
 //            showControls();
 
-        showNow();
+        showNow(); //update queue when its loaded
+
         // showBubbles();
 
         handleStartIntents(); //search media share....
 
+        handleSearchIntents();
     }
-
+//    public View onCreateView(String name, Context context, AttributeSet attrs) {
+//        log("onCreateView event");
+//        return super.onCreateView(name, context, attrs);
+//    }
+//    @Override
+//    public void showNoti(String msg){
+//        int id = 0;
+//        Notification.Builder nb = null;
+//        nb = noti.getNotification1("Music", msg);
+//
+//        if (nb != null) {
+//            noti.notify(id, nb);
+//        }
+//    }
 
     /* -----------------------------------   onCreate over.   ----------------------------------- */
 
 
-    /* ---------- Main side drawer navigation menu ------------- */
+    public void showLogs(){
+        log("Showing Log Fragment");
+//        expandLog();
+//        logFrag = LoggerFragment.Companion.newInstance();
+//        logFrag.setListener(this);
+//        getSupportFragmentManager().beginTransaction().replace(R.id.logframe, logFrag).commit();
+//        Logger.setListener(this);
+    }
+
+//    @Override
+//    public void updateLogs(ArrayList<String> log) {
+//        if(logFrag != null)
+//        logFrag.updateLog(log);
+//    }
+
+
+    public interface mFabListener{
+        void onMove(float x, float y);
+    }
+
+    public void fabMove(float x, float y){
+        log("fab Moving " + x + " " + y + " sfrag " + (mfabLis == null));
+        if(mfabLis != null)
+            mfabLis.onMove(x, y );
+    }
+
+    /* ---------- Main side drawer_actions navigation menu ------------- */
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -267,14 +376,18 @@ public class DrawerActivity extends AppCompatActivity
 
             showNow();
 
-        } else if (id == R.id.nav_bubble) {
-            log("Nav bubble clicked!");
+        } else if (id == R.id.nav_eq) {
+            log("Nav eq clicked!");
             showEQTab();
             //showBubbles();
 
         } else if (id == R.id.nav_dream) {
             log("Nav dream clicked!");
             showDaydream();
+
+        } else if (id == R.id.nav_setdream) {
+            log("Nav dream settings clicked!");
+            showDaydreamSettings();
 
         } else if (id == R.id.nav_theme) {
             log("Nav theme clicked!");
@@ -323,23 +436,31 @@ public class DrawerActivity extends AppCompatActivity
             showFragment(R.id.frame, f, true);
 
         } else if (id == R.id.nav_songs) {
-            Fragment f = SongFragment.newInstance();
-            showFragment(R.id.frame, f, true);
+//            Fragment f = SongFragment.newInstance();
+//            showFragment(R.id.frame, f, true);
+            log("Songs clicked. loading Query page.");
+            doMySearch("");
 
 
         } else if (id == R.id.nav_settings) {
             log("Settings clicked.");
 
-            showMix();
+//            showMix();
+            Fragment f = PlaylistFileFragment.newInstance();
+            showFragment(R.id.frame, f, true);
 //            Fragment f = (Fragment) HeaderFragment.newInstance("", "");
 //            showFragment(R.id.frame, f, true);
-        }
+        } else if (id == R.id.nav_mix) {
+            log("mix clicked.");
+            showMixx();
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
+        }
+            if(autoCloseDrawer) {
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                drawer.closeDrawer(GravityCompat.START);
+            }
         return true;
     }
-
 
 
     /* ---------- Service Connection! UI Callbacks ------------- */
@@ -395,6 +516,31 @@ public class DrawerActivity extends AppCompatActivity
 
 
     /* -----------------------------------  start    ----------------------------------- */
+    public void handleSearchIntents() {
+        Intent intent = this.getIntent();
+
+        try {
+            if (intent.getAction().compareTo(MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH) == 0) {
+
+                String mediaFocus = intent.getStringExtra(MediaStore.EXTRA_MEDIA_FOCUS);
+                String query = intent.getStringExtra(SearchManager.QUERY);
+                if (query.isEmpty()) {
+                    log("no query found");
+                } else {
+                    log("query: " + query);
+                }
+                // Some of these extras might not be available depending on the search mode.
+                String album = intent.getStringExtra(MediaStore.EXTRA_MEDIA_ALBUM);
+                String artist = intent.getStringExtra(MediaStore.EXTRA_MEDIA_ARTIST);
+                String genre = intent.getStringExtra("android.intent.extra.genre");
+                String playlist = intent.getStringExtra("android.intent.extra.playlist");
+                String title = intent.getStringExtra(MediaStore.EXTRA_MEDIA_TITLE);
+            }
+        } catch (Exception e) {
+            log(e.toString());
+        }
+    }
+
 
     private void handleStartIntents() {
 
@@ -413,7 +559,20 @@ public class DrawerActivity extends AppCompatActivity
             Uri uri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
 
             log("Type: ===>> " + type);
-            log("Oh its audio!!" + uri.toString());
+
+            String shortname = uri.getEncodedPath();
+            log("Shared item Location?: " + shortname );
+            try {
+                File f = new File(shortname);
+
+                Scanner myReader = new Scanner(f);
+                while (myReader.hasNextLine()) {
+                    String data = myReader.nextLine();
+                    log(data);
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
 
             String id = uri.toString().substring(uri.toString().lastIndexOf('/'), uri.toString().length());
             //shared = new Song("Shared Song", id );
@@ -427,6 +586,7 @@ public class DrawerActivity extends AppCompatActivity
 
     }
 
+
     @Override
     public void finish() {
         //startService(new Intent(MusicService.ACTION_STOP));
@@ -439,6 +599,7 @@ public class DrawerActivity extends AppCompatActivity
         }
 
         super.finish();
+        System.exit(0);
     }
 
     @Override
@@ -452,12 +613,25 @@ public class DrawerActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
 
+//        mfab.setButtonStartPos();
         log("Resume activity.");
+//        showLogs();
+        if(playlistExport) {
+            if(pname != null)
+                log("Playlist save flag. " + pname);
+            exportPlaylist();
+            //do the work.
+//            playlistExport = false;
+        }
     }
+
+
 
     @Override
     protected void onStart() {
         super.onStart();
+
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
         // Bind to LocalService
 
         final Intent intent = new Intent("music.app.my.music.player.MUSICSERVICE");  //Intent(DrawerActivity.this, music.app.my.music.player.MusicService.class);
@@ -509,7 +683,13 @@ public class DrawerActivity extends AppCompatActivity
     public int onRepeatClicked(){
         log("Repeat clicked");
         int b = mService.repeatSongs();
-        Toast.makeText(mService, "Repeat: " + b, Toast.LENGTH_SHORT).show();
+        String bb = "";
+        switch (b){
+            case 0: bb = "Off"; break;
+            case 1: bb = "Single"; break;
+            case 2: bb = "All"; break;
+        }
+        Toast.makeText(mService, "Repeat: " + bb, Toast.LENGTH_SHORT).show();
 
         return b;
     }
@@ -524,7 +704,14 @@ public class DrawerActivity extends AppCompatActivity
         } else if (id == R.id.repeat) {
             onRepeatClicked();
             return true;
-        } else if (id == R.id.mix) {
+        }
+//        else if (id == R.id.mixxer) {
+//            log("Show Fade Settings...");
+//
+//            showMixx();
+//            return true;
+//        }
+        else if (id == R.id.mix) {
             log("Mix clicked");
             Song s = PlaylistHelper.getRandomSong(getApplicationContext());
             String b = "Mix: " + s.getTitle() + " by " + s.getArtist() + " added to Queue.";
@@ -548,7 +735,7 @@ public class DrawerActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(final Menu menu) {
         // Inflate the options menu from XML
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.drawer, menu);
+        inflater.inflate(R.menu.drawer_actions, menu);
         // Get the SearchView and set the searchable configuration
         // SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         final SearchView searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
@@ -599,11 +786,11 @@ public class DrawerActivity extends AppCompatActivity
         searchActive = false;
     }
 
+    //load all songs ready for search keyword. in title, artist, album.
     private void doMySearch(String q) {
         log("Searching for: " + q);
 
         if (!searchActive) {
-            searchActive = true;
             sf = (SongFragment) SongFragment.newInstance();
 
             Bundle b = new Bundle();
@@ -612,9 +799,12 @@ public class DrawerActivity extends AppCompatActivity
             b.putString("Query", q);
             sf.setArguments(b);
             showFragment(R.id.frame, sf, true);
+            searchActive = true;
         }
 
     }
+
+
 
 
     /* ---------- Daydream ------------- */
@@ -625,6 +815,13 @@ public class DrawerActivity extends AppCompatActivity
         startActivity(intent);
 
     }
+
+    private void showDaydreamSettings() {
+
+        final  Intent intent = new Intent(Settings.ACTION_DREAM_SETTINGS);
+        startActivity(intent);
+    }
+
 
 
     /* ---------- Themes ------------- */
@@ -639,6 +836,7 @@ public class DrawerActivity extends AppCompatActivity
         Intent intent = getIntent();
         String action = intent.getAction();
         log("Theme Got intent! action: " + action);
+//        if(action == null) return;
         if (actionSetTheme.equals(action)) {
             int r = intent.getIntExtra("THEME", -22);
             if (r == -22) {  //if there was no extra,
@@ -653,7 +851,7 @@ public class DrawerActivity extends AppCompatActivity
             editor.putInt(getString(R.string.saved_theme), currentTheme);
             editor.commit();
 
-        } else if (Intent.ACTION_MAIN.equals(action)) {
+        } else{ // if (Intent.ACTION_MAIN.equals(action)) {
             //regular start.
             log("Setting default Theme.");
             SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
@@ -716,10 +914,11 @@ public class DrawerActivity extends AppCompatActivity
             public boolean onLongClick(View v) {
                 Log.d(TAG, "Fab 2 Long Clicked: play/pause");
 
+                playPauseLongClicked(); //trigger the fade in also.
                 //mini q
                 showq = 0;
                 showQ();
-                showNow();
+//                showNow();
                 return true;
             }
         });
@@ -877,22 +1076,6 @@ public class DrawerActivity extends AppCompatActivity
 
     }
 
-    public void visualizerLongClicked() {
-        log("Vis long clicked.");
-        showNow();
-    }
-
-
-    public void visualizerCreated() {
-        log("Vis created.");
-        if (mService != null && mService.getPlayer() != null && mService.getPlayer().isPlaying()) {
-            vf.setImageView(nf.getIcon());
-            vf.setAid(mService.getPlayer().getAID());
-            //vf.setEnabled(true);
-        }
-
-    }
-
 
 
     //adjust layout weights to hide/show queue and player
@@ -941,7 +1124,44 @@ public class DrawerActivity extends AppCompatActivity
             //main frame
         }
     }
+//    @Override
+//    public void onLogClick(){
+//        log("Log Clicked " + showlog);
+//
+////                if(showlog++ > 2){
+////                    showlog = 0;
+//////                    getSupportFragmentManager().beginTransaction().remove(logFrag).commit();
+////                }//else
+////                    showLogs();
+////                expandLog();
+//
+//    }
+    public void expandLog(){
+        log("Expanding q frame");
+        int orientation = getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            // In landscape
 
+            LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
+                    0,
+                    DrawerLayout.LayoutParams.MATCH_PARENT,
+                    1.0f
+            );
+            findViewById(R.id.logframe).setLayoutParams(param);
+
+        } else {
+            // In portrait
+            LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
+                    DrawerLayout.LayoutParams.MATCH_PARENT,
+                    0,
+                    (showlog==0? .5f : showlog )
+            );
+            findViewById(R.id.logframe).setLayoutParams(param);
+
+
+        }
+
+    }
     public void expandSidebar() {
         log("Expanding q frame");
         int orientation = getResources().getConfiguration().orientation;
@@ -967,16 +1187,17 @@ public class DrawerActivity extends AppCompatActivity
             LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
                     DrawerLayout.LayoutParams.MATCH_PARENT,
                     0,
-                    (float) (2 * showq)
+                    (float) ((showq == 2 ? 2:1)  * showq)
             );
             findViewById(R.id.sidebar).setLayoutParams(param);
 
-            param = new LinearLayout.LayoutParams(
-                    DrawerLayout.LayoutParams.MATCH_PARENT,
-                    0,
-                    (showq < 3) ? 5.0f : 0.0f
-            );
-            findViewById(R.id.frame).setLayoutParams(param);
+
+                param = new LinearLayout.LayoutParams(
+                        DrawerLayout.LayoutParams.MATCH_PARENT,
+                        0,
+                        (showq < 3) ? 6.0f : 0.0f
+                );
+                findViewById(R.id.frame).setLayoutParams(param);
 
 
         }
@@ -1002,17 +1223,24 @@ public class DrawerActivity extends AppCompatActivity
             // return showq;
         }
         if (showq > 3) {
+            log("Hiding browser.");
             showq = 0;
+            log("Hiding fm.");
             if (showfmenu) hideFM();
             moveFab(true); //move menu back up
+            log("Hiding Queue.");
             hideQ();
+            log("Hiding sidebar....");
             closeSidebar();
             return showq;
         }
-        if (qf == null) qf = QueueFragment.newInstance();
-        expandSidebar();
-        showFragment(R.id.qframe, qf, false);
 
+        log("updating queue.");
+        if (qf == null) {
+            qf = QueueFragment.newInstance();
+            showFragment(R.id.qframe, qf, false);
+        }
+        expandSidebar();
         return showq;
     }
 
@@ -1054,13 +1282,16 @@ public class DrawerActivity extends AppCompatActivity
             } else if(nowShowing && nf != null){
                 //if the now frag was show. kill it. so it can show the actionbar.
                     nf.onDestroy();
-            }
+            }else if( f instanceof mFabListener)  mfabLis = (mFabListener) f;
+            else if(f instanceof PlayListFragment) playlistFrag = (PlayListFragment) f;
+
             //other fragments. just make sure the mainframe is visible
             if (showq > 2) {
                 showq = 1;
                 showQ();
                 showControls();
             }
+
         }
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -1088,6 +1319,11 @@ public class DrawerActivity extends AppCompatActivity
 
     }
 
+    public boolean onSupportNavigateUp(){
+        log("up called.?");
+        onBackPressed();
+        return true;
+    }
 
 
     @Override
@@ -1097,15 +1333,36 @@ public class DrawerActivity extends AppCompatActivity
         showNow();
     }
 
+
+
+    public void visualizerLongClicked() {
+        log("Vis long clicked.");
+        nowIconLongClicked();
+        // showNow();
+    }
+
+
+    public void visualizerCreated() {
+        log("Vis created.");
+        if (mService != null && mService.getPlayer() != null && mService.getPlayer().isPlaying()) {
+            vf.setImageView(nf.getIcon());
+            vf.setAid(mService.getPlayer().getAID());
+            //vf.setEnabled(true);
+        }
+
+    }
+
+
     @Override
     public void nowIconLongClicked() {
 
-        Log.d(TAG, "Now icon Long clicked ");
+        Log.d(TAG, "Now icon Long clicked " + (vf==null) );
 
         if (vf == null) {
             vf = VisualizerDialogFragment.newInstance();
             getSupportFragmentManager().beginTransaction().show(vf).commit();
         } else {
+            vf.stop();
             getSupportFragmentManager().beginTransaction().remove(vf).commit();
             vf = null;
             //nowIconLongClicked();
@@ -1181,6 +1438,7 @@ public class DrawerActivity extends AppCompatActivity
                 if (mService != null)
                     if (nf.isVisible() || cf.isVisible())
                         if (mService.getQueue().getSize() > 0) {
+                            updateQueueFrag( mService.getQueue() );
                             updateCurrentInfo(mService.getCurrentSong());
                             updateNowButtons(mService.getQueue());
                             nf.setupVolbar(getMaxVol(), getVol());
@@ -1188,7 +1446,7 @@ public class DrawerActivity extends AppCompatActivity
                 Log.d(TAG, "Now updating..");
                 h.removeCallbacks(this);
             }
-        }, 1000);
+        }, 400);
 
 
     }
@@ -1223,7 +1481,16 @@ public class DrawerActivity extends AppCompatActivity
         if(mf != null && mf.isVisible() ) return;
         mf =  MixxerFragment.newInstance();
         showFragment(R.id.frame, mf, true);
+
     }
+    //show new kt mixer/fader
+    public void showMixx(){
+        Log.d(TAG, "Showing MIixX fragment");
+        if(mx != null && mx.isVisible() ) return;
+        mx =  MixFragment.Companion.newInstance();
+        showFragment(R.id.frame, mx, true);
+    }
+
 
 
     /* ---------- Show placeholder. for now its used for eq instead. ------------- */
@@ -1277,6 +1544,10 @@ public class DrawerActivity extends AppCompatActivity
     }
 
     @Override
+    public void onArtistLongClick(Artist a) {
+        onArtistLongClicked(a);
+    }
+    @Override
     public void onAlbumClicked(Album mItem) {
         log("Album Selected: " + mItem.getAlbum() + " by " + mItem.getArtist());
         log("Looking for album songs");
@@ -1311,10 +1582,14 @@ public class DrawerActivity extends AppCompatActivity
 
     }
 
+
+
     @Override
     public void nameEnted(String name, boolean isQ) {
         Log.d(TAG, "Playlist  name entered: " + name);
         PlaylistHelper.newPlaylist(getApplicationContext(), name);
+//         PlaylistFilemaker pl = new PlaylistFilemaker();
+//         pl.newPlaylist(getApplicationContext(), name);
         Toast.makeText(mService, "Created Playlist: " + name, Toast.LENGTH_SHORT).show();
         if(isQ)  saveQueueAsPlaylist(name);
     }
@@ -1365,7 +1640,9 @@ public class DrawerActivity extends AppCompatActivity
 
             if(mService!=null) {
                 mService.pauseRequest();
+                hideQ();
                 mService.getQueue().clearQueue();
+                updateQueueFrag(mService.getQueue());
 
                 Toast.makeText(mService, "Cleared Now playing: " + name + " : " + pid, Toast.LENGTH_SHORT).show();
             }
@@ -1377,8 +1654,10 @@ public class DrawerActivity extends AppCompatActivity
     }
 
     /*
-    add song to playlist
+    add song to playlist  end
      */
+
+    //playlist option add == delete playlist confirm dialog
     @Override
     public void onPlaylistOptionClicked(int position, String pid, String name) {
         //confirm first! important! double confirm?
@@ -1387,10 +1666,35 @@ public class DrawerActivity extends AppCompatActivity
 
     }
 
+    private void exportPlaylist(){
+        if(playlistFrag == null){
+            log("null fragment...");
+
+//            return;
+        }
+//        playlistFrag.exportPlaylist(pname, pid);
+        log("Writing playlist data to file..");
+        //fuck you android. now my moto g stylus saves m3u files in internal /music
+
+//        PlaylistFilemaker pl = new PlaylistFilemaker();
+//         pl.exportPlaylist(pname, pid);
+//         log("playlist export complete.");
+    }
+
+    //save playlist to xml file
     @Override
-    public void onPlaylistNextUpClicked(int position, String pid) {
+    public void onPlaylistNextUpClicked(int position, String id, String name) {
         Log.d(TAG, "Playlist next up clicked");
-        //play list?
+        //play list to xml for real saving...
+
+         PlaylistFilemaker pl = new PlaylistFilemaker();
+
+         Intent i = pl.newPlaylist(getApplicationContext(), name);
+          playlistExport = true;
+          pid = id;
+          pname = name;
+          startActivity(i);
+        Toast.makeText(mService, "Saving Playlist: " + name + ".m3u", Toast.LENGTH_SHORT).show();
     }
 
     public void addToPlaylistCanceled(){
@@ -1463,7 +1767,7 @@ public class DrawerActivity extends AppCompatActivity
     /* ---------- playlist stuff over ------------- */
 
 
-    //calls above method when a playlist is seltected
+    //calls above method when a playlist is selected
     @Override
     public void onOptionLongClicked(Song song) {
         Log.d(TAG, "Option long clicked, add to playlist");
@@ -1474,7 +1778,7 @@ public class DrawerActivity extends AppCompatActivity
     @Override
     public void onNextLongClicked(Song song) {
         Log.d(TAG, "Option long clicked, add to top of playlist");
-        DialogFragment c = ChoosePlaylistDialogFragment.newInstance(song.getTitle(), song.getId(), false, true, null);
+        DialogFragment c = ChoosePlaylistDialogFragment.newInstance(song.getTitle(), song.getId(), true, false, null);
         c.show(getSupportFragmentManager(), song.getId());
     }
 
@@ -1512,21 +1816,28 @@ public class DrawerActivity extends AppCompatActivity
 
     @Override
     public void addSongsToQueue(ArrayList<Song> items, boolean play) {
-    log("Group header clicked. adding group to queue and playing...");
 
         plist p = mService.getQueue(); //new plist();
-        if(p.getSize() > 0) {
-            p.addToTop(items);
-            if(play)
-            mService.nextRequest();
-        }
-        else{
-            p.addTo(items);
-            if(play)
-            startService(playIntent);
+        if(play) {
+            log("Group header clicked. adding group to queue and playing...");
+
+            showNow();     //on header clicked.
+            if(p.getSize() > 0) {
+                p.addToTop(items);
+                mService.nextRequest();
+            }
+            else {
+                p.addTo(items);
+                mService.playSongFromQueue(0);
+//                startService(playIntent);
+            }
         }
 
-        showNow();
+        else{
+            log("Group ops clicked. adding group to queue...");
+            p.addTo(items);
+        }
+
         updateQueueFrag(p);
 
 //        updateNextSongInfo();
@@ -1543,6 +1854,11 @@ public class DrawerActivity extends AppCompatActivity
         b.putString("PlaylistName", item.getName());
         f.setArguments(b);
         showFragment(R.id.frame, f, true);
+    }
+
+    @Override
+    public void onPlaylistFClicked(Playlist item) {
+                PlaylistHelper.viewPlaylist(getApplicationContext(), item.getName());
     }
 
 
@@ -1696,7 +2012,7 @@ public class DrawerActivity extends AppCompatActivity
     /* ---------- Mixxer Fragment end ------------- */
 
     public void updateQueueFrag(plist p){
-        if(qf != null && showq != 0)
+        if(qf != null && showq != 0 && p != null)
             qf.setQList(p);
     }
 
@@ -1736,6 +2052,12 @@ public class DrawerActivity extends AppCompatActivity
     }
 
 
+    @Override
+    public void playPauseLongClicked() {
+        if(mService != null)
+            mService.getPlayer().fadeIn();
+    }
+
     //updates seekbar and fader cue at 1hz
     /* ---------- Music Serice Callbacks UpdateUI ------------- */
     public void updateProgress(MusicPlayer player){
@@ -1755,8 +2077,8 @@ public class DrawerActivity extends AppCompatActivity
         if(mixxerReadyForUpdates) mf.updateMP(mService.getPlayer());
 
         if(vf != null) vf.setAid(mService.getPlayer().getAID());
-        if(nf != null) nf.updateSongInfo(s);
-        if(cf != null) cf.updateSongInfo(s);
+        if(nf != null && nowShowing) nf.updateSongInfo(s);
+        if(cf != null && controlsVisible) cf.updateSongInfo(s);
 
 //        updateNextSongInfo();
 
@@ -1801,30 +2123,90 @@ public class DrawerActivity extends AppCompatActivity
 
     }
 
+//   override system volume and double the steps.
     @Override
     public int getMaxVol() {
         int max = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-        return max;
+        return max*2+1;
     }
 
+    private void volUp(){
+        int v = getVol();
+        if(v < getMaxVol()) onVolChanged(v+1);
+    }
+
+    private void volDown(){
+        int v = getVol();
+        if(v > 1) onVolChanged(v-1);
+    }
+
+    private int hvol = -1;
     @Override
     public int getVol() {
-        return am.getStreamVolume(AudioManager.STREAM_MUSIC);
+        if(hvol < 0) hvol = am.getStreamVolume(AudioManager.STREAM_MUSIC);
+        else {
+            int sv = am.getStreamVolume(AudioManager.STREAM_MUSIC);
+            log(sv +"  " + hvol/2);
+            if (sv != hvol/2) hvol = sv*2;
+        }
+        return hvol;
 
     }
 
     @Override
     public void onVolChanged(int i) {
-        log("Vol changed: "+ i);
-        int max = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+        int max = getMaxVol();
+        log("Vol changed: "+ i +" max: " + max);
         if(i > max) i = max;
-        else if(i < 0) i = 0;
-
+        else if(i < 1) i = 0;
+        hvol = i;
+//        if(i %2 == 0)
+        log("is half set active: " + (i%2==0) + " " + round(i/2) );
+        mService.setVolStep(i%2==0);
         am.setStreamVolume(
                 AudioManager.STREAM_MUSIC, // Stream type
-                i, // Index
+                round(i/2), // Index
                 0 //AudioManager.FLAG_SHOW_UI // Flags
         );
+
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        //just let the system do it if nowfrag is not visble
+//        if(!nowShowing || nf == null) return super.onKeyDown(keyCode, event);
+
+
+        if ((keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)){
+            //Do something
+            log("Volume down button clicked.");
+//            prevPressed();
+//            am.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, 0);
+              volDown();
+        }else if ((keyCode == KeyEvent.KEYCODE_VOLUME_UP)){
+            //Do something
+            log("Volume up button clicked.");
+//            nextPressed();
+//            am.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, 0);
+             volUp();
+        }else if ((keyCode == KeyEvent.KEYCODE_MEDIA_PREVIOUS)){
+            //Do something
+            log("Previous Media button clicked.");
+            prevPressed();
+        }else if ((keyCode == KeyEvent.KEYCODE_MEDIA_NEXT)){
+            //Do something
+            log("Next Media button clicked.");
+            nextPressed();
+        }else if ((keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE)){
+            //Do something
+            log("Play/pause Media button clicked.");
+            playPausePressed();
+        }
+
+        //show the change on the now fragment if its showing.
+        if(nowShowing && nf != null) nf.updateVol(getVol());
+
+        return true;
     }
 
     /* ---------- not needed? ------------- */

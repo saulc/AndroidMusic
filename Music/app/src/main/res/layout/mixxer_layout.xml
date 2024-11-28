@@ -6,23 +6,33 @@
     android:padding="@dimen/text_margin"
     android:background="?colorPrimaryDark">
 
-        <include layout="@layout/mixxer_control"
+<!--        <include-->
+<!--            android:id="@+id/fade"-->
+<!--            layout="@layout/mix_fragment"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="0dp"-->
+<!--            android:layout_weight="1" />-->
+
+        <include
             android:id="@+id/deck0"
+            layout="@layout/mixxer_control"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_weight="1" />
 
-        <include layout="@layout/mixxer_control"
+        <include
             android:id="@+id/deck1"
-            android:background="?colorPrimary"
+            layout="@layout/mixxer_control"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="?colorPrimary" />
 
-        <include layout="@layout/mixxer_control"
+        <include
             android:id="@+id/deck2"
+            layout="@layout/mixxer_control"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_weight="1" />
 
 

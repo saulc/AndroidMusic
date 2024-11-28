@@ -1,14 +1,13 @@
 package music.app.my.music.adapters;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.undo.UndoAdapter;
 import com.nhaarman.listviewanimations.util.Insertable;
@@ -61,6 +60,8 @@ public class QueueAdapter extends BaseAdapter implements UndoAdapter , Swappable
     public Object getItem(int position) {
         if(repeatMode == 1 && current < mValues.size()) return mValues.get(current);
         int s = mValues.size();
+        if(s == 0) return null;
+
         if(repeatMode == 2) return mValues.get(position % s);
 
        // if(repeatMode == 0)
@@ -71,6 +72,7 @@ public class QueueAdapter extends BaseAdapter implements UndoAdapter , Swappable
     private int getPos(int p){
         if(repeatMode == 1 && current < mValues.size()) return  current;
         int s = mValues.size();
+        if(s == 0) return 0;
         if(repeatMode == 2) return (p % s);
 
         return p;
@@ -83,9 +85,9 @@ public class QueueAdapter extends BaseAdapter implements UndoAdapter , Swappable
     @Override
     public long getItemId(int position) {
         long i = 0;
-
+        if(mValues.size() == 0) return -1;
         try {
-            if(position >= mValues.size()) position %= mValues.size();
+            if(position >= mValues.size() ) position %= mValues.size();
            i =  Long.parseLong(mValues.get(position).getId());
         } catch (NumberFormatException e) {
             e.printStackTrace();
@@ -98,7 +100,9 @@ public class QueueAdapter extends BaseAdapter implements UndoAdapter , Swappable
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.fragment_queueitem, parent, false);
 
+        if(position == -1) return view;
         final Song mItem = (Song) getItem(position);
+        if(mItem == null) return view;
             mView = view;
             mIdView = (TextView) view.findViewById(R.id.id);
             mContentView = (TextView) view.findViewById(R.id.content);
@@ -150,9 +154,11 @@ public class QueueAdapter extends BaseAdapter implements UndoAdapter , Swappable
     @NonNull
     @Override
     public View getUndoView(int i, @Nullable View view, @NonNull ViewGroup viewGroup) {
-        uv =  getView(i, view, viewGroup);
 
-        mIdView.setText("Swipe again to remove.");
+        uv =  getView(i, view, viewGroup);
+        if(view == null ) return uv;
+
+                mIdView.setText("Swipe again to remove.");
         mContentView.setText("Tap to undo.");
 //        TextView v = new TextView();
 //        v.setText("Swipe again to remove " + mValues.get(i).getTitle() + " from queue.");

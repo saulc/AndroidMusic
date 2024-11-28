@@ -5,12 +5,14 @@ import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.media.audiofx.Equalizer;
+import android.os.Handler;
 import android.util.Log;
 
 
 import java.io.IOException;
 import java.util.ArrayList;
 
+import music.app.my.music.helpers.Logger;
 import music.app.my.music.types.Song;
 import music.app.my.music.types.plist;
 
@@ -18,6 +20,7 @@ import music.app.my.music.types.plist;
 public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 
 	private Equalizer eq;
+	private Handler mHandler;
 	
 	private ArrayList<myPlayer> player;
 	 private int currentPlayer = 0;	//the one actually palying
@@ -37,12 +40,17 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 	
 	private boolean CrossFadeEnabled = true;
 	private boolean playWhenPrepared = true;
-	private int fadeInDuration = 1000, fadeOutDuration = 2000, fadeOutGap = 4000;
+	private int fadeInDuration = 7000, fadeOutDuration = 12000, fadeOutGap = 4000, fadeInGap = 1000;
 
 	private void log(String s){
-		Log.d(getClass().getSimpleName(), s);
+//        Logger.log(TAG, s);
+		Log.i(getClass().getSimpleName(), s);
 	}
-	
+
+	public void setVolStep(boolean active){
+		for(int i=0; i <player.size(); i++)
+			player.get(i).setVolStep(active);
+	}
 	public MusicPlayer(MusicPlayerStateListener l){
 		iniPlayer();
 		sListener = l;
@@ -53,10 +61,12 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 			fadeInDuration = 500;
 			fadeOutDuration = 500;
 			fadeOutGap = 2000;
+			fadeInGap = 500;
 		}
 		queue = new plist();
 		index = 0;
-		
+
+		mHandler = new Handler();
 	}
 
 	//3 myplayers only! never add. never remove. only reset.
@@ -67,38 +77,55 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 			nextPlayer = 1;
 			auxPlayer = 2;
 
-			myPlayer temp = new myPlayer();
-			temp.setId(currentPlayer);
+			myPlayer temp = new myPlayer(0);
+//			temp.setId(0);
 			player.add(temp);
-			temp = new myPlayer();
-			temp.setId(nextPlayer);
+			temp = new myPlayer(1);
+//			temp.setId(1);
 			player.add(temp);
-			temp = new myPlayer();
-			temp.setId(auxPlayer);
+			temp = new myPlayer(2);
+//			temp.setId(2);
 			player.add(temp);
+
 
 		}
 
 	}
 
+	//update the new music player's fader settings ..
+	public void updateFader(){
+		setFadeInDuration(fadeInDuration);
+		setFadeInGap(fadeInGap);
+		setFadeOutDuration(fadeOutDuration);
+		setFadeOutGap(fadeOutGap);
+	}
 	public void setFadeOutGap(int g){
+		fadeOutGap = g;
 		for(myPlayer p: player)
 			//myPlayer p = player.get(currentPlayer);
 			p.setFadeOutGap(g);
 	}
 	public void setFadeInGap(int g){
+		fadeInGap = g;
 		for(myPlayer p: player)
 			p.setStartGap(g);
 	}
 	public void setFadeOutDuration(int g){
+		fadeOutDuration = g;
 		for(myPlayer p: player)
 			p.setFadeOutDuration(g);
 	}
 
 	public void setFadeInDuration(int g){
+		fadeInDuration = g;
 		for(myPlayer p: player)
 			p.setFadeInDuration(g);
 	}
+
+	public int getFadeInGap(){ return player.get(currentPlayer).getStartGap(); }
+	public int getFadeInDuration(){ return player.get(currentPlayer).getFadeInDuration(); }
+	public int getFadeOutDuration(){ return player.get(currentPlayer).getFadeOutDuration(); }
+	public int getFadeOutGap(){ return player.get(currentPlayer).getFadeOutGap(); }
 
 
 	private void setState(MUSICPLAYER_STATE s){
@@ -137,12 +164,11 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 	}
 	
 	public void pauseRequest() {
-		 if(mState == MUSICPLAYER_STATE.PLAYING || mState == MUSICPLAYER_STATE.PLAYING_DUCKING)
+		 if(mState == MUSICPLAYER_STATE.PLAYING || mState == MUSICPLAYER_STATE.PLAYING_DUCKING) {
 			 player.get(currentPlayer).pausePlayback();
-			 
-			 
+
 			 setState(MUSICPLAYER_STATE.PAUSED_USER);
-		 
+		 }
 	}
 	
 	public void previousRequest() {
@@ -217,8 +243,10 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 		//setup the new player, aux should be 2 songs previous. already faded out and done with.
 		//aux represents the player after next.
 		//we reset now. the next player will be reset when it becomes aux ie. after it has faded out.
-		player.get(auxPlayer).stop();
-		player.get(auxPlayer).reset();
+//		player.get(auxPlayer).stop();
+//		player.get(auxPlayer).reset();
+
+
 
 		incrementPlayers(); //move each player role to the next step. cur -> next - > aux -> cur *
 
@@ -261,13 +289,16 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 	//this should never be called!!
 	@Override
 	public void onCompletion(MediaPlayer mp) {
-		Log.i("Music Service", mp + " player completed! wft!!! <<------");
+		log( mp + " player completed! wft!!! <<------");
 		((myPlayer)mp).removeCallbacks();
-		int i = ((myPlayer)mp).getId();
+
+		int i = currentPlayer; //((myPlayer)mp).getId();
+		log( "PLayer completed: " + i);
 		player.remove(i);
-		myPlayer rp = new myPlayer();
-		rp.setId(i);
+		myPlayer rp = new myPlayer(i);
+//		rp.setId(i);
 		player.add(i,  rp);
+		updateFader();
 
 
 //		if(player.contains(mp)){
@@ -277,14 +308,14 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 		mp.release();
 		mp = null;
 
-		Log.i("Music Service", mp + "Get ready...Crunch? --->>>");
+		log( mp + "Get ready...Crunch? --->>>");
 	}
 
 
 
 	public void playRequest() {
 
-
+//		updateFader();
 		log("Play requested");
 		if(queue.getSize() == 0) //play all songs
 		{
@@ -303,9 +334,61 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 	    	player.get(currentPlayer).playAndFadeIn();
 	    	setState(MUSICPLAYER_STATE.PLAYING);
 
+//	    	mHandler.postDelayed(volCheck, getFadeInDuration()*2);
+	    	//fix annoying problem where current player is faded out
+
+			//try to catch it early, hopefully before its audible.
+//			mHandler.postDelayed(volCheck2,  getFadeInDuration()+320);
+
 	    }
 	
 	}
+
+	public void fadeIn(){
+		player.get(currentPlayer).fadeIn();
+	}
+
+	private Runnable volCheck = new Runnable() {
+		@Override
+		public void run() {
+			log("Checking volume levels.");
+			myPlayer p = player.get(currentPlayer);
+			if(!p.isPaused() && p.isPlaying()){
+				float v = p.getVolumeValue();
+				for(int i=0; i<1000; i++);
+
+				if(v < p.getVolumeValue() || v < .05f){
+					log("Using volume fix: " + v + " Fading in...");
+					p.fadeIn();
+				}else if(v < .75f){
+					log("Volume ok. " + v +" " + p.getVolumeValue());
+
+					mHandler.postDelayed(volCheck, 100);
+				}else
+					log("Volume ok. " + v +" " + p.getVolumeValue());
+
+			}
+
+		}
+	};
+
+	private Runnable volCheck2 = new Runnable() {
+		@Override
+		public void run() {
+			log("Checking fade in...");
+			myPlayer p = player.get(currentPlayer);
+			if(!p.isPaused() && p.isPlaying()){
+				float v = p.getVolumeValue();
+				if(v < .7f){
+					log("Fade out caught. " + v + " applying fix...");
+					p.fadeIn();
+				}else log("fade in ok. " + v);
+			}
+
+		}
+	};
+
+
 
 	public int getAID(){
 		return player.get(currentPlayer).getAudioSessionId();
@@ -374,13 +457,15 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 	private void prepareSong() {
 		if(queue.getSize() > 0){
 			try {
-				
-		
+
+//			 player.get(currentPlayer).stop();
+			 player.get(currentPlayer).reset();
 			 player.get(currentPlayer).setDataSource(queue.nowPlayingPath());
 			 player.get(currentPlayer).setOnPreparedListener(this);
 			 player.get(currentPlayer).setOnCompletionListener(this);
 			 player.get(currentPlayer).prepareAsync();
 			 setState(MUSICPLAYER_STATE.PREPARING);
+
 			// player.get(currentPlayer).attachAuxEffect(eq.getId());
 			 
 			} catch (IllegalArgumentException e) {
@@ -398,8 +483,6 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 			}
 		}
 	}
-	public int getFadeOutDuration(){ return player.get(currentPlayer).getFadeOutDuration(); }
-	public int getFadeOutGap(){ return player.get(currentPlayer).getFadeOutGap(); }
 
 	public int getCurrentPosition(){
 		if(!isPlaying()) return 0;

@@ -1,20 +1,18 @@
 package music.app.my.music.ui.browser;
 
 import android.content.ContentResolver;
-import android.content.ContentValues;
+import android.content.ContentUris;
 import android.content.Context;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.Size;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,25 +21,36 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.annotation.RequiresApi;
+import androidx.recyclerview.widget.LinearLayoutManager;
+
 import com.simplecityapps.recyclerview_fastscroll.interfaces.OnFastScrollStateChangeListener;
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 
+import music.app.my.music.DrawerActivity;
 import music.app.my.music.R;
 import music.app.my.music.adapters.SongAdapter;
 import music.app.my.music.helpers.MediaHelperListener;
 import music.app.my.music.types.Playlist;
 
 import music.app.my.music.types.Song;
-import music.app.my.music.ui.ControlFragment;
 
 /**
  * Created by saul on 7/26/16.
  */
-public class SongFragment extends baseListFragment implements MediaHelperListener {
+public class   SongFragment extends baseListFragment implements MediaHelperListener , DrawerActivity.mFabListener {
+
+    @Override
+    public void onMove(float x, float y) {
+        log("move called:" + x + " " + y);
+//            int sy = (int) (y/10);
+        log("scroll by:" + y);
+//            recyclerView.scrollBy(0, (int) y);
+    }
 
     public enum SF_TYPE {QUEUE, PLAYLISTITEMS, SONGS, ALBUMS, ARTISTS, GENRE, QUERY, BUBBLE };
     private SF_TYPE myType = SF_TYPE.SONGS;
@@ -49,6 +58,7 @@ public class SongFragment extends baseListFragment implements MediaHelperListene
     private final String TAG = getClass().getSimpleName();
     private void log(String s){
         Log.d(TAG, s);
+//        Logger.log(getClass().getSimpleName(), s);
     }
 
    // private MediaStoreHelper msHelper;
@@ -158,7 +168,18 @@ public class SongFragment extends baseListFragment implements MediaHelperListene
         if(myType == SF_TYPE.QUERY)  mListener.onSearchDestroyed();
         super.onDestroy();
     }
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private Bitmap getAlbumArtwork(ContentResolver resolver, long albumId) throws IOException {
+        Uri contentUri = ContentUris.withAppendedId(
+                MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
+                albumId
+        );
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            return resolver.loadThumbnail(contentUri, new Size(640, 480), null);
+        }
+        return null;
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -185,6 +206,7 @@ public class SongFragment extends baseListFragment implements MediaHelperListene
             songbar.setProgress(songprogress);
             songbar.setMax(100);
 
+//            recyclerView.scrollBy();
 
             mhandler = new Handler();
             mhandler.postDelayed(updatesongbar, 10);
@@ -192,19 +214,33 @@ public class SongFragment extends baseListFragment implements MediaHelperListene
 
             if(myType == SF_TYPE.ALBUMS) {
                 if (pid != null) {
+                    try {
+                        String aa= pid;
+                        log("Now fragment updating albumart: " + aa);
+                        long p = Long.parseLong(aa);
+                        Bitmap b =  getAlbumArtwork( getContext().getContentResolver() , p);
+
+                        Drawable d = new BitmapDrawable(getResources(), b);
 
                     ImageView bigIcon = (ImageView) view.findViewById(R.id.bigIcon);
-                    String p =  getArguments().getString("AlbumArt"); //findAlbumArt(pid);
+                    bigIcon.setImageDrawable(d);
 
-                    log(" fragment updating albumart: " + p);
-                    Drawable d = Drawable.createFromPath(p);
-                    if (d != null) {
-                        Bitmap bitmap = ((BitmapDrawable) d).getBitmap();
-                        d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, 600, 600, true));
+                    } catch (IOException e) {
+//                        throw new RuntimeException(e);
+                    }
 
-                        bigIcon.setImageDrawable(d);
-
-                    }//else icon.setImageResource(R.drawable.android_robot_icon_2);
+//                    ImageView bigIcon = (ImageView) view.findViewById(R.id.bigIcon);
+//                    String p =  getArguments().getString("AlbumArt"); //findAlbumArt(pid);
+//
+//                    log(" fragment updating albumart: " + p);
+//                    Drawable d = Drawable.createFromPath(p);
+//                    if (d != null) {
+//                        Bitmap bitmap = ((BitmapDrawable) d).getBitmap();
+//                        d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, 600, 600, true));
+//
+//                        bigIcon.setImageDrawable(d);
+//
+//                    }//else icon.setImageResource(R.drawable.android_robot_icon_2);
                 }
             }
 
@@ -306,7 +342,7 @@ public class SongFragment extends baseListFragment implements MediaHelperListene
             mhandler.removeCallbacks(updatesongbar);
         }
 
-        log("progress: " + songbar.getProgress());
+     //   log("progress: " + songbar.getProgress());
 
     }
     @Override

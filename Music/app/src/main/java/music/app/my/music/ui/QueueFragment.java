@@ -3,7 +3,6 @@ package music.app.my.music.ui;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -12,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
+import androidx.annotation.NonNull;
 
 import com.nhaarman.listviewanimations.appearance.simple.AlphaInAnimationAdapter;
 import com.nhaarman.listviewanimations.appearance.simple.SwingBottomInAnimationAdapter;
@@ -19,7 +19,7 @@ import com.nhaarman.listviewanimations.appearance.simple.SwingLeftInAnimationAda
 import com.nhaarman.listviewanimations.itemmanipulation.DynamicListView;
 import com.nhaarman.listviewanimations.itemmanipulation.dragdrop.TouchViewDraggableManager;
 import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.OnDismissCallback;
-import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.undo.SimpleSwipeUndoAdapter;
+import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.SwipeDismissAdapter;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -28,6 +28,7 @@ import java.util.Date;
 
 import music.app.my.music.R;
 import music.app.my.music.adapters.QueueAdapter;
+import music.app.my.music.helpers.Logger;
 import music.app.my.music.helpers.QueueListener;
 import music.app.my.music.types.Song;
 import music.app.my.music.types.plist;
@@ -51,7 +52,7 @@ public class QueueFragment extends baseListFragment {
     private ArrayList<Song> items;
     private DynamicListView mListView;
     private TextSwitcher qHeader;
-    private int headerMode = 0; //song count only, 1 = seconds. 2 = full count, 3 remaining playtime
+    private int headerMode = 1; //song count only, 1 = seconds. 2 = full count, 3 remaining playtime
 
     //private MediaStoreHelper msHelper;
     //private RecyclerView.Adapter mAdapter;
@@ -131,6 +132,7 @@ public class QueueFragment extends baseListFragment {
     public void updateAdapter(){
         if(items == null) {
             items = new ArrayList<>();
+            return;
         }
 
         mAdapter = new QueueAdapter(items, (QueueListener) getActivity());
@@ -142,34 +144,52 @@ public class QueueFragment extends baseListFragment {
 
     //    animationAdapter.setAbsListView(mListView);
   //      mListView.setAdapter(animationAdapter);
+        if( getView()  == null) return;
+        if(mListView == null)   mListView = (DynamicListView) getView().findViewById(R.id.qlistview);
+
         mListView.enableDragAndDrop();
         mListView.setDraggableManager(new TouchViewDraggableManager(R.id.content));
 
-        SimpleSwipeUndoAdapter swipeUndoAdapter = new SimpleSwipeUndoAdapter(alphaAdapter, getContext(),
-                new OnDismissCallback() {
-                    @Override
-                    public void onDismiss(@NonNull final ViewGroup listView, @NonNull final int[] reverseSortedPositions) {
-                        for (int position : reverseSortedPositions) {
+//        SimpleSwipeUndoAdapter swipeUndoAdapter = new SimpleSwipeUndoAdapter(alphaAdapter, getContext(),
+//                new OnDismissCallback() {
+//                    @Override
+//                    public void onDismiss(@NonNull final ViewGroup listView, @NonNull final int[] reverseSortedPositions) {
+//                        for (int position : reverseSortedPositions) {
+//                            mListener.onItemSwiped(items.get(position), position);
+//                            mAdapter.notifyDataSetChanged();
+//                        }
+//                    }
+//                }
+//        );
+
+        SwipeDismissAdapter swipeAdapter = new SwipeDismissAdapter(alphaAdapter, new OnDismissCallback() {
+            @Override
+            public void onDismiss(@NonNull ViewGroup viewGroup, @NonNull int[] ints) {
+                for (int position : ints) {
                             mListener.onItemSwiped(items.get(position), position);
                             mAdapter.notifyDataSetChanged();
                         }
-                    }
+            }
+        });
+
+        swipeAdapter.setAbsListView(mListView);
+        mListView.setAdapter(swipeAdapter);
+        mListView.enableSwipeToDismiss(new OnDismissCallback() {
+            @Override
+            public void onDismiss(@NonNull ViewGroup viewGroup, @NonNull int[] ints) {
+                for (int position : ints) {
+                    log("p: "+ position);
+                    mListener.onItemSwiped(items.get(position), position);
+                    mAdapter.notifyDataSetChanged();
                 }
-        );
-
-
-        swipeUndoAdapter.setAbsListView(mListView);
-        mListView.setAdapter(swipeUndoAdapter);
-        mListView.enableSimpleSwipeUndo();
+            }
+        });
+//        mListView.enableSimpleSwipeUndo();
         mListView.setFastScrollEnabled(true);
-
 
         mAdapter.setCurrent(current);
         mAdapter.setRepeatMode(repeatMode);
-      //  ((QueueAdapter)  mAdapter).setCurrent(current);
         mListView.setSelection(current) ;
-        // mListView.setAdapter(mAdapter);
-
         log("Updating adapter");
         mAdapter.notifyDataSetChanged();
 
@@ -197,7 +217,7 @@ public class QueueFragment extends baseListFragment {
 
     private  void updateHeader(){
         int s = items.size();
-        String m = "Now playing queue contains: " + s + " song" + ( (s >1) ? "s": "");
+        String m = "Now playing: " + s + " song" + ( (s >1) ? "s": "");
 
         //song count only, 1 = seconds. 2 = full count, 3 remaining playtime
         if (headerMode > 1) {
@@ -206,7 +226,7 @@ public class QueueFragment extends baseListFragment {
             long td = 0;     //total duration in seconds
             for (int i=current; i< items.size(); i++) td += items.get(i).getDuration();
 
-            if(headerMode == 2) m +=  td + "Seconds ";   //seconds only
+            if(headerMode == 2) m +=  td + " Seconds ";   //seconds only
             else m += secToString(td);      //long version.
 
         }
@@ -214,7 +234,8 @@ public class QueueFragment extends baseListFragment {
             //long version
             long td = 0;     //total duration in seconds
             for (Song i : items) td += i.getDuration();
-            m += " Total Playtime: " + secToString(td);
+            m += " Playtime: " + secToString(td);
+            m += " / " + td + " Seconds" ;
         }
         qHeader.setText( m );
     }
@@ -254,6 +275,7 @@ public class QueueFragment extends baseListFragment {
 
     private void log(String s){
         Log.d(getClass().getSimpleName(), s);
+//        Logger.log(getClass().getSimpleName(), s);
     }
 
 

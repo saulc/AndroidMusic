@@ -2,17 +2,16 @@ package music.app.my.music.ui;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
+
+import androidx.fragment.app.Fragment;
 
 import music.app.my.music.R;
 import music.app.my.music.player.MusicPlayer;
@@ -25,6 +24,13 @@ import music.app.my.music.player.myPlayer;
  * to handle interaction events.
  * Use the {@link MixxerFragment#newInstance} factory method to
  * create an instance of this fragment.
+ *
+ * shows status of 3 media players that make up
+ * the crossfading music player service core.
+ *
+ * created for debugging volume sync bug.
+ * sometimes the current track is faded out when it should be fading in...
+ * or shadow tracks playing when should be paused. (early bug)...
  */
 public class MixxerFragment extends Fragment {
 
@@ -136,8 +142,8 @@ public class MixxerFragment extends Fragment {
             player = mp;
             if(role == 0)  mixText0.setTextColor(Color.GREEN);
             else mixText0.setTextColor(Color.RED);
-
-            mixText0.setText(getRoleText() + getInfo(mp));
+            try {
+                mixText0.setText(getRoleText() + getInfo(mp));
 
 
             if(mp.getmPlayers().get(index).isPaused()) pause.setBackgroundColor(Color.GREEN);
@@ -148,22 +154,28 @@ public class MixxerFragment extends Fragment {
 
             if(mp.getmPlayers().get(index).isPrepared()) reset.setBackgroundColor(Color.GREEN);
             else reset.setBackgroundColor(Color.RED);
-
+            }catch(IllegalStateException e){
+                log(e.toString());
+            }
 
 
         }
         public void update(myPlayer p){
 
             volbar.setProgress( (int)(p.getVolumeValue()*100) );
-            posText.setText( " pos: " + ( p.getCurrentPosition() / 1000 ) );
-            if(p.isPrepared() && !p.isPaused()) {
+            try {
+                posText.setText(" pos: " + (p.getCurrentPosition() / 1000));
+                if (p.isPrepared() && !p.isPaused()) {
 
-                double d = p.getDuration();
-                double e = p.getCurrentPosition();
-                double f = (e / d * 100);
-                //log(" d: " + d + " pos: " + e + " pro: " + f);
-                posbar.setProgress((int)f);
-            }
+                    double d = p.getDuration();
+                    double e = p.getCurrentPosition();
+                    double f = (e / d * 100);
+                    //log(" d: " + d + " pos: " + e + " pro: " + f);
+                    posbar.setProgress((int) f);
+                }
+            } catch(IllegalStateException e){
+                log(e.toString());
+                }
 
         }
 

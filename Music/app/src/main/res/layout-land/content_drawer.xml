@@ -23,6 +23,13 @@
         android:layout_height="match_parent"
         android:orientation="horizontal">
 
+        <include
+            layout="@layout/menulist"
+            android:layout_width="@dimen/menu_width"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:background="?colorPrimary"  />
+
         <FrameLayout
 
             android:id="@+id/frame"
@@ -51,6 +58,13 @@
             <FrameLayout
 
                 android:id="@+id/qframe"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            </FrameLayout>
+            <FrameLayout
+
+                android:id="@+id/logframe"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 

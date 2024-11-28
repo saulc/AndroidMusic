@@ -5,19 +5,29 @@ import android.os.Handler;
 import android.util.Log;
 
 public class myPlayer extends MediaPlayer
+
 		implements MediaPlayer.OnErrorListener {
 
 	private Handler mHandler = new Handler();
 	private float volumeValue = 0f;
 	private boolean paused = true;
-	private int fadeInDuration = 1000, fadeOutDuration = 2000, fadeOutGap = 4000, startGap = 0;
+	private int pausePos = 0;
+
+	private int fadeInDuration = 7000, fadeOutDuration = 12000, fadeOutGap = 4000, startGap = 0;
 	private int mCurrentStep = 1;
+	private float lastvol = 0f;
+	private float maxVol = 1f;
+	private float stepVol = .5f;
+
+	private boolean isFading = false;
+
     private float duckVolume = .1f;
     private boolean isPrepared = false;
 	private int id = -1;
 
-    public myPlayer(){
+    public myPlayer(int i){
     	super();
+		setId(i);
     	
     }
  
@@ -28,6 +38,12 @@ public class myPlayer extends MediaPlayer
     	fadeOutGap = outg;
     	startGap = startg;
     }
+	public void setVolStep(boolean active){
+		if(active) maxVol = stepVol;
+		else maxVol = 1f;
+		if(!isFading) setVol((maxVol));
+	}
+
 
     public void setId(int i){
     	id = i;
@@ -38,11 +54,25 @@ public class myPlayer extends MediaPlayer
 	}
 
 	public void playAndFadeIn(){
-		paused = false;
+
+//			Log.d("player", "seeking to " + pausePos );
+//			seekTo(pausePos);
+
 		start();
+		paused = false;
 		setVol(0);
+		mCurrentStep = 1;
 		mHandler.post(fadeInVolume);
 		
+	}
+	private boolean fadingIn = false;
+
+	public boolean isFadingIn() {
+		return fadingIn;
+	}
+
+	public void fadeIn(){
+		mHandler.post(fadeInVolume);
 	}
 	public void playAndFadeIn(int ms){
 		fadeInDuration = ms;
@@ -61,6 +91,7 @@ public class myPlayer extends MediaPlayer
     	if(paused) return;
 		mHandler.post(fadeOutVolume);
 		mHandler.postDelayed(pause, fadeOutDuration + 1000);
+		pausePos = getCurrentPosition();
 		paused = true;
 	}
 
@@ -97,7 +128,7 @@ public class myPlayer extends MediaPlayer
 
 			if(isPlaying()){
 			volumeValue = v;
-			setVolume(v, v);
+			setVolume(v, v);  //balance slider goes here...
 			//Log.i("MyPlayer", "volume at " + volumeValue);
 			}
 		} catch (IllegalStateException e) {
@@ -114,18 +145,33 @@ public class myPlayer extends MediaPlayer
 	    	@Override
 	    public void run()
 	    {
-	    	
+//	    	if(!fadingIn) fadingIn = true;
+
+//				float temp = lastvol;
+				lastvol = (float) ( Math.pow(mCurrentStep, 2) / Math.pow((fadeInDuration / 50.), 2) );
+				if(!isFading){
+//					Log.d("myPlayer", "Found audio bug...." + mCurrentStep +" " + fadeInDuration);
+//					setVol(0);
+					mHandler.removeCallbacks(fadeInVolume);
+					mCurrentStep = 1;
+					isFading = true;
+
+//					mHandler.postDelayed(fadeInVolume, 200);
+//					return;
+				}
 	    		//setVol( (float) ( Math.log( mCurrentStep + 1) / (Math.log( (fadeInDuration/20)) )) );
-	    		setVol( (float) ( Math.pow(mCurrentStep, 2) / Math.pow((fadeInDuration / 50), 2) ) );
+	    		setVol( lastvol );
 	    		//Log.d("Myplayer", mCurrentStep + " fading in: " + volumeValue);
 	    		//setVol( (float) ( Math.pow( ( mCurrentStep - (fadeOutDuration/20)), 2) / Math.pow( mCurrentStep + (fadeOutDuration/20), 2) ) );
 
 	    		mCurrentStep++;
+//				Log.d("myPlayer", "plyer step fadeing in: "+mCurrentStep);
 	      // if (mCurrentStep++ > (fadeInDuration/20)) {
-	    		if(volumeValue >= .98){
-	        	setVol(1);
+	    		if(volumeValue >= maxVol){
+	        	setVol(maxVol);
 	        	mHandler.removeCallbacks(fadeInVolume);
 	        	mCurrentStep = 1;
+	        	isFading = false;
 	        } else mHandler.postDelayed(fadeInVolume, 50);
 	    }
 	    };
@@ -136,19 +182,21 @@ public class myPlayer extends MediaPlayer
 	    	@Override
 	    public void run()
 	    {
-	    		
+	    		if(mCurrentStep == 1) isFading = true;
 	    		//setVol((float) ( Math.log( (fadeOutDuration/20) - mCurrentStep + 1) / (Math.log( (fadeOutDuration/20) ) ) ) );
 //	    		setVol( (float) ( ( ( (fadeOutDuration/50) - mCurrentStep) * ( (fadeOutDuration/50) - mCurrentStep) ) 
 //	    				/( (fadeOutDuration/50) * (fadeOutDuration/50) ) ) );
-	    		setVol( (float) ( Math.pow((fadeOutDuration / 50) - mCurrentStep, 2) / Math.pow(fadeOutDuration / 50, 2) ) );
+	    		setVol( (float) (maxVol*( Math.pow((fadeOutDuration / 50.) - mCurrentStep, 2) / Math.pow(fadeOutDuration / 50., 2) )) );
 	    		//Log.d("Myplayer", mCurrentStep + " fading out: " + volumeValue);
 
-	    		mCurrentStep++;
-	    //    if (mCurrentStep++ > (fadeOutDuration/20)) {  || (getCurrentPosition() >= getDuration()) 
-	    		if((volumeValue <= 0.15) ){
+//	    		mCurrentStep++;
+//			Log.d("Myplayer", "fade out current step: " + mCurrentStep );
+	    //    if (mCurrentStep++ > (fadeOutDuration/20)) {  || (getCurrentPosition() >= getDuration())
+	    		if((fadeOutDuration / 50. <= mCurrentStep++) ){
 	        	setVol(0f);
 	        	mHandler.removeCallbacks(fadeOutVolume);
 	        	mCurrentStep = 1;
+				isFading = false;
 	        } else 	mHandler.postDelayed(fadeOutVolume, 50);
 	    }
 	    };
@@ -191,7 +239,7 @@ public class myPlayer extends MediaPlayer
 		public void setNormalVolume() {
 			// TODO Auto-generated method stub
 			if(!paused)
-				setVol(1f);
+				setVol(maxVol);
 		}
 		
 

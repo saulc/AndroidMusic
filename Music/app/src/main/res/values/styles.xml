@@ -3,6 +3,7 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat">
         <!-- Customize your theme here. -->
+        <item name="android:windowContentTransitions">true</item>
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
@@ -40,6 +41,7 @@
     <style name="AppThemeLight" parent="Theme.AppCompat.Light.NoActionBar" />
 
     <style name="DarkSide" parent="Theme.AppCompat.NoActionBar" >
+        <item name="android:windowContentTransitions">true</item>
         <item name="colorPrimary">@color/darksidecp</item>
         <item name="colorPrimaryDark">@color/darksidecd</item>
         <item name="colorAccent">@color/darksideca</item>
@@ -48,21 +50,24 @@
 
     <style name="AppThemeNior" parent="Theme.AppCompat.NoActionBar" >
         <item name="android:colorBackground">?colorPrimaryDark</item>
+        <item name="android:windowContentTransitions">true</item>
     </style>
 
     <style name="AppThemeColors" parent="Theme.AppCompat.NoActionBar" >
         <item name="colorPrimary">@color/colorscp</item>
         <item name="colorPrimaryDark">@color/colorscd</item>
         <item name="colorAccent">@color/colorsca</item>
-        <item name="android:colorBackground">?colorPrimaryDark</item>
+        <item name="android:colorBackground">@color/jarviscp</item>
+        <item name="android:colorForeground">@color/darksideca</item>
     </style>
 
-    <style name="AppThemeJarvis" parent="Theme.AppCompat.Light.NoActionBar" >
+    <style name="AppThemeJarvis" parent="Theme.AppCompat.NoActionBar" >
         <item name="colorPrimary">@color/jarviscp</item>
         <item name="colorPrimaryDark">@color/jarviscd</item>
         <item name="colorAccent">@color/jarvisca</item>
         <item name="android:colorBackground">?attr/colorPrimaryDark</item>
-        <item name="android:colorForeground">?attr/colorPrimary</item>
+        <item name="android:colorForeground">@color/jarvisca</item>
+
     </style>
 
 

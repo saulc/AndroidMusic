@@ -23,9 +23,10 @@
         android:layout_marginTop="@dimen/top_text_margin"
         android:layout_marginRight="@dimen/top_text_margin"
         android:layout_weight="3"
-        android:fontFamily="cursive"
+        android:fontFamily="casual"
         android:gravity="center_horizontal"
         android:lines="1"
+        android:textAlignment="center"
         android:textAppearance="?attr/textAppearanceListItem" />
 
     <TextView

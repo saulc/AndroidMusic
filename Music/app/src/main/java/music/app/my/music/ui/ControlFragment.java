@@ -10,9 +10,6 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,11 +19,14 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import androidx.fragment.app.Fragment;
+
 import java.util.ArrayList;
 
 import music.app.my.music.DrawerActivity;
 import music.app.my.music.R;
 import music.app.my.music.player.MusicPlayer;
+import music.app.my.music.types.Artist;
 import music.app.my.music.types.Playlist;
 import music.app.my.music.types.Song;
 
@@ -69,6 +69,10 @@ public class ControlFragment extends Fragment {
         int getMaxVol();
 
         int getVol();
+
+        void onArtistLongClick(Artist a);
+
+        void playPauseLongClicked();
     }
     private ControlFragmentListener mListener;
     private SeekBar sbar;
@@ -125,7 +129,7 @@ public class ControlFragment extends Fragment {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                     if(fromUser)
-                    mListener.seekBarChanged(progress);
+                        mListener.seekBarChanged(progress);
                 }
 
                 @Override

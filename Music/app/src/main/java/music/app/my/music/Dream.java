@@ -1,9 +1,12 @@
 package music.app.my.music;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.service.dreams.DreamService;
@@ -46,7 +49,7 @@ public class Dream extends DreamService implements FabDoubleTapGS.DoubleTapListe
     private Runnable updateDream = new Runnable() {
         @Override
         public void run() {
-            log("Update Dream.");
+           // log("Update Dream.");
             updateTime();
             mhandler.postDelayed(updateDream, delay);
 
@@ -102,7 +105,7 @@ public class Dream extends DreamService implements FabDoubleTapGS.DoubleTapListe
                     getString(R.string.preference_file_key), Context.MODE_PRIVATE);
 
         int defaultValue = 0; //black
-        cc = sharedPref.getInt(getString(R.string.saved_theme), defaultValue);
+        cc = sharedPref.getInt(getString(R.string.last_dream), defaultValue);
 
 
     }
@@ -139,10 +142,15 @@ public class Dream extends DreamService implements FabDoubleTapGS.DoubleTapListe
         DisplayMetrics metrics = getApplicationContext().getResources().getDisplayMetrics();
         width = metrics.widthPixels;
         height = metrics.heightPixels;
+        float den = metrics.density;
+        if(den < 2f)
+        dreamText.setTextSize(333f);
+        log("density: " + den);
         //v = Math.round(height/10f);
         log("Dreaming window size: " + width + " h: " + height);
 
         getLastBG();
+        clicked();
         mhandler = new Handler();
         mhandler.postDelayed(updateDream, 2000);
 
@@ -155,6 +163,7 @@ public class Dream extends DreamService implements FabDoubleTapGS.DoubleTapListe
 
     @Override
     public void onDreamingStopped(){
+        unregisterReceiver(mBatInfoReceiver);
         saveBG();
         mhandler.removeCallbacks(updateDream);
         wakeIntent = new Intent(this, MusicService.class);
@@ -162,12 +171,20 @@ public class Dream extends DreamService implements FabDoubleTapGS.DoubleTapListe
         startService(snoozeIntent);
     }
 
+    private BroadcastReceiver mBatInfoReceiver = new BroadcastReceiver(){
+        @Override
+        public void onReceive(Context ctxt, Intent intent) {
+            int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
+            batt = level + "%";
+        }
+    };
 
     //Day dream turned on! ;)  zzzz
     @Override
     public void onAttachedToWindow() {
         super.onAttachedToWindow();
 
+        registerReceiver(mBatInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
         // Exit dream upon user touch if false
         setInteractive(true);
         // Hide system UI
@@ -214,7 +231,8 @@ public class Dream extends DreamService implements FabDoubleTapGS.DoubleTapListe
 
     private void updateTime(){
         Date d = new Date();
-        DateFormat dateFormat = new SimpleDateFormat("h:mma");
+        DateFormat dateFormat = new SimpleDateFormat("h:mm");
+        DateFormat af = new SimpleDateFormat("aa");
         String s = dateFormat.format(d) + System.lineSeparator();
        // dateFormat = new SimpleDateFormat("mm");
         //s += dateFormat.format(d) + System.lineSeparator();
@@ -222,27 +240,40 @@ public class Dream extends DreamService implements FabDoubleTapGS.DoubleTapListe
         //s += dateFormat.format(d);
         int sec = Integer.parseInt(dateFormat.format(d));
         dreamTicker.setProgress(sec);
-        if(sec % 10 == 0) any = true;       //animate Y axis every 10 seconds.
-
 
         dateFormat = new SimpleDateFormat("EEEE MMMM d yyyy ");
         String s2 = dateFormat.format(d);
 
+        String ap = af.format(d);
+        //log("am: " + ap);
+        if(ap.toLowerCase().compareTo( "am") == 0)
+            dreamText.setTextColor(Color.GRAY);
+        else dreamText.setTextColor(Color.RED);
         dreamText.setText(s.toLowerCase());
-        subText.setText(s2 + System.lineSeparator() +  msg);
+        subText.setText(s2 + batt +  System.lineSeparator() +  msg);
+        if(sec % 10 == 0) any = true;       //animate Y axis every 10 seconds.
 
-        updateAnimation();
+         if(any) //batt = updateBatteryInfo();
+         updateAnimation();
     }
 
 
-    private boolean any = false;
+//    private String updateBatteryInfo(){
+//        BatteryManager bm = (BatteryManager)getSystemService(BATTERY_SERVICE);
+//        int batLevel = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
+//
+//        return batLevel + "%";
+//    }
+
+    private String batt = "";
+    private boolean any = true;
     private  float v =  100.0f, vx = 10f;  //update to v = height/10f; onDreamStarted()
     private float y = 0;
     private float x = 0;
 
     private  void updateAnimation(){
         //a simple bounce animation.
-        if(any) {
+
             y += v;
             log("Y: " + y + "  Height: " + height);
             if (y > height / 2 || y < 100) {
@@ -251,9 +282,9 @@ public class Dream extends DreamService implements FabDoubleTapGS.DoubleTapListe
             dreamText.animate().translationY(y);
             //subText.animate().translationY( y );
             any = false;
-        }
+
         x += vx;
-        if(x > width/2 || x < 0 ){
+        if(x > width/3 || x < 0 ){
             vx *= -1f;
         }
         subText.animate().translationX(x);

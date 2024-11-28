@@ -2,9 +2,6 @@ package music.app.my.music.ui.browser;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,10 +9,13 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.LinearLayoutManager;
+
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.util.ArrayList;
 
+import music.app.my.music.DrawerActivity;
 import music.app.my.music.R;
 import music.app.my.music.adapters.PlaylistAdapter;
 import music.app.my.music.types.Playlist;
@@ -25,12 +25,19 @@ import music.app.my.music.types.Song;
 /**
  * Created by saul on 7/26/16.
  */
-public class PlayListFragment extends baseListFragment {
+public class PlayListFragment extends baseListFragment implements DrawerActivity.mFabListener {
 
 
+    public void onMove(float x, float y) {
+        log("move called:" + x + " " + y);
+//            int sy = (int) (y/10);
+        log("scroll by:" + y);
+        recyclerView.scrollBy(0, (int) y);
+    }
     private final String TAG = getClass().getSimpleName();
     private void log(String s){
         Log.d(TAG, s);
+//        Logger.log(getClass().getSimpleName(), s);
     }
 
     private TextView countline;
@@ -117,17 +124,25 @@ public class PlayListFragment extends baseListFragment {
         return view;
     }
 
+    public void exportPlaylist(String name, String id){
+        log("playlist export, opening playlist: " + name);
+        int s = items.size();
+        log("checking playlists... found: " + s);
+//        PlaylistFilemaker pf = new PlaylistFilemaker();
+//        pf.exportPlaylist(name, id, items);
+    }
 
     @Override
     public void updateAdapter(){
         mAdapter = new PlaylistAdapter(items
                 , ( baseListFragment.OnListFragmentInteractionListener) getActivity() );
-    if(recyclerView == null) return;
+        if(recyclerView == null) return;
+
         recyclerView.setAdapter(mAdapter);
         log("Updating adapter");
         mAdapter.notifyDataSetChanged();
         log("items:" + items.size());
-        String sl = items.size() + " song" +  ( (items.size()==1) ? "" : "s");
+        String sl = items.size() + " playlist" +  ( (items.size()==1) ? "" : "s");
         countline.setText(sl);
     }
 

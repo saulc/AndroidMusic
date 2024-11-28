@@ -2,12 +2,12 @@ package music.app.my.music.player;
 
 
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.app.TaskStackBuilder;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -17,28 +17,37 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.MediaMetadataRetriever;
 import android.media.RemoteControlClient;
 import android.net.Uri;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
-import android.service.dreams.DreamService;
-import android.support.v4.app.NotificationCompat;
+import android.support.v4.media.MediaMetadataCompat;
+import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
-import music.app.my.music.DrawerActivity;
+import android.util.Size;
+
+import androidx.annotation.RequiresApi;
+import androidx.core.app.NotificationCompat;
+
+import java.io.IOException;
+
 import music.app.my.music.Dream;
 import music.app.my.music.R;
+import music.app.my.music.helpers.NotificationHelper;
 import music.app.my.music.types.Song;
 import music.app.my.music.types.plist;
 
 
 
-public class MusicService extends Service implements OnSharedPreferenceChangeListener, MusicPlayer.MusicPlayerStateListener{
+public class MusicService extends Service implements OnSharedPreferenceChangeListener,
+						MusicPlayer.MusicPlayerStateListener {
 
 	final static int myID = 1234;
 	private static final int NOTIFICATION_ID = 1;
@@ -68,18 +77,23 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 	private boolean dreaming = false;
 
 	private RemoteControlClientCompat mRemoteControlClientCompat;
-   private MediaControlReceiver mediaReceiver;
-   private NotificationCompat.Builder mBuilder;
-   private NotificationManager mNotificationManager;
+   private BroadcastReceiver mediaReceiver;
+//   private NotificationCompat.Builder mBuilder;
+//   private NotificationManager mNotificationManager;
  //  MyNoisyAudioStreamReceiver mNoisyAudioReceiver;
    private Notification mNotification = null;
   // private Equalizer eq;
    private  AudioFocusHelper audioFocus;
    private String queuePlaylist = "QUEUE";
    private long queuePlaylistId =  0;
+   private NotificationHelper noti;
+
+	private PlaybackStateCompat.Builder stateBuilder;
+	private MediaSessionCompat mediaSession;
 
 	private void log(String s){
 		Log.d(getClass().getSimpleName(), s);
+//		Logger.log(getClass().getSimpleName(), s);
 	}
 
    @Override
@@ -95,19 +109,61 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
          audioFocus = new AudioFocusHelper(this);
          audioFocus.requestFocus();
 
-         myEventReceiver = new ComponentName(getPackageName(),  MediaControlReceiver.class.getName());
+//         myEventReceiver = new ComponentName(getPackageName(),  MediaControlReceiver.class.getName());
 
          //register mediareceiver to get media button intents and "noisy" intent/headphone disconnected
-         mediaReceiver = new MediaControlReceiver();
+//         mediaReceiver = new MediaControlReceiver();
+		 mediaReceiver = new BroadcastReceiver(){
+			 @Override
+			 public void onReceive(Context context, Intent intent) {
+				 log("Device disconnected. Pausing music.");
+				 pauseRequest();
+			 }
+		 };
          IntentFilter noisyAudioIntentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
-         noisyAudioIntentFilter.addAction(Intent.ACTION_MEDIA_BUTTON);
+//         noisyAudioIntentFilter.addAction(Intent.ACTION_MEDIA_BUTTON);
          registerReceiver(mediaReceiver,noisyAudioIntentFilter);
 
-         am.registerMediaButtonEventReceiver(myEventReceiver);
+//         am.registerMediaButtonEventReceiver(myEventReceiver);
 
-         setupRemoteControls();
+	    mediaSession = new MediaSessionCompat(getApplicationContext(), "remote");
+//		mediaSession.setMediaButtonReceiver();
+	   mediaSession.setFlags(
+			   MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
+					   MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
+	   // Set an initial PlaybackState with ACTION_PLAY, so media buttons can start the player
+	   stateBuilder = new PlaybackStateCompat.Builder()
+			   .setActions(PlaybackStateCompat.ACTION_PLAY |
+					   PlaybackStateCompat.ACTION_SKIP_TO_NEXT| PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS);
+	   mediaSession.setPlaybackState(stateBuilder.build());
+
+	   mediaSession.setCallback(new MediaSessionCompat.Callback() {
+		   @Override
+		   public void onPlay() {
+//			   super.onPause();
+			   log("play/pause caught!");
+			   togglePlaybackRequest();
+		   }
+		   @Override
+		   public void onSkipToNext() {
+//			   super.onFastForward();
+			   log("next caught!");
+			   nextRequest();
+		   }
+		   @Override
+		   public void onSkipToPrevious() {
+//			   super.onRewind();
+			   log("previous caught!");
+			   previousRequest();
+		   }
+	   });
+	   mediaSession.setActive(true);
+//         setupRemoteControls();
 
          loadQueue();
+
+
+	   noti = new NotificationHelper(this, mediaSession);
 
        //  eq = new Equalizer(100, player.getAudioSessionId());
        //  setupEq();
@@ -152,6 +208,10 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
    }
 
 
+   public void fadeIn(){
+   	 log("Fading called.");
+   	 player.fadeIn();
+   }
    public void duck(){
    log("Music service Audio ducking: " + player.isDucking() );
 	   player.setDucking(!player.isDucking());
@@ -175,7 +235,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
     */
    public class LocalBinder extends Binder {
        public MusicService getService() {
-       	Log.i("Music Service", "Service binded");
+		   log( "Service binded");
            // Return this instance of LocalService so clients can call public methods
            return MusicService.this;
        }
@@ -189,6 +249,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 
    	//public void sendProgress(HashMap<String, String> info);
 
+	//   public void showNoti(String msg);
 	    public void sendProgress(MusicPlayer player);
 		public void setPlayPause(Boolean isPlaying);
 
@@ -212,7 +273,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 	   secs = secs * d;
 	   log("seekto " + secs + " m seconds");
 	   secs = secs / 100;
-	   log("seekto " + secs + " m seconds");
+	   log("seekto " + secs + " seconds");
 
 	   if(secs < getDuration() )
    		player.seekTo((int)(secs ));
@@ -239,6 +300,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 		log("Music Service is Destroying.");
 		removeFromForeground();  //remove notification
 		//saveQueue();
+		mediaSession.setActive(false);
 		unregisterReceiver(mediaReceiver);
 		audioFocus.abandonFocus();
 		mHandler.removeCallbacks(updateUi);
@@ -322,84 +384,129 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 
 	}
 
+	@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+	private Bitmap getAlbumArtwork(ContentResolver resolver, long albumId) throws IOException {
+		Uri contentUri = ContentUris.withAppendedId(
+				MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
+				albumId
+		);
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+			return resolver.loadThumbnail(contentUri, new Size(640, 480), null);
+		}
+		return null;
+	}
 	   /**
     * Configures service as a foreground service. A foreground service is a service that's doing
     * something the user is actively aware of (such as playing music), and must appear to the
     * user as a notification. That's why we create the notification here.
     */
    private void setUpAsForeground(String text) {
-	   Log.i("Music Service", "Setting service as Foreground");
+	   log("Setting service as Foreground");
 
-			   mBuilder =  new NotificationCompat.Builder(this);
-
-	   //RemoteViews rv = new RemoteViews(getPackageName(), R.layout.notification_layout);
+	   NotificationCompat.Builder nb = null;
 
 	   Song s = getQueue().getCurrentSong();
-	   Intent resultIntent = new Intent(this, DrawerActivity.class);
-	   TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-	   stackBuilder.addNextIntentWithParentStack(resultIntent);
-	   PendingIntent resultPendingIntent =
-			   stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 
-	   int pr = android.R.drawable.ic_media_pause;
-	   if(text.contains("Paused"))
-		   pr = android.R.drawable.ic_media_play;
+       Bitmap ab = null;
+       try {
+           ab = getAlbumArtwork(getContentResolver(), Long.parseLong(s.getAlbumId()) );
 
+	   } catch (IOException e) {
+		   log(e.toString());
+	   }
+	   if(ab == null) ab = BitmapFactory.decodeResource(getResources(), R.drawable.android_icon32);
+	   nb = noti.getNotification1(s.getTitle() + " (" + text + ") ",
+			   s.getArtist() + " - " + s.getAlbum(),
+			   ab);
 
-	   Intent pi = new Intent(this, MusicService.class);
-	   pi.setAction(MusicService.ACTION_TOGGLE_PLAYBACK);
-	   PendingIntent togglepi = PendingIntent.getService(this, 21, pi, PendingIntent.FLAG_UPDATE_CURRENT );
-	   NotificationCompat.Action pp = new NotificationCompat.Action(pr, "Play/Pause", togglepi);
+	   MediaMetadataCompat.Builder mediaMetaData_builder = new MediaMetadataCompat.Builder();
+	   mediaMetaData_builder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, s.getDuration() )
+			   .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, s.getArtist())
+			   .putString(MediaMetadataCompat.METADATA_KEY_TITLE, s.getTitle())
+			   .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, ab)
+	   ;
+	   mediaSession.setMetadata(mediaMetaData_builder.build());
+	   if (nb != null) {
 
-	   //previous
-	   Intent prei = new Intent(this, MusicService.class);
-	   prei.setAction(MusicService.ACTION_PREVIOUS);
-	   PendingIntent prevpi = PendingIntent.getService(this, 22, prei, PendingIntent.FLAG_UPDATE_CURRENT );
-	   NotificationCompat.Action previous = new NotificationCompat.Action(android.R.drawable.ic_media_previous, "Previous", prevpi);
+		  mNotification =  noti.notify(NOTIFICATION_ID, nb);
 
-	   //next
-	   Intent nexi = new Intent(this, MusicService.class);
-	   nexi.setAction(MusicService.ACTION_NEXT);
-	   PendingIntent nextpi = PendingIntent.getService(this, 23, nexi, PendingIntent.FLAG_UPDATE_CURRENT );
-	   NotificationCompat.Action next = new NotificationCompat.Action(android.R.drawable.ic_media_next, "Next", nextpi);
-
-
-	   Bitmap li = BitmapFactory.decodeResource(getResources(), R.drawable.android_icon32128);
-	    mBuilder.setSmallIcon(R.drawable.android_icon3small)
-				.setLargeIcon(li)
-						//.setStyle(new NotificationCompat.DecoratedCustomViewStyle())
-				.setColor(Color.argb(100, 50, 0 , 30))
-						.setOngoing(true)
-						.setContentIntent(resultPendingIntent)
-				.addAction(previous)
-				.addAction(pp)
-				.addAction(next)
-   		        .setContentTitle(s.getTitle() + " (" + text + ") ")
-   		        .setContentText( s.getArtist())
-				.setSubText(s.getAlbum())
-                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
-				//.setStyle(new NotificationCompat.BigTextStyle().bigText(s.getArtist()));
+	   }
+		if(mNotification !=null)
+			startForeground(NOTIFICATION_ID, mNotification);
+	   }
 
 
+//			   mBuilder =  new NotificationCompat.Builder(this);
 
-   		 mNotificationManager =  (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-   		 mNotification = mBuilder.build();
-   		// mNotification.contentView = rv;
-   		mNotificationManager.notify(NOTIFICATION_ID, mNotification);
-   		startForeground(NOTIFICATION_ID, mNotification);
-
-   }
+//	   //RemoteViews rv = new RemoteViews(getPackageName(), R.layout.notification_layout);
+//
+//	   Song s = getQueue().getCurrentSong();
+//	   Intent resultIntent = new Intent(this, DrawerActivity.class);
+//	   TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+//	   stackBuilder.addNextIntentWithParentStack(resultIntent);
+//	   PendingIntent resultPendingIntent =
+//			   stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+//
+//	   int pr = android.R.drawable.ic_media_pause;
+//	   if(text.contains("Paused"))
+//		   pr = android.R.drawable.ic_media_play;
+//
+//
+//	   Intent pi = new Intent(this, MusicService.class);
+//	   pi.setAction(MusicService.ACTION_TOGGLE_PLAYBACK);
+//	   PendingIntent togglepi = PendingIntent.getService(this, 21, pi, PendingIntent.FLAG_UPDATE_CURRENT );
+//	   NotificationCompat.Action pp = new NotificationCompat.Action(pr, "Play/Pause", togglepi);
+//
+//	   //previous
+//	   Intent prei = new Intent(this, MusicService.class);
+//	   prei.setAction(MusicService.ACTION_PREVIOUS);
+//	   PendingIntent prevpi = PendingIntent.getService(this, 22, prei, PendingIntent.FLAG_UPDATE_CURRENT );
+//	   NotificationCompat.Action previous = new NotificationCompat.Action(android.R.drawable.ic_media_previous, "Previous", prevpi);
+//
+//	   //next
+//	   Intent nexi = new Intent(this, MusicService.class);
+//	   nexi.setAction(MusicService.ACTION_NEXT);
+//	   PendingIntent nextpi = PendingIntent.getService(this, 23, nexi, PendingIntent.FLAG_UPDATE_CURRENT );
+//	   NotificationCompat.Action next = new NotificationCompat.Action(android.R.drawable.ic_media_next, "Next", nextpi);
+//
+//
+//	   Bitmap li = BitmapFactory.decodeResource(getResources(), R.drawable.android_icon32128);
+//	    mBuilder.setSmallIcon(R.drawable.android_icon3small)
+//				.setLargeIcon(li)
+//						//.setStyle(new NotificationCompat.DecoratedCustomViewStyle())
+//				.setColor(Color.argb(100, 50, 0 , 30))
+//						.setOngoing(true)
+//						.setContentIntent(resultPendingIntent)
+//				.addAction(previous)
+//				.addAction(pp)
+//				.addAction(next)
+//   		        .setContentTitle(s.getTitle() + " (" + text + ") ")
+//   		        .setContentText( s.getArtist())
+//				.setSubText(s.getAlbum())
+//                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+//				//.setStyle(new NotificationCompat.BigTextStyle().bigText(s.getArtist()));
+//
+//
+//
+//   		 mNotificationManager =  (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+//   		 mNotification = mBuilder.build();
+//   		// mNotification.contentView = rv;
+//   		mNotificationManager.notify(NOTIFICATION_ID, mNotification);
+//   		startForeground(NOTIFICATION_ID, mNotification);
+//
+//   }
 
    public void removeFromForeground(){
    		log("Removing Service from foreground.");
-   		mNotificationManager.cancelAll();
+   		//mNotificationManager.cancelAll();
    		stopForeground(true);
    }
 
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
 										  String key) {
-		Log.i("Music Service", "Preferences changed");
+		log( "Preferences changed");
 //		   if (key.equals("pref_crossfade_in")) {
 //			   fadeInDuration = Integer.parseInt(sharedPreferences.getString(key, "1"));
 //			   player.setFadeInDuration(fadeInDuration);
@@ -519,16 +626,16 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 			 long gap =  (player.getmPlayers().get(player.getCurrentPlayer()).getFadeOutGap()/1000 );
 
 			// log("Fade out needs at least: " + endSpace + " seconds. + gap: " + gap + " remainingTime: " + remainingTime);
-			 endSpace += gap;
+			 endSpace += gap + 1;
 
 			if( remainingTime <= endSpace ) {
 
-				Log.i("Music Service", "Playing next song based on progress...");
+				log( "Playing next song based on progress...");
 				nextRequest();
 
 				//if its the last song, wait till the end.
 				if (!getQueue().hasNext() && (getDuration() - (player.getCurrentPosition() / 1000) < 1)){
-					Log.i("Music Service", "No song up next, pausing player.");
+					log("No song up next, pausing player.");
 
 					mHandler.removeCallbacks(updateUi);
 					//player.removeCallbacks();
@@ -548,7 +655,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 * Save/load queue when closing.
 */
 	public void saveQueue(){
-		Log.i("m6", "Saving Queue");
+		log("Saving Queue");
 		Uri uri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
 		ContentValues values = new ContentValues();
 		values.put(MediaStore.Audio.Playlists.NAME, queuePlaylist);
@@ -564,13 +671,13 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 			cur.moveToFirst();
 			final int base = cur.getInt(0);
 			cur.close();
-			Log.d("Music service", "base: " + base);
+			log( "base: " + base);
 
 			int i =0;
 			for(Song t : player.getQueue().getArray()){
 				values = new ContentValues();
 				int songid = Integer.parseInt(t.getId());
-				Log.d("Music service", i +" saving song: " + t.getTitle() + songid);
+				log( i +" saving song: " + t.getTitle() + songid);
 				values.put(MediaStore.Audio.Playlists.Members.PLAY_ORDER,  i++ );
 				values.put(MediaStore.Audio.Playlists.Members.AUDIO_ID, songid);
 				resolver.insert(uri, values);
@@ -584,7 +691,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 
 		//if(queuePlaylistId == 0)
 		if(findQueuePlaylist()){
-			Log.d("M6", "Loading queue playlist");
+			log("Loading queue playlist");
 			ContentResolver resolver = this.getApplicationContext().getContentResolver();
 			String[] memberProjection = {
 					MediaStore.Audio.Playlists.Members.TITLE,
@@ -603,7 +710,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 			Cursor cursor = resolver.query(memebersUri, memberProjection, null, null, sort);
 			//  ArrayList<Song> songs = new ArrayList<Song>();
 			while(cursor.moveToNext()){
-				Log.d("Music service", "Adding song: " + cursor.getString(0) + cursor.getString(5));
+				log("Adding song: " + cursor.getString(0) + cursor.getString(5));
 				player.addSong(new Song(cursor.getString(0), cursor.getString(1),
 						cursor.getString(2), cursor.getString(3), cursor.getString(4)
 						, cursor.getString(5), cursor.getString(6), cursor.getString(7), cursor.getString(8)));
@@ -612,12 +719,12 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 
 			//Uri uri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
 			//this.getApplicationContext().getContentResolver().delete(uri, MediaStore.Audio.Playlists._ID +" = "+queuePlaylistId, null);
-		} else Log.i("Music Service", "no saved queue found");
+		} else log( "no saved queue found");
 		// addGroupToQueue(songs);
 	}
 
 	public boolean findQueuePlaylist(){
-		Log.d("M6", "seting up queue playlist");
+		log( "seting up queue playlist");
 		ContentResolver resolver = this.getApplicationContext().getContentResolver();
 		String[] playlistProjection = { MediaStore.Audio.Playlists.NAME,
 				MediaStore.Audio.Playlists._ID};
@@ -627,7 +734,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 		while(cur.moveToNext()){
 			if(cur.getString(0).equals(queuePlaylist)){
 				queuePlaylistId = Long.parseLong(cur.getString(1));
-				Log.d("m6", "queue playlist id: " + cur.getString(1));
+				log( "queue playlist id: " + cur.getString(1));
 				return true;
 			}
 		}
@@ -646,8 +753,9 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 			mListener.setCurrentInfo(player.getCurrentSong());
 
 			updateFadeSettings();
+			//player.updateFader();
 			mHandler.postDelayed(updateUi, 1000);
-			updateDream();
+			updateDream(); //send now playing info to daydream..screensaver...
 
 			setUpAsForeground("Playing");;
 			// Tell any remote controls that our playback state is 'paused'.
@@ -707,12 +815,54 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 	}
 
 
-	private void updateFadeSettings(){
+	private void updateFadeSettings() {
 		log("Updating Fader settings.");
 
-		int g = 11; //player.getQueue().getCurrentSong().getDuration() - 12;
-		log("Setting Fade out to 67% = -" + g + " seconds remaining.");
-		if(g > 10) player.setFadeOutGap(g);
+		updateig();
+		updateog();
+
+
+	}
+	private void updateig(){
+			log("fade In gap");
+		int g = player.getFadeInGap()/1000;
+		int d =  player.getQueue().getCurrentSong().getDuration() ;
+		log("fg: " + g);
+		if(g > 7 & g < 11) {
+			//for max mix, cutout last 33%
+
+			if(g > 10) g = (int) (d * .33);
+			else if(g > 9) g = (int) (d * .22);
+			else if(g > 8) g = (int) (d * .11);
+			else g = (int) (d * .07);
+
+//			if (d <= 33) g = 3;
+		}
+			log("song length: " + d);
+			log("Setting Fade in: " + g + " seconds + ");
+
+		 setFadeInGap(g);
+		player.seekTo(g); //
+
+
+	}
+
+	private void updateog(){
+		log("fade out Gap");
+		int g = player.getFadeOutGap()/1000;
+		int d =  player.getQueue().getCurrentSong().getDuration() ;
+		if(g > 7 & g < 11) {
+			//for mix, cutout last 33%
+			if(g > 10) g = (int) (d * .33);
+			else if(g > 9) g = (int) (d * .22);
+			else if(g > 8) g = (int) (d * .11);
+			else g = (int) (d * .07);
+
+			//if (d <= 33) g = 4;
+			log("song length: " + d);
+			log("Setting Fade out: " + g + " seconds remaining.");
+		}
+		 setFadeOutGap(g);
 
 
 	}
@@ -733,7 +883,9 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 		player.setFadeOutGap(i);
 	}
 
-
+	public void setVolStep(boolean active){
+		player.setVolStep(active);
+	}
 }
 
 

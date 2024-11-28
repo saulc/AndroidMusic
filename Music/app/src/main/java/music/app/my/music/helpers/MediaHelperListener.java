@@ -25,10 +25,7 @@ public interface MediaHelperListener {
     void helperReady();
 
     void songLoadedFinished(ArrayList<Song> songs);
-
     void queueitemLoaderFinished(ArrayList<Song> songs);
-
     void albumLoaderFinished(ArrayList<Album> ar);
-
     void queryLoaderFinished(ArrayList<Song> songs);
 }

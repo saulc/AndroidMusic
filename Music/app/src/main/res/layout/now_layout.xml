@@ -29,7 +29,7 @@
             android:id="@+id/shuffleButton"
             android:layout_width="@dimen/now_button"
             android:layout_height="@dimen/now_button"
-            android:background="@drawable/gradientcircle"
+            android:background="@drawable/gradientbox"
             android:padding="@dimen/top_text_margin"
             android:scaleType="fitXY"
             app:srcCompat="@drawable/shuffle128" />
@@ -39,7 +39,6 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:animateLayoutChanges="true"
-            android:background="@drawable/gradientbox"
             android:gravity="center_horizontal"
             android:orientation="vertical">
 
@@ -84,7 +83,7 @@
             android:id="@+id/repeatButton"
             android:layout_width="@dimen/now_button"
             android:layout_height="@dimen/now_button"
-            android:background="@drawable/boarder"
+            android:background="@drawable/gradientbox"
             android:padding="@dimen/top_text_margin"
             android:scaleType="fitXY"
             app:srcCompat="@drawable/repeat128" />
@@ -180,9 +179,8 @@
             android:id="@+id/vold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:alpha=".5"
             android:padding="@dimen/top_text_margin"
-            android:src="@android:drawable/ic_lock_silent_mode" />
+            app:srcCompat="@android:drawable/ic_lock_silent_mode" />
 
         <SeekBar
             android:id="@+id/volBar"
@@ -194,9 +192,8 @@
             android:id="@+id/volu"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:alpha=".5"
             android:padding="@dimen/top_text_margin"
-            android:src="@android:drawable/ic_lock_silent_mode_off" />
+            app:srcCompat="@android:drawable/ic_lock_silent_mode_off" />
 
     </LinearLayout>
 

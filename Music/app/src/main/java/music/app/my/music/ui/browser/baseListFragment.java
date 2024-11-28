@@ -2,16 +2,17 @@ package music.app.my.music.ui.browser;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
@@ -34,7 +35,7 @@ import music.app.my.music.ui.dummy.DummyContent.DummyItem;
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public  class baseListFragment extends Fragment  implements MediaHelperListener {
+public  class baseListFragment extends Fragment implements MediaHelperListener {
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
@@ -109,7 +110,7 @@ public  class baseListFragment extends Fragment  implements MediaHelperListener 
         log("Setting up MediaStore Helper");
         msHelper = new MediaStoreHelper(getContext());
 
-        FragmentManager fragmentManager = getFragmentManager();
+        FragmentManager fragmentManager = getChildFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
         fragmentTransaction.add(msHelper, "MediaStoreHelper");
@@ -231,6 +232,7 @@ public  class baseListFragment extends Fragment  implements MediaHelperListener 
         // TODO: Update argument type and name
         void onListFragmentInteraction(DummyItem item);
         void onPlaylistClicked(Playlist item);
+        void onPlaylistFClicked(Playlist item);
         void onSongClicked(Song item);
 
         void onArtistClicked(Artist mItem);
@@ -249,7 +251,7 @@ public  class baseListFragment extends Fragment  implements MediaHelperListener 
 
         void onPlaylistOptionClicked(int position, String pid, String name);
 
-        void  onPlaylistNextUpClicked(int position, String pid);
+        void  onPlaylistNextUpClicked(int position, String pid, String name);
 
         void onOptionLongClicked(Song song);
 

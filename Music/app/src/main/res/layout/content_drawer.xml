@@ -18,24 +18,44 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+
     <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <com.google.android.material.navigation.NavigationView
+            android:id="@+id/menu_view"
+            android:layout_width="@dimen/smenu_width"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:background="?colorPrimary"
+            android:fitsSystemWindows="true"
+            app:menu="@menu/activity_drawer_drawer" />
+
+        <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
         <FrameLayout
-
             android:id="@+id/frame"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="5" />
 
+            <FrameLayout
+                android:id="@+id/logframe"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0" />
         <TextSwitcher
             android:id="@+id/nextText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="0"
             android:fontFamily="monospace"
+            android:textSize="10dp"
             android:text="Up Next:"
             android:typeface="monospace"
             android:visibility="gone" />
@@ -43,14 +63,22 @@
         <LinearLayout
             android:id="@+id/sidebar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_weight="0"
             android:animateLayoutChanges="true"
             android:gravity="top"
             android:orientation="vertical">
 
-            <FrameLayout
+            <TextSwitcher
+                android:id="@+id/infoText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="monospace"
+                android:text="Console output."
+                android:typeface="monospace"
+                />
 
+            <FrameLayout
                 android:id="@+id/controlFrame"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
@@ -60,8 +88,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
+
+
         </LinearLayout>
 
+    </LinearLayout>
     </LinearLayout>
 
 

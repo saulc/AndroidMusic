@@ -2,6 +2,7 @@ package music.app.my.music.ui.popup;
 
 
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.DialogInterface;
@@ -9,13 +10,11 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.v4.app.DialogFragment;
-import android.support.v7.app.AlertDialog;
 import android.util.Log;
-import android.widget.TextView;
+
+import androidx.fragment.app.DialogFragment;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import music.app.my.music.DrawerActivity;
 
@@ -45,7 +44,7 @@ public  class ChoosePlaylistDialogFragment extends DialogFragment {
             String[] playlistProjection = { MediaStore.Audio.Playlists.NAME,  MediaStore.Audio.Playlists._ID};
             Uri uri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
 
-            String playlistSortOrder = MediaStore.Audio.Playlists.NAME   + " COLLATE LOCALIZED ASC";
+            String playlistSortOrder = MediaStore.Audio.Playlists.NAME   + " ASC";
             Cursor cur = resolver.query(uri, playlistProjection, null, null, playlistSortOrder);
 
             String id = "";
