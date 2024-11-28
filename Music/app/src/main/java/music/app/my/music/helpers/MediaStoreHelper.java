@@ -475,9 +475,9 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
 	}
 
 	private Uri songUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-	private String defaultSort =  MediaStore.Audio.Media.TITLE + " ASC";
-	private String allAlbumSort =  MediaStore.Audio.Media.ALBUM + " ASC";
-	private String allArtistSort =  MediaStore.Audio.Media.ARTIST + " ASC";
+	private String defaultSort =  MediaStore.Audio.Media.TITLE + " COLLATE NOCASE ASC";
+	private String allAlbumSort =  MediaStore.Audio.Media.ALBUM + " COLLATE NOCASE ASC";
+	private String allArtistSort =  MediaStore.Audio.Media.ARTIST + " COLLATE NOCASE ASC";
 	private String defaultSelection = MediaStore.Audio.Media.IS_MUSIC + " != 0";
 	private String[] defaultProjection = {
             MediaStore.Audio.Media.TITLE,
@@ -499,7 +499,7 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
 	            MediaStore.Audio.Albums._ID
 	    };
 	   private Uri albumUri = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI;
-	   private String albumSort = MediaStore.Audio.Albums.ALBUM + " ASC";
+	   private String albumSort = MediaStore.Audio.Albums.ALBUM + "  COLLATE NOCASE ASC";
 
 	   //for artist albums
 	private String albumSelection =  MediaStore.Audio.Albums.ARTIST + "=?";
@@ -517,14 +517,14 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
 			    MediaStore.Audio.Media.ARTIST_ID
 
 	   };
-	   private String albumMemeberSort =  MediaStore.Audio.Media.TRACK + " ASC";
+	   private String albumMemeberSort =  MediaStore.Audio.Media.TRACK + "  COLLATE NOCASE ASC";
 	   private String albumMemberSelection =  MediaStore.Audio.Media.ALBUM_ID + "=?";
 
 
 	   private String artistMemberSelection =  MediaStore.Audio.Media.ARTIST_ID + "=?";
 
 	   private Uri artistUri = MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI;
-	   private String artistSortOrder = MediaStore.Audio.Artists.ARTIST   + " ASC";
+	   private String artistSortOrder = MediaStore.Audio.Artists.ARTIST   + "  COLLATE NOCASE ASC";
 	   private String[] artistProjection = {
 				MediaStore.Audio.Artists._ID,
 				MediaStore.Audio.Artists.ARTIST,
@@ -553,10 +553,10 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
 			MediaStore.Audio.Playlists._ID,
 	};
 	private Uri playlistUri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
-	private String playlistSortOrder = MediaStore.Audio.Playlists.NAME   + " ASC";
+	private String playlistSortOrder = MediaStore.Audio.Playlists.NAME   + "  COLLATE NOCASE ASC";
 
 	private Uri genreUri = MediaStore.Audio.Genres.EXTERNAL_CONTENT_URI;
-	private String genreSortOrder = MediaStore.Audio.Genres.NAME   + " ASC";
+	private String genreSortOrder = MediaStore.Audio.Genres.NAME   + "  COLLATE NOCASE ASC";
 	private String[] genreProjection = {
 			MediaStore.Audio.Genres.NAME,
 			MediaStore.Audio.Genres._ID
@@ -564,7 +564,7 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
 	};
 
 
-	private String genreMembersSortOrder = MediaStore.Audio.Genres.Members.ARTIST   + " ASC";
+	private String genreMembersSortOrder = MediaStore.Audio.Genres.Members.ARTIST   + "  COLLATE NOCASE ASC";
 	private String[] genreMembersProjection = {
 			MediaStore.Audio.Genres.Members.TITLE,
 			MediaStore.Audio.Genres.Members.GENRE_ID,

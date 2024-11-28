@@ -185,7 +185,7 @@ public class  PlaylistHelper {
         ContentResolver resolver = context.getContentResolver();
 
         Uri songUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        String defaultSort = MediaStore.Audio.Media.TITLE + " ASC";
+        String defaultSort = MediaStore.Audio.Media.TITLE + " COLLATE NOCASE ASC";
         String defaultSelection = MediaStore.Audio.Media.IS_MUSIC + " != 0";
         String[] defaultProjection = {
                 MediaStore.Audio.Media.TITLE,

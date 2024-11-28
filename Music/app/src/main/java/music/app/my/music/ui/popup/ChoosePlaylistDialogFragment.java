@@ -44,7 +44,7 @@ public  class ChoosePlaylistDialogFragment extends DialogFragment {
             String[] playlistProjection = { MediaStore.Audio.Playlists.NAME,  MediaStore.Audio.Playlists._ID};
             Uri uri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
 
-            String playlistSortOrder = MediaStore.Audio.Playlists.NAME   + " ASC";
+            String playlistSortOrder = MediaStore.Audio.Playlists.NAME   + "  COLLATE NOCASE ASC";
             Cursor cur = resolver.query(uri, playlistProjection, null, null, playlistSortOrder);
 
             String id = "";

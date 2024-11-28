@@ -1467,7 +1467,7 @@ public class DrawerActivity extends AppCompatActivity
         //always show controls in landscape.
         int orientation = getResources().getConfiguration().orientation;
         if (orientation == Configuration.ORIENTATION_PORTRAIT)
-        hideControls(false);
+            hideControls(false);
 
         if(nf != null && nf.isVisible() ) return;
 
