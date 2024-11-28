@@ -223,16 +223,16 @@ public class DrawerActivity extends AppCompatActivity
         iniFM();
         moveFab(true);
 
-        mfab = (MovableFloatingActionButton) findViewById(R.id.mfab);
-        mfab.setCallback(this);
-//        mfab.setButtonStartPos();
-        mfab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.d(TAG, "mFab Clicked: " + showq);
-                showQ();
-            }
-        });
+//        mfab = (MovableFloatingActionButton) findViewById(R.id.mfab);
+//        mfab.setCallback(this);
+////        mfab.setButtonStartPos();
+//        mfab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Log.d(TAG, "mFab Clicked: " + showq);
+//                showQ();
+//            }
+//        });
 //        fab.setOnLongClickListener(new View.OnLongClickListener() {
 //            @Override
 //            public boolean onLongClick(View view) {
@@ -1136,32 +1136,32 @@ public class DrawerActivity extends AppCompatActivity
 ////                expandLog();
 //
 //    }
-    public void expandLog(){
-        log("Expanding q frame");
-        int orientation = getResources().getConfiguration().orientation;
-        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            // In landscape
-
-            LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
-                    0,
-                    DrawerLayout.LayoutParams.MATCH_PARENT,
-                    1.0f
-            );
-            findViewById(R.id.logframe).setLayoutParams(param);
-
-        } else {
-            // In portrait
-            LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
-                    DrawerLayout.LayoutParams.MATCH_PARENT,
-                    0,
-                    (showlog==0? .5f : showlog )
-            );
-            findViewById(R.id.logframe).setLayoutParams(param);
-
-
-        }
-
-    }
+//    public void expandLog(){
+//        log("Expanding q frame");
+//        int orientation = getResources().getConfiguration().orientation;
+//        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+//            // In landscape
+//
+//            LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
+//                    0,
+//                    DrawerLayout.LayoutParams.MATCH_PARENT,
+//                    1.0f
+//            );
+//            findViewById(R.id.logframe).setLayoutParams(param);
+//
+//        } else {
+//            // In portrait
+//            LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
+//                    DrawerLayout.LayoutParams.MATCH_PARENT,
+//                    0,
+//                    (showlog==0? .5f : showlog )
+//            );
+//            findViewById(R.id.logframe).setLayoutParams(param);
+//
+//
+//        }
+//
+//    }
     public void expandSidebar() {
         log("Expanding q frame");
         int orientation = getResources().getConfiguration().orientation;
