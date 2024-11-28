@@ -1467,7 +1467,7 @@ public class DrawerActivity extends AppCompatActivity
         //always show controls in landscape.
         int orientation = getResources().getConfiguration().orientation;
         if (orientation == Configuration.ORIENTATION_PORTRAIT)
-        hideControls(false);
+            hideControls(false);
 
         if(nf != null && nf.isVisible() ) return;
 
@@ -1702,13 +1702,13 @@ public class DrawerActivity extends AppCompatActivity
         //nothign to do.
     }
 
-    public void addSongToPlaylist(String name, String sid, int pos, String pid, boolean top){
+    public void addSongToPlaylist(String name, String spath, int pos, String pid, boolean top){
         Log.d(TAG, "Playlist picked: " + pos + " pid:" + pid);
         try {
             long id = Long.parseLong(pid);
-            long lsid = Long.parseLong(sid);
+//            long lsid = Long.parseLong(sid);
 
-            PlaylistHelper.addToPlaylist(getApplicationContext(), name, id, lsid, top);
+            PlaylistHelper.addToPlaylist(getApplicationContext(), name, spath, top);
         } catch (NumberFormatException e) {
             e.printStackTrace();
         }

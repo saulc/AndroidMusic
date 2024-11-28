@@ -80,34 +80,34 @@ public class  PlaylistHelper {
     }
 
     //add 1 song to playlist
-    public static void addToPlaylist(Context context, String pname, Long pid, Long sid, boolean top) {
-        String[] cols = new String[]{
-                MediaStore.Audio.Playlists.Members.PLAY_ORDER,
-                MediaStore.Audio.Playlists.Members.AUDIO_ID
-        };
-
-        ContentResolver resolver = context.getContentResolver();
-        Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external", pid);
-        Cursor cur = resolver.query(uri, cols, null, null, null);
-        int base = 0;
-        if (!top && cur.moveToLast()) {
-
-            base = cur.getInt(0);
-            base += 1;
-            String id = cur.getString(1);
-        } else {
-            cur.moveToFirst();
-        }
-        cur.close();
-        log("adding item --->>>>>base: " + base + " to " + pname);
-
-        ContentValues values = new ContentValues();
-        values.put(MediaStore.Audio.Playlists.Members.PLAY_ORDER, base);
-        values.put(MediaStore.Audio.Playlists.Members.AUDIO_ID, sid);
-        resolver.insert(uri, values);
-
-
-    }
+//    public static void addToPlaylist(Context context, String pname, Long pid, Long sid, boolean top) {
+//        String[] cols = new String[]{
+//                MediaStore.Audio.Playlists.Members.PLAY_ORDER,
+//                MediaStore.Audio.Playlists.Members.AUDIO_ID
+//        };
+//
+//        ContentResolver resolver = context.getContentResolver();
+//        Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external", pid);
+//        Cursor cur = resolver.query(uri, cols, null, null, null);
+//        int base = 0;
+//        if (!top && cur.moveToLast()) {
+//
+//            base = cur.getInt(0);
+//            base += 1;
+//            String id = cur.getString(1);
+//        } else {
+//            cur.moveToFirst();
+//        }
+//        cur.close();
+//        log("adding item --->>>>>base: " + base + " to " + pname);
+//
+//        ContentValues values = new ContentValues();
+//        values.put(MediaStore.Audio.Playlists.Members.PLAY_ORDER, base);
+//        values.put(MediaStore.Audio.Playlists.Members.AUDIO_ID, sid);
+//        resolver.insert(uri, values);
+//
+//
+//    }
 
     //remove 1 song from playlist
     public static void deleleFromPlaylist(Context context, Long pid, String pname, String sid, int pos) {
@@ -239,6 +239,33 @@ public class  PlaylistHelper {
 }
 
     public static void viewPlaylist(Context context, String pname){
+
+        String path = Environment.getExternalStorageDirectory().toString()+"/Music/"+pname+".m3u";
+        Log.d("Files", "Path: " + path);
+//        File f = new File(path);
+        String aBuffer = "";
+        ArrayList<String> dat = new ArrayList<>();
+        try {
+            File myFile = new File(path);
+            FileInputStream fIn = new FileInputStream(myFile);
+            BufferedReader myReader = new BufferedReader(new InputStreamReader(fIn));
+            String aDataRow = "";
+            while ((aDataRow = myReader.readLine()) != null) {
+//                aBuffer += aDataRow;
+                dat.add(aDataRow);
+            }
+            myReader.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        for(String l : dat)
+            log(l);
+
+    }
+
+    public static void addToPlaylist(Context context, String pname, String spath, boolean top){
 
         String path = Environment.getExternalStorageDirectory().toString()+"/Music/"+pname+".m3u";
         Log.d("Files", "Path: " + path);
