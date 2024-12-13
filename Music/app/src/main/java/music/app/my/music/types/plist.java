@@ -18,6 +18,7 @@ public class plist extends Qbase{
 	    private ArrayList<Song> songs;
 	    private int songIndex=0;
 	    private int repeatmode = 2;	//0 off, 1 repeat song, 2 repeat all
+		private int shufflemode = 0; //0 off, 1 shuffle mix, 2 shuffle normal.
 	    private boolean shuffled = false;//, repeatVal=false;
 	    private ArrayList<Song> backup;
 
@@ -43,8 +44,16 @@ public class plist extends Qbase{
 		return shuffled;
 	}
 
-	public boolean shuffle(){
-	    	if(songs.size() == 0)
+	public int shuffle() {
+		if(shufflemode++ >= 2) shufflemode = 0;
+		if(shufflemode != 2)
+			shuf();
+		return shufflemode;
+	}
+
+	private boolean shuf(){
+
+	    	if(songs.isEmpty())
 	    		return false;
 	    	if(shuffled)
 	    	{
@@ -63,6 +72,7 @@ public class plist extends Qbase{
 
 	    }
 	    public void resetShuffle(){
+			shufflemode = 0;
 	    	shuffled = false;
 	    	backup = null;
 	    }
@@ -107,6 +117,11 @@ public class plist extends Qbase{
 			if(repeatmode == 2 && (songIndex == songs.size() )) {
 				//last song and repeat is on
 				songIndex = 0;
+
+				if(shufflemode == 1){
+					shuf();
+					shuf();
+				}
 			}
 	    }
 	    public void previousSong(){

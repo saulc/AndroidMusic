@@ -543,7 +543,7 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 		return queue.getCurrentSong();
 	}
 
-	public boolean shuffle() {
+	public int shuffle() {
 
 		return queue.shuffle();
 	}

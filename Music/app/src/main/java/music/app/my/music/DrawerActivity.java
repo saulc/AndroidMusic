@@ -672,11 +672,11 @@ public class DrawerActivity extends AppCompatActivity
     @Override
     public boolean onShuffleClicked(){
         log("Suffle clicked");
-        boolean b = mService.shuffleSongs();
+        int b = mService.shuffleSongs();
         Toast.makeText(mService, "Shuffle: " + b, Toast.LENGTH_SHORT).show();
         updateQueueFrag(mService.getQueue());
 
-        return b;
+        return b > 0;
     }
 
     @Override
