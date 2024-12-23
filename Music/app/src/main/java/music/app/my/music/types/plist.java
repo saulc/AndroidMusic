@@ -65,7 +65,7 @@ public class plist extends Qbase{
 	    		Song current = songs.remove(songIndex);
 	    		Collections.shuffle(songs);
 	    		songs.add(0, current);
-	    		shuffled = true;;
+	    		shuffled = true;
 	    		songIndex = 0;
 	    	}
 	    	return shuffled;
@@ -200,7 +200,7 @@ public class plist extends Qbase{
 	    public Song removeSong(int i){
 	    	
 	    	Song s = songs.remove(i);
-	      if(songIndex >= songs.size())	//in case you remove the last song.
+	        if(songIndex >= songs.size())	//in case you remove the last song.
 	    		songIndex = songs.size()-1;
 //	      else if(songIndex > i)
 //				i--;

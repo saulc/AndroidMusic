@@ -4,17 +4,21 @@ import static java.lang.Math.round;
 
 import android.animation.LayoutTransition;
 import android.app.SearchManager;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
 import android.media.AudioManager;
 import android.media.session.MediaSession;
 import android.net.Uri;
+import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -37,10 +41,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.DialogFragment;
@@ -136,6 +142,7 @@ public class DrawerActivity extends AppCompatActivity
     private boolean showfmenu = false; //show/hide floating control buttons.
     private int showq = 0; //0 == hidden, 1 = miniplayer q, 2 = half, 3 = full screen, todo 4 edit plist
     private int showlog = 1;
+    private boolean powerPaused = false;
     private final String TAG = getClass().getSimpleName();
 
     private void log(String s) {
@@ -320,7 +327,42 @@ public class DrawerActivity extends AppCompatActivity
         handleStartIntents(); //search media share....
 
         handleSearchIntents();
+
+
+        BroadcastReceiver receiver = new BroadcastReceiver() {
+            public void onReceive(Context context, Intent intent) {
+
+                int plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
+                boolean lowbatt = intent.getBooleanExtra(BatteryManager.EXTRA_BATTERY_LOW, false);
+                if ((plugged == BatteryManager.BATTERY_PLUGGED_AC) | (plugged == BatteryManager.BATTERY_PLUGGED_USB)) {
+                    // on USB power
+                    if(powerPaused & !mService.getPlayer().isPlaying()){
+                        playPausePressed();
+                        powerPaused = false;
+                    }
+                } else if (plugged == 0) {
+                    // on battery power
+                } else if(lowbatt){
+                    log("Low battery detected.");
+                    if(mService.getPlayer().isPlaying()) {
+                        log("Pausing audio.");
+                        playPausePressed();
+                        powerPaused = true;
+                    }
+                }else {
+                    // intent didnt include extra info
+                }
+            }
+        };
+
+
+        IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        Intent batteryIntent = registerReceiver(receiver, filter);
+
     }
+
+
+
 //    public View onCreateView(String name, Context context, AttributeSet attrs) {
 //        log("onCreateView event");
 //        return super.onCreateView(name, context, attrs);

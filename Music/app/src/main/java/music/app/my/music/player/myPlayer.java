@@ -13,7 +13,7 @@ public class myPlayer extends MediaPlayer
 	private boolean paused = true;
 	private int pausePos = 0;
 
-	private int fadeInDuration = 7000, fadeOutDuration = 12000, fadeOutGap = 4000, startGap = 0;
+	private int fadeInDuration = 5000, fadeOutDuration = 10000, fadeOutGap = 4000, startGap = 0;
 	private int mCurrentStep = 1;
 	private float lastvol = 0f;
 	private float maxVol = 1f;
