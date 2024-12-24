@@ -187,12 +187,16 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
        else if (action.equals(ACTION_PREVIOUS)) previousRequest();
        else if(action.equals(ACTION_BLANK)) ;
 	   else if(action.equals(ACTION_DUCK)) {
-		  		 player.setDucking(true);
+//		  		 player.setDucking(true);
+//				   player.duck();
+		   if(player.isPlaying())
+		   		togglePlaybackRequest();
 	   }
 		else if(action.equals(ACTION_GOOSE)){
-				player.setDucking(false);
-				player.duck();
-		   log("Music service Audio ducking: " + player.isDucking() );
+//				player.setDucking(false);
+//				player.duck();
+//		   log("Music service Audio ducking: " + player.isDucking() );
+
 
 	   } else if(action.equals(ACTION_SNOOZE)) {
 		   dreaming = true;

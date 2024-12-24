@@ -143,6 +143,7 @@ public class DrawerActivity extends AppCompatActivity
     private int showq = 0; //0 == hidden, 1 = miniplayer q, 2 = half, 3 = full screen, todo 4 edit plist
     private int showlog = 1;
     private boolean powerPaused = false;
+    private boolean battWarn = false;
     private final String TAG = getClass().getSimpleName();
 
     private void log(String s) {
@@ -336,18 +337,20 @@ public class DrawerActivity extends AppCompatActivity
                 boolean lowbatt = intent.getBooleanExtra(BatteryManager.EXTRA_BATTERY_LOW, false);
                 if ((plugged == BatteryManager.BATTERY_PLUGGED_AC) | (plugged == BatteryManager.BATTERY_PLUGGED_USB)) {
                     // on USB power
-                    if(powerPaused & !mService.getPlayer().isPlaying()){
+                    if(mService == null) return;
+                    if(battWarn & powerPaused & !mService.getPlayer().isPlaying()){
                         playPausePressed();
                         powerPaused = false;
+//                        battWarn = false;
                     }
-                } else if (plugged == 0) {
-                    // on battery power
-                } else if(lowbatt){
+                }
+                else if(lowbatt & !battWarn){
                     log("Low battery detected.");
                     if(mService.getPlayer().isPlaying()) {
                         log("Pausing audio.");
                         playPausePressed();
                         powerPaused = true;
+                        battWarn = true;
                     }
                 }else {
                     // intent didnt include extra info
