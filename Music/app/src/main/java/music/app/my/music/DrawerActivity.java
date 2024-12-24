@@ -333,28 +333,32 @@ public class DrawerActivity extends AppCompatActivity
         BroadcastReceiver receiver = new BroadcastReceiver() {
             public void onReceive(Context context, Intent intent) {
 
+                int status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+                boolean fullbatt = status == BatteryManager.BATTERY_STATUS_FULL;
+
                 int plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
                 boolean lowbatt = intent.getBooleanExtra(BatteryManager.EXTRA_BATTERY_LOW, false);
-                if ((plugged == BatteryManager.BATTERY_PLUGGED_AC) | (plugged == BatteryManager.BATTERY_PLUGGED_USB)) {
-                    // on USB power
-                    if(mService == null) return;
-                    if(battWarn & powerPaused & !mService.getPlayer().isPlaying()){
-                        playPausePressed();
-                        powerPaused = false;
-//                        battWarn = false;
+                if(fullbatt) {
+                        battWarn = false;
+                }else if ((plugged == BatteryManager.BATTERY_PLUGGED_AC) | (plugged == BatteryManager.BATTERY_PLUGGED_USB)) {
+                        // on USB power
+                        if(mService == null) return;
+                        if(battWarn & powerPaused & !mService.getPlayer().isPlaying()){
+                            playPausePressed();
+                            powerPaused = false;
+                        }
+                    } else if(lowbatt & !battWarn){
+                        log("Low battery detected.");
+                        if(mService.getPlayer().isPlaying()) {
+                            log("Pausing audio.");
+                            playPausePressed();
+                            powerPaused = true;
+                            battWarn = true;
+                        }
+                    }else {
+                        // intent didnt include extra info
                     }
-                }
-                else if(lowbatt & !battWarn){
-                    log("Low battery detected.");
-                    if(mService.getPlayer().isPlaying()) {
-                        log("Pausing audio.");
-                        playPausePressed();
-                        powerPaused = true;
-                        battWarn = true;
-                    }
-                }else {
-                    // intent didnt include extra info
-                }
+                
             }
         };
 
