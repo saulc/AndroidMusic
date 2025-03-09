@@ -358,7 +358,7 @@ public class DrawerActivity extends AppCompatActivity
                     }else {
                         // intent didnt include extra info
                     }
-                
+
             }
         };
 
