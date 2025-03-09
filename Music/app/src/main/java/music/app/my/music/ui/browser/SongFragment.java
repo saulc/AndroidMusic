@@ -52,7 +52,7 @@ public class   SongFragment extends baseListFragment implements MediaHelperListe
 //            recyclerView.scrollBy(0, (int) y);
     }
 
-    public enum SF_TYPE {QUEUE, PLAYLISTITEMS, SONGS, ALBUMS, ARTISTS, GENRE, QUERY, BUBBLE };
+    public enum SF_TYPE {QUEUE, PLAYLISTITEMS, SONGS, ALBUMS, ARTISTS, GENRE, QUERY, BUBBLE, RADIOITEMS };
     private SF_TYPE myType = SF_TYPE.SONGS;
 
     private final String TAG = getClass().getSimpleName();
@@ -96,7 +96,13 @@ public class   SongFragment extends baseListFragment implements MediaHelperListe
             String s = b.getString("SFTYPE");
             if(s == null) return; //default to songs
 
-            if(s.compareTo(SF_TYPE.PLAYLISTITEMS.toString())==0) {
+            if(s.compareTo(SF_TYPE.RADIOITEMS.toString())==0) {
+                myType = SF_TYPE.RADIOITEMS;
+
+                pid = b.getString("PlaylistID");
+                pname = b.getString("PlaylistName");
+            }
+            else if(s.compareTo(SF_TYPE.PLAYLISTITEMS.toString())==0) {
                 myType = SF_TYPE.PLAYLISTITEMS;
 
                 pid = b.getString("PlaylistID");
@@ -398,6 +404,9 @@ public class   SongFragment extends baseListFragment implements MediaHelperListe
                 case PLAYLISTITEMS:
                     msHelper.loadPlaylistItems(pid, pname);
                     break;
+                case RADIOITEMS:
+                    msHelper.loadRadioItems(pid, pname);
+                    break;
             }
 
     }
@@ -470,6 +479,20 @@ public class   SongFragment extends baseListFragment implements MediaHelperListe
         updateAdapter();
     }
 
+    @Override
+    public void radioLoaderFinished(ArrayList<Song> songs) {
+        log("Radio Loaded " + songs.size() + " song(s)");
+//        ArrayList<Song> ss = new ArrayList<>();
+//        String n = pname.toLowerCase();
+//        log("Radio check: " + n + " " + songs.get(0).getFilePath().toLowerCase());
+//        for(Song s: items) {
+//            if(s.getFilePath().toLowerCase().contains(n))
+//                ss.add(s);
+//        }
+//        items = ss;
+        items = songs;
+        updateAdapter();
+    }
 
     @Override
     public void songLoadedFinished(ArrayList<Song> songs) {

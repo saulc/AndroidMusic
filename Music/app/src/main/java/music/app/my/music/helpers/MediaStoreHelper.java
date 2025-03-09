@@ -7,6 +7,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.provider.MediaStore;
 
 import android.util.Log;
@@ -41,7 +42,7 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
 //	public  enum Media { songs, artists, playlists};
 
 	private MediaHelperListener mListener;
-	private enum LOADER_TYPE {QUEUE,  PLAYLIST, PLAYLISTITEMS, SONGS, ALBUMS,ALBUMITEMS, ARTISTS,ARTISTITEMS, GENRE, GENREITEMS, QUERY };
+	private enum LOADER_TYPE {QUEUE,  PLAYLIST, PLAYLISTITEMS, SONGS, ALBUMS,ALBUMITEMS, ARTISTS,ARTISTITEMS, GENRE, GENREITEMS, QUERY, RADIO, RADIOITEMS };
 	private LOADER_TYPE myType = LOADER_TYPE.SONGS;
 	private Context mContext;
 	private String pid = null;
@@ -99,6 +100,7 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
 		myType = LOADER_TYPE.QUEUE;
 		LoaderManager.getInstance(this).initLoader(mLOADER, null, this);
 //		getLoaderManager().initLoader(mLOADER, null, this);
+
 
 	}
 	public void loadPlaylists(){
@@ -178,6 +180,14 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
 
     }
 
+	public void loadRadioItems(String id, String name){
+		log("Loading Radio directory: " + name);
+		myType = LOADER_TYPE.RADIOITEMS;
+		pname = name;
+		LoaderManager.getInstance(this).initLoader(mLOADER, null, this);
+//		getLoaderManager().initLoader(mLOADER, null, this);
+
+	}
 	@Override
 	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
 
@@ -186,6 +196,17 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
 			log("mshelper loading playlists/queue...");
             return new CursorLoader(mContext, playlistUri, playlistProjection, null, null, playlistSortOrder);
         }
+		else  if(myType == LOADER_TYPE.RADIOITEMS) {
+
+			log("Radio Item loader Created");
+			try {
+
+//				Uri uri =  MediaStore.Audio.Media.getContentUriForPath("Music/"+ pname);
+				return new CursorLoader(mContext, songUri, defaultProjection,  MediaStore.Audio.Media.DATA + " LIKE ? " , new String[]{"%"+pname+"/%"}, defaultSort);
+			} catch (NumberFormatException e) {
+				e.printStackTrace();
+			}
+		}
         else  if(myType == LOADER_TYPE.PLAYLISTITEMS) {
 
             log("Playlist Item loader Created");
@@ -424,7 +445,18 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
 			mListener.albumLoaderFinished(ar);
 			return;
 		}
-
+		else  if(myType == LOADER_TYPE.RADIOITEMS) {
+			log("Radio Items loaded");
+			ArrayList<Song> songs = new ArrayList<Song>();
+			while(cursor.moveToNext()) {
+				songs.add(new Song(cursor.getString(0), cursor.getString(1),
+						cursor.getString(2), cursor.getString(3), cursor.getString(4)
+						, cursor.getString(5), cursor.getString(6), cursor.getString(7 )));
+			}
+			log("Returning Radio songs to activity: " + songs.size());
+			mListener.radioLoaderFinished(songs);
+			return;
+		}
 
 		else  if(myType == LOADER_TYPE.SONGS) {
 			log("SONG Items loaded");

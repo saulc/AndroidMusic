@@ -1898,7 +1898,10 @@ public class DrawerActivity extends AppCompatActivity
         Log.d(TAG, "Playlist  clicked");
         Fragment f =  (Fragment) SongFragment.newInstance();
         Bundle b = new Bundle();
-        b.putString("SFTYPE", SongFragment.SF_TYPE.PLAYLISTITEMS.toString());
+        String n = item.getName();
+        if(n.toLowerCase().contains("radio"))
+            b.putString("SFTYPE", SongFragment.SF_TYPE.RADIOITEMS.toString());
+        else b.putString("SFTYPE", SongFragment.SF_TYPE.PLAYLISTITEMS.toString());
         b.putString("PlaylistID", item.getId());
         b.putString("PlaylistName", item.getName());
         f.setArguments(b);
