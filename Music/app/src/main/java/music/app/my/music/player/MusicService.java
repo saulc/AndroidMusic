@@ -629,9 +629,10 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 			 long remainingTime = ( getDuration() - (player.getCurrentPosition()/1000) );
 			 long endSpace = ( player.getFadeOutDuration()/1000 );
 			 long gap =  (player.getmPlayers().get(player.getCurrentPlayer()).getFadeOutGap()/1000 );
+			long cf =  (player.getmPlayers().get(player.getCurrentPlayer()).getCrossFade()/1000 );
 
 			// log("Fade out needs at least: " + endSpace + " seconds. + gap: " + gap + " remainingTime: " + remainingTime);
-			 endSpace += gap + 1;
+			 endSpace += gap + 1 + cf;
 			//start next song early. then pause 'current'
 			if( remainingTime <= endSpace ) {
 
