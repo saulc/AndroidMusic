@@ -743,6 +743,14 @@ public class DrawerActivity extends AppCompatActivity
         return b;
     }
 
+    public void onMixLongClicked(){
+        //random album with > 9 tracks/playlist?
+//        Song s = PlaylistHelper.getRandomSong(getApplicationContext());
+//        String b = "Mix: " + s.getTitle() + " by " + s.getArtist() + " added to Queue.";
+//        Toast.makeText(mService, b, Toast.LENGTH_SHORT).show();
+//
+//        onSongClicked(s);
+    }
     @Override
     public boolean onMenuItemClick(MenuItem item) {
         int id = item.getItemId();
@@ -822,6 +830,29 @@ public class DrawerActivity extends AppCompatActivity
                 if (sf != null)
                     sf.updateQuery(newText);
                 return true;
+            }
+        });
+
+
+        new Handler().post(new Runnable() {
+            @Override
+            public void run() {
+                final View view = findViewById(R.id.mix);
+
+                if (view != null) {
+                    view.setOnLongClickListener(new View.OnLongClickListener() {
+                        @Override
+                        public boolean onLongClick(View v) {
+
+                            // Do something...
+
+//                            Toast.makeText(getApplicationContext(), "Long pressed", Toast.LENGTH_SHORT).show();
+                            log("Mix long click.");
+
+                            return true;
+                        }
+                    });
+                }
             }
         });
 

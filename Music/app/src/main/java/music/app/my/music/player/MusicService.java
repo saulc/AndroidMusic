@@ -576,7 +576,8 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 		player.setQueue(q);
 	}
     public plist getQueue(){
-		if(player== null) return null;
+		if(player== null)
+			return null;
    	return player.getQueue();
    }
 
@@ -631,7 +632,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 
 			// log("Fade out needs at least: " + endSpace + " seconds. + gap: " + gap + " remainingTime: " + remainingTime);
 			 endSpace += gap + 1;
-
+			//start next song early. then pause 'current'
 			if( remainingTime <= endSpace ) {
 
 				log( "Playing next song based on progress...");
