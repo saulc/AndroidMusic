@@ -567,6 +567,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
    	return player.getCurrentSong();
    }
 	public int shuffleSongs() {  return player.shuffle(); }
+	public boolean reshuffle() {  return player.reshuffle(); }
 	public int repeatSongs(){
 		return player.repeat();
 	}

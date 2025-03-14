@@ -48,6 +48,13 @@
             android:lines="1"
             android:text="Fade Out Gap:"
             android:textAlignment="center" />
+        <TextView
+            android:id="@+id/label4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:lines="1"
+            android:text="Crossfade :"
+            android:textAlignment="center" />
         <Switch
             android:id="@+id/mixmodeSwitch"
             android:layout_width="wrap_content"
@@ -104,6 +111,15 @@
             android:min="1"
             android:progress="9" />
 
+        <SeekBar
+            android:id="@+id/fade4"
+            style="@style/Widget.AppCompat.SeekBar.Discrete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="11"
+            android:min="1"
+            android:progress="3" />
+
         <TextView
             android:id="@+id/mixdata"
             android:layout_width="match_parent"
@@ -135,6 +151,12 @@
 
         <TextView
             android:id="@+id/f4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="mix data"
+            android:textAlignment="center" />
+        <TextView
+            android:id="@+id/f5"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="mix data"

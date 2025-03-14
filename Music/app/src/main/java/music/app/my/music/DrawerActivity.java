@@ -729,6 +729,15 @@ public class DrawerActivity extends AppCompatActivity
     }
 
     @Override
+    public boolean onShuffleLongClicked(){
+        log("Suffle clicked");
+        boolean b = mService.reshuffle();
+        updateQueueFrag(mService.getQueue());
+        Toast.makeText(mService, "Re - Shuffle", Toast.LENGTH_SHORT).show();
+        return true;
+    }
+
+    @Override
     public int onRepeatClicked(){
         log("Repeat clicked");
         int b = mService.repeatSongs();

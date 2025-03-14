@@ -567,6 +567,11 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 
 		return queue.shuffle();
 	}
+	public boolean reshuffle() {
+
+		return queue.shuf();
+	}
+
 
 	public int repeat() {
 		
