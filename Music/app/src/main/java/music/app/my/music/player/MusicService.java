@@ -577,9 +577,9 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 		player.setQueue(q);
 	}
     public plist getQueue(){
-		if(player== null)
+		if(player == null)
 			return null;
-   	return player.getQueue();
+   		return player.getQueue();
    }
 
    public MusicPlayer getUiInfo(){
@@ -623,9 +623,6 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 		public void run()
 		{
 
-			 if(mListener != null){
-		            mListener.sendProgress(getUiInfo());		//send call to begin updating UI
-			 }
 
 			 long remainingTime = ( getDuration() - (player.getCurrentPosition()/1000) );
 			 long endSpace = ( player.getFadeOutDuration()/1000 );
@@ -651,6 +648,10 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 					//seekTo(0);
 					return;
 					}
+			}
+			if(mListener != null){
+				getPlayer().getmPlayers().get(getPlayer().getCurrentPlayer()).setEndspace((int)endSpace);
+				mListener.sendProgress(getUiInfo());		//send call to begin updating UI
 			}
 			 mHandler.postDelayed(updateUi, 1000);
 

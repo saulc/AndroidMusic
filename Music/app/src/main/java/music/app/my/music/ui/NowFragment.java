@@ -383,9 +383,10 @@ public class NowFragment extends ControlFragment {
                 if(!isMini){
                     int a = player.getCurrentPosition() / 1000;
                     int d = player.getDuration();  //already in seconds
+                    int e = player.getEndspace();  //already in seconds
 
                     pos.setText(a+"");
-                    time.setText( (d-a) + "");
+                    time.setText( (d-a-e) + "");
                 }
             }
 

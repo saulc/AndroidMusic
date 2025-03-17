@@ -210,6 +210,7 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 		public void run() {
 			log("Fading out older player...");
 			fadeOutOldPlayer();
+			
 		}
 	};
 
@@ -525,7 +526,11 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 		return (player.get(currentPlayer).getDuration()/1000);
 		return 110;
 	}
-
+	public int getEndspace(){
+		if(player.get(currentPlayer).isPrepared() && !player.get(currentPlayer).isPaused())
+			return player.get(currentPlayer).getEndspace();
+		return 0;
+	}
 
     private int seekMe = 0;
     public void seekTo(int secs){

@@ -24,7 +24,14 @@ public class myPlayer extends MediaPlayer
     private float duckVolume = .1f;
     private boolean isPrepared = false;
 	private int id = -1;
+	private int endspace = 0;
 
+	public void setEndspace(int e){
+		endspace = e;
+	}
+	public int getEndspace(){
+		return endspace;
+	}
     public myPlayer(int i){
     	super();
 		setId(i);
@@ -91,7 +98,7 @@ public class myPlayer extends MediaPlayer
 	public void pausePlayback(){
     	if(paused) return;
 		mHandler.post(fadeOutVolume);
-		mHandler.postDelayed(pause, fadeOutDuration + 1000);
+		mHandler.postDelayed(pause, fadeOutDuration );
 		pausePos = getCurrentPosition();
 		paused = true;
 	}
