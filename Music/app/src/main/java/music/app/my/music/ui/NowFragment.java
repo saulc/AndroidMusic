@@ -203,6 +203,14 @@ public class NowFragment extends ControlFragment {
                     shuffleClicked();
                 }
             });
+            shuffle.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    log("Shuffle long Clicked");
+                    shuffleLongClicked();
+                    return true;
+                }
+            });
 
             repeat = (ImageButton) view.findViewById(R.id.repeatButton);
             repeat.setOnClickListener(new View.OnClickListener() {
@@ -375,9 +383,10 @@ public class NowFragment extends ControlFragment {
                 if(!isMini){
                     int a = player.getCurrentPosition() / 1000;
                     int d = player.getDuration();  //already in seconds
+                    int e = player.getEndspace();  //already in seconds
 
                     pos.setText(a+"");
-                    time.setText( (d-a) + "");
+                    time.setText( (d-a-e) + "");
                 }
             }
 
@@ -525,6 +534,11 @@ public class NowFragment extends ControlFragment {
         boolean r = mListener.onShuffleClicked();
         setShuffleRes(r);
     }
+
+    private  void shuffleLongClicked(){
+        boolean r = mListener.onShuffleLongClicked();
+    }
+
 
     private  void setShuffleRes(boolean on){
         //set the clear board if now shuffle. set gradient if shuffle

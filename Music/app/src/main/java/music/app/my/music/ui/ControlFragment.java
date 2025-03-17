@@ -62,6 +62,8 @@ public class ControlFragment extends Fragment {
 
         boolean onShuffleClicked();
 
+        boolean onShuffleLongClicked();
+
         int onRepeatClicked();
 
         void onVolChanged(int i);

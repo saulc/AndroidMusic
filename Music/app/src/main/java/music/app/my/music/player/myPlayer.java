@@ -13,7 +13,7 @@ public class myPlayer extends MediaPlayer
 	private boolean paused = true;
 	private int pausePos = 0;
 
-	private int fadeInDuration = 5000, fadeOutDuration = 10000, fadeOutGap = 4000, startGap = 0;
+	private int fadeInDuration = 5000, fadeOutDuration = 10000, fadeOutGap = 4000, startGap = 0, crossFade = 3000;
 	private int mCurrentStep = 1;
 	private float lastvol = 0f;
 	private float maxVol = 1f;
@@ -24,19 +24,27 @@ public class myPlayer extends MediaPlayer
     private float duckVolume = .1f;
     private boolean isPrepared = false;
 	private int id = -1;
+	private int endspace = 0;
 
+	public void setEndspace(int e){
+		endspace = e;
+	}
+	public int getEndspace(){
+		return endspace;
+	}
     public myPlayer(int i){
     	super();
 		setId(i);
     	
     }
  
-    public myPlayer(int in, int out, int outg, int startg){
+    public myPlayer(int in, int out, int outg, int startg, int cf){
     	super();
     	fadeInDuration = in;
     	fadeOutDuration =out;
     	fadeOutGap = outg;
     	startGap = startg;
+		crossFade = cf;
     }
 	public void setVolStep(boolean active){
 		if(active) maxVol = stepVol;
@@ -90,7 +98,7 @@ public class myPlayer extends MediaPlayer
 	public void pausePlayback(){
     	if(paused) return;
 		mHandler.post(fadeOutVolume);
-		mHandler.postDelayed(pause, fadeOutDuration + 1000);
+		mHandler.postDelayed(pause, fadeOutDuration );
 		pausePos = getCurrentPosition();
 		paused = true;
 	}
@@ -254,6 +262,11 @@ public class myPlayer extends MediaPlayer
 		return fadeOutGap;
 	}
 	public int getStartGap() { return  startGap; }
+	public int getCrossFade() { return  crossFade; }
+	public void setCrossFade(int crossFadeSecs) {
+		if(crossFadeSecs < 1) crossFadeSecs = 1;
+		this.crossFade = crossFadeSecs *1000;
+	}
 
 			public void setFadeInDuration(int fadeInDurationSecs) {
 	    		if(fadeInDurationSecs < 1) fadeInDurationSecs = 1;

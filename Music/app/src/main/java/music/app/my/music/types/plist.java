@@ -51,7 +51,7 @@ public class plist extends Qbase{
 		return shufflemode;
 	}
 
-	private boolean shuf(){
+	public boolean shuf(){
 
 	    	if(songs.isEmpty())
 	    		return false;

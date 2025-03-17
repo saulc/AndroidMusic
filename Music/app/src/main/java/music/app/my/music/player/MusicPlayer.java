@@ -40,7 +40,7 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 	
 	private boolean CrossFadeEnabled = true;
 	private boolean playWhenPrepared = true;
-	private int fadeInDuration = 7000, fadeOutDuration = 12000, fadeOutGap = 4000, fadeInGap = 1000;
+	private int fadeInDuration = 7000, fadeOutDuration = 12000, fadeOutGap = 4000, fadeInGap = 1000, crossFade = 3000;
 
 	private void log(String s){
 //        Logger.log(TAG, s);
@@ -98,6 +98,7 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 		setFadeInGap(fadeInGap);
 		setFadeOutDuration(fadeOutDuration);
 		setFadeOutGap(fadeOutGap);
+		setCrossFade(crossFade);
 	}
 	public void setFadeOutGap(int g){
 		fadeOutGap = g;
@@ -122,10 +123,17 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 			p.setFadeInDuration(g);
 	}
 
+	public void setCrossFade(int g){
+		crossFade = g;
+		for(myPlayer p: player)
+			p.setCrossFade(g);
+	}
+
 	public int getFadeInGap(){ return player.get(currentPlayer).getStartGap(); }
 	public int getFadeInDuration(){ return player.get(currentPlayer).getFadeInDuration(); }
 	public int getFadeOutDuration(){ return player.get(currentPlayer).getFadeOutDuration(); }
 	public int getFadeOutGap(){ return player.get(currentPlayer).getFadeOutGap(); }
+	public int getCrossFade(){ return player.get(currentPlayer).getCrossFade(); }
 
 
 	private void setState(MUSICPLAYER_STATE s){
@@ -187,19 +195,31 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 
 		if(queue.hasNext()){
 			
-			fadeOutOldPlayer();
+//			fadeOutOldPlayer();
+
+			incrementPlayers();
+			mHandler.postDelayed(setOldPlayerFadeout, crossFade);
 			queue.nextSong();
 			playWhenPrepared = true;
 			prepareSong();
 		
 		}
 	}
-	
+	private Runnable setOldPlayerFadeout = new Runnable() {
+		@Override
+		public void run() {
+			log("Fading out older player...");
+			fadeOutOldPlayer();
+			
+		}
+	};
+
 	public void playSongFromQueue(int index) {
 		if( index < queue.getSize() ){
-			
-			fadeOutOldPlayer();
+
 			queue.setIndex(index);
+			incrementPlayers();
+			mHandler.postDelayed(setOldPlayerFadeout, crossFade);
 			playWhenPrepared = true;
 			prepareSong();
 		
@@ -235,10 +255,10 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 	//	if(!isPlaying()) return; //if not playing no need to fade it out.
 
 		//other wise stop the ui updates.
-		sListener.stopUiCallbacks();
+//		sListener.stopUiCallbacks();
 
 		//new 3 player loop. simple.
-		player.get(currentPlayer).pausePlayback();  //pause and fade out current.
+		player.get(auxPlayer).pausePlayback();  //pause and fade out current.
 
 		//setup the new player, aux should be 2 songs previous. already faded out and done with.
 		//aux represents the player after next.
@@ -247,8 +267,8 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 //		player.get(auxPlayer).reset();
 
 
-
-		incrementPlayers(); //move each player role to the next step. cur -> next - > aux -> cur *
+//
+//		incrementPlayers(); //move each player role to the next step. cur -> next - > aux -> cur *
 
 		//first try 3 player loop. wtf was i thinking? lol
 //		int temp = nextPlayer;		//save
@@ -441,10 +461,7 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 		iniAFX(player.get(currentPlayer).getAudioSessionId());
 
 		//mListener.setAudioId(player);
-		if(seekMe != 0) {
-			player.get(currentPlayer).seekTo(seekMe);
-			seekMe=0;
-		}
+
 		if(playWhenPrepared == true){
 			//apply fade in gap if its been set. skip song intro.
 			if(player.get(currentPlayer).getStartGap() > 0)
@@ -452,6 +469,10 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 
 			playRequest();
 		} //else player.get(currentPlayer).pause();
+		if(seekMe != 0) {
+			player.get(currentPlayer).seekTo(seekMe);
+			seekMe=0;
+		}
 	}
 
 	private void prepareSong() {
@@ -505,7 +526,11 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 		return (player.get(currentPlayer).getDuration()/1000);
 		return 110;
 	}
-
+	public int getEndspace(){
+		if(player.get(currentPlayer).isPrepared() && !player.get(currentPlayer).isPaused())
+			return player.get(currentPlayer).getEndspace();
+		return 0;
+	}
 
     private int seekMe = 0;
     public void seekTo(int secs){
@@ -547,6 +572,11 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener {
 
 		return queue.shuffle();
 	}
+	public boolean reshuffle() {
+
+		return queue.shuf();
+	}
+
 
 	public int repeat() {
 		

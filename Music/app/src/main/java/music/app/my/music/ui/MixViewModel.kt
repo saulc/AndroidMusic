@@ -9,6 +9,7 @@ class MixViewModel : ViewModel() {
     var fadeInGap : Int = 9000
     var fadeOut : Int = 7000
     var fadeOutGap : Int = 9000
+    var crossFade : Int = 3000
 
     var fadeOn : Boolean = true
     var mixOn : Boolean = true

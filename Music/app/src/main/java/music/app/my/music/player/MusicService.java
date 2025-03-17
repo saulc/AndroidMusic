@@ -567,6 +567,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
    	return player.getCurrentSong();
    }
 	public int shuffleSongs() {  return player.shuffle(); }
+	public boolean reshuffle() {  return player.reshuffle(); }
 	public int repeatSongs(){
 		return player.repeat();
 	}
@@ -576,9 +577,9 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 		player.setQueue(q);
 	}
     public plist getQueue(){
-		if(player== null)
+		if(player == null)
 			return null;
-   	return player.getQueue();
+   		return player.getQueue();
    }
 
    public MusicPlayer getUiInfo(){
@@ -622,16 +623,14 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 		public void run()
 		{
 
-			 if(mListener != null){
-		            mListener.sendProgress(getUiInfo());		//send call to begin updating UI
-			 }
 
 			 long remainingTime = ( getDuration() - (player.getCurrentPosition()/1000) );
 			 long endSpace = ( player.getFadeOutDuration()/1000 );
 			 long gap =  (player.getmPlayers().get(player.getCurrentPlayer()).getFadeOutGap()/1000 );
+			long cf =  (player.getmPlayers().get(player.getCurrentPlayer()).getCrossFade()/1000 );
 
 			// log("Fade out needs at least: " + endSpace + " seconds. + gap: " + gap + " remainingTime: " + remainingTime);
-			 endSpace += gap + 1;
+			 endSpace += gap + 1 + cf;
 			//start next song early. then pause 'current'
 			if( remainingTime <= endSpace ) {
 
@@ -649,6 +648,10 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 					//seekTo(0);
 					return;
 					}
+			}
+			if(mListener != null){
+				getPlayer().getmPlayers().get(getPlayer().getCurrentPlayer()).setEndspace((int)endSpace);
+				mListener.sendProgress(getUiInfo());		//send call to begin updating UI
 			}
 			 mHandler.postDelayed(updateUi, 1000);
 

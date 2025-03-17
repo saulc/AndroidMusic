@@ -33,6 +33,7 @@ class MixFragment : Fragment() {
         s1 = v.findViewById(R.id.fade1)
         s2 = v.findViewById(R.id.fade2)
         s3 = v.findViewById(R.id.fade3)
+        s4 = v.findViewById(R.id.fade4)
 
         dataText = v.findViewById(R.id.mixdata)
         mixSwitch = v.findViewById(R.id.mixmodeSwitch)
@@ -48,6 +49,7 @@ class MixFragment : Fragment() {
         fadeingap = v.findViewById(R.id.f3)
         fadeout = v.findViewById(R.id.f2)
         fadeoutgap = v.findViewById(R.id.f4)
+        crossfade = v.findViewById(R.id.f5)
 
 
 
@@ -69,6 +71,7 @@ class MixFragment : Fragment() {
         val og = s3?.progress
         val fi = s0?.progress
         val fo = s1?.progress
+        val cf = s4?.progress
 
         var t :String = "Mix in: " + cvtdata(ig!!)
         t +=  " out: " + cvtdata(og!! )
@@ -79,6 +82,7 @@ class MixFragment : Fragment() {
         fadeingap?.text = "Fade in Gap: " + ig
         fadeout?.text = "Fade Out: " + fo
         fadeoutgap?.text = "Fade Out Gap: " + og
+        crossfade?.text = "Crossfade: " + cf
 
     }
     fun setMixMode(mixOn: Boolean){
@@ -88,12 +92,16 @@ class MixFragment : Fragment() {
             s0?.progress = 7
             s1?.progress = s1!!.max
 
+            s4?.progress = 3
+
         } else {
 
             s0?.progress = 4
             s1?.progress = 7
             s2?.progress = 7
             s3?.progress = 7
+
+            s4?.progress = 7
         }
 
     }
@@ -127,12 +135,14 @@ class MixFragment : Fragment() {
     private var fadeout: TextView? = null
     private var fadeingap: TextView? = null
     private var fadeoutgap: TextView? = null
+    private var crossfade: TextView? = null
 
     private var dataText: TextView? = null
     private var s0: SeekBar? = null
     private  var s1:SeekBar? = null
     private  var s2:SeekBar? = null
     private  var s3:SeekBar? = null
+    private  var s4:SeekBar? = null
     private var mixSwitch: Switch? = null
 
     fun loadValues(){
@@ -140,6 +150,7 @@ class MixFragment : Fragment() {
          s1?.progress =   viewModel.fadeOut
         s2?.progress =   viewModel.fadeInGap
         s3?.progress =   viewModel.fadeOutGap
+        s4?.progress =   viewModel.crossFade
     }
 
     fun iniBars(){
