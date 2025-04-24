@@ -2,10 +2,11 @@
 <resources>
     <color name="colorPrimary">#3E0163</color>
     <color name="colorPrimaryDark">#000000</color>
-    <color name="colorAccent">#dcfd22</color>
+    <color name="colorAccent">#E65AFB</color>background_material
+    <color name="background_material">#6D6D6D</color>
     <color name="background_material_dark">#49484a</color>
-    <color name="primary_material_light">#01e017</color>
-    <color name="primary_dark_material_light">#00451f</color>
+    <color name="primary_material_light">#00A89A</color>
+    <color name="primary_dark_material_light">#009688</color>
     <color name="accent_material_dark">#00ff40</color>
     <color name="primary_dark_material_dark">#a0000000</color>
     <color name="primary_material_dark">#5e645d</color>

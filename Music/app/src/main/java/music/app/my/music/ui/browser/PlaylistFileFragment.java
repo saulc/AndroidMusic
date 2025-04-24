@@ -139,7 +139,7 @@ public class PlaylistFileFragment extends baseListFragment implements DrawerActi
     public void updateAdapter(){
         mAdapter = new PlaylistFileAdapter(items
                 , ( OnListFragmentInteractionListener) getActivity() );
-    if(recyclerView == null) return;
+        if(recyclerView == null) return;
         recyclerView.setAdapter(mAdapter);
         log("Updating adapter");
         mAdapter.notifyDataSetChanged();

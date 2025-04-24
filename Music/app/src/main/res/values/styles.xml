@@ -38,7 +38,9 @@
         <item name="android:background">?android:attr/listDivider</item>
     </style>
 
-    <style name="AppThemeLight" parent="Theme.AppCompat.Light.NoActionBar" />
+    <style name="AppThemeLight" parent="Theme.AppCompat.Light.NoActionBar" >
+      <item name="android:colorBackground">@color/background_material</item>
+    </style>
 
     <style name="DarkSide" parent="Theme.AppCompat.NoActionBar" >
         <item name="android:windowContentTransitions">true</item>
