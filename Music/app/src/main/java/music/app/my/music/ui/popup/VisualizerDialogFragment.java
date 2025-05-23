@@ -2,6 +2,7 @@ package music.app.my.music.ui.popup;
 
 
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -11,15 +12,27 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+
+import java.util.Objects;
 
 import music.app.my.music.DrawerActivity;
 import music.app.my.music.R;
 
-public  class VisualizerDialogFragment extends Fragment implements Visualizer.OnDataCaptureListener {
+public  class  VisualizerDialogFragment extends Fragment implements Visualizer.OnDataCaptureListener {
 
     public static VisualizerDialogFragment newInstance() {
+        Log.d("Visualizer", "Creating visualizer fragment...");
+        return new VisualizerDialogFragment();
+    }
+
+    public static VisualizerDialogFragment newInstance(int aid) {
+        Log.d("Visualizer", "Creating visualizer fragment with aid: " + aid);
         VisualizerDialogFragment fragment = new VisualizerDialogFragment();
+        Bundle b = new Bundle();
+        b.putInt("Aid", aid);
+        fragment.setArguments(b);
         return fragment;
     }
 
@@ -33,7 +46,7 @@ public  class VisualizerDialogFragment extends Fragment implements Visualizer.On
     }
 
 
-    public VisualizerDialogFragment(){ }
+//    public VisualizerDialogFragment(){ }
 
 
     @Override
@@ -57,14 +70,25 @@ public  class VisualizerDialogFragment extends Fragment implements Visualizer.On
     Fragment stuff ----------------.....................--------------------
      */
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        ((DrawerActivity) getActivity()).visualizerCreated();
+        log("Visualizer created.");
         if (getArguments() != null) {
+            aid = getArguments().getInt("Aid");
+            log("Visualizer aid: " + aid);
 
+            callBack.visualizerCreated();
         }
+    }
+    private DrawerActivity callBack;
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        log("Visualizer attached.");
+        callBack = (DrawerActivity) context;
     }
 
     public void setImageView(ImageView i){ iv = i; }
@@ -115,7 +139,6 @@ public  class VisualizerDialogFragment extends Fragment implements Visualizer.On
     }
 
     private int aid;
-    private  boolean enabled = true;
     private Visualizer vis = null;
 
     private ImageView iv, iv2;
@@ -128,16 +151,20 @@ public  class VisualizerDialogFragment extends Fragment implements Visualizer.On
     private  int mode = 4, modes = 7;
 
     public void clicked(){
+        if(vis == null) startup();
+
         if(++mode >= modes) mode = 0;
         log("VIs clicked. mode: " + mode);
     }
 
-    public boolean isEnabled() {
-        return enabled;
+    public void startup(){
+        log("Visualizer starting.");
+        callBack.visualizerCreated();
     }
 
+
     public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
+
 
         vis.setEnabled(enabled);
     }
@@ -148,10 +175,10 @@ public  class VisualizerDialogFragment extends Fragment implements Visualizer.On
 
         if(id != aid){
             if (vis != null)
-            setEnabled(false);
+                setEnabled(false);
             aid = id;
             vis = new Visualizer(aid);
-            if(enabled) setEnabled(false);
+            if(vis.getEnabled()) setEnabled(false);
             iniVis();
 
             setEnabled(true);
@@ -161,7 +188,8 @@ public  class VisualizerDialogFragment extends Fragment implements Visualizer.On
 
     public void stop(){
 
-        log("Visualizer stopped.");
+        log("Visualizer stopped. " + vis);
+        if(vis == null) return;
         try {
             vis.setEnabled(false);
             vis.release();

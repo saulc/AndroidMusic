@@ -116,6 +116,7 @@ public class DrawerActivity extends AppCompatActivity
 //    Logger.LogCallback , LoggerFragment.LogFragListener
 
     private VisualizerDialogFragment vf = null;
+    private boolean vis = false;
 
     //fragments that need callbacks. send info/triggers to fragments
     private PlayListFragment playlistFrag = null;
@@ -331,7 +332,6 @@ public class DrawerActivity extends AppCompatActivity
         handleSearchIntents();
 
         addBattListener();
-
     }
 
 
@@ -1430,8 +1430,10 @@ public void addBattListener(){
 
     public void visualizerLongClicked() {
         log("Vis long clicked.");
-        nowIconLongClicked();
-        // showNow();
+        vf.stop();
+        getSupportFragmentManager().beginTransaction().remove(vf).commit();
+        vf = null;
+        vis = false;
     }
 
 
@@ -1440,26 +1442,26 @@ public void addBattListener(){
         if (mService != null && mService.getPlayer() != null && mService.getPlayer().isPlaying()) {
             vf.setImageView(nf.getIcon());
             vf.setAid(mService.getPlayer().getAID());
-            //vf.setEnabled(true);
+//            vf.setEnabled(true);
+            vis = true;
         }
 
     }
 
 
+
+
     @Override
     public void nowIconLongClicked() {
 
-        Log.d(TAG, "Now icon Long clicked " + (vf==null) );
+        Log.d(TAG, "Now icon Long clicked " + (vf==null) + " " + vis );
 
-        if (vf == null) {
+        if (!vis) {
+            log("Starting visulizer.");
             vf = VisualizerDialogFragment.newInstance();
-            getSupportFragmentManager().beginTransaction().show(vf).commit();
-        } else {
-            vf.stop();
-            getSupportFragmentManager().beginTransaction().remove(vf).commit();
-            vf = null;
-            //nowIconLongClicked();
-        }
+            getSupportFragmentManager().beginTransaction().add(vf, "Viz").commit();
+//            vis = true;
+        }else visualizerLongClicked();
 
         //showFragment(R.id.frame, vf, true);
     }
