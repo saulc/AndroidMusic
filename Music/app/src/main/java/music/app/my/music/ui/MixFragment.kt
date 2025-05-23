@@ -92,7 +92,7 @@ class MixFragment : Fragment() {
             s0?.progress = 7
             s1?.progress = s1!!.max
 
-            s4?.progress = 3
+            s4?.progress = 11
 
         } else {
 

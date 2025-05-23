@@ -25,6 +25,13 @@ public class myPlayer extends MediaPlayer
     private boolean isPrepared = false;
 	private int id = -1;
 	private int endspace = 0;
+	private int duration = 0;
+
+	@Override
+	public int getDuration(){
+		if(duration == 0) duration = super.getDuration();
+		return duration;
+	}
 
 	public void setEndspace(int e){
 		endspace = e;
@@ -122,6 +129,7 @@ public class myPlayer extends MediaPlayer
 	}
 	
 	public void prepared(){
+		duration = 0;
 		isPrepared = true;
 	}
     public boolean isPrepared(){
