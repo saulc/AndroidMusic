@@ -815,7 +815,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 		if(i <= in) player.getQueue().setIndex(in-1);
 		in = player.getQueue().getIndex();
 
-		if(i >= in) {
+		if(i == in) {
 			playSongFromQueue(i);
 			log("Music Player playing current song");
 		}

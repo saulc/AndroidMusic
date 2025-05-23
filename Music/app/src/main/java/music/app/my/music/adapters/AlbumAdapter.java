@@ -3,13 +3,16 @@ package music.app.my.music.adapters;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.util.Size;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -95,17 +98,60 @@ public class AlbumAdapter   extends  RecyclerView.Adapter<AlbumAdapter.ViewHolde
         cc.drawText(msg, width/3, height*.7f, p);
         return rc;
     }
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    private Bitmap getAlbumArtwork(ContentResolver resolver, long albumId) throws IOException {
-        Uri contentUri = ContentUris.withAppendedId(
+//    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+//    private Bitmap getAlbumArtwork(ContentResolver resolver, long albumId) throws IOException {
+//        Uri contentUri = ContentUris.withAppendedId(
+//                MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
+//                albumId
+//        );
+//
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+//            return resolver.loadThumbnail(contentUri, new Size(640, 480), null);
+//        }
+//        return null;
+//    }
+
+    private Bitmap getAlbumArtworkBitmap(Context context, long albumId) {
+        Size targetSize = new Size(60, 60);
+        ContentResolver resolver = context.getContentResolver();
+        Uri albumArtUri = ContentUris.withAppendedId(
                 MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
                 albumId
         );
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            return resolver.loadThumbnail(contentUri, new Size(640, 480), null);
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                // CancellationSignal can be useful if the operation needs to be cancelled
+                return resolver.loadThumbnail(albumArtUri, targetSize , null);
+            } else {
+                // Fallback for older versions
+                // This is a common way, but it might not always find art if it's not embedded
+                // or directly linked in the MediaStore.
+                // You might need more robust methods like querying MediaStore.Audio.Albums.ALBUM_ART
+                // or using a library like Glide/Picasso which handles this complexity.
+
+                String[] projection = {MediaStore.Audio.Albums.ALBUM_ART};
+                Cursor cursor = resolver.query(albumArtUri, projection, null, null, null);
+                Bitmap bitmap = null;
+                if (cursor != null) {
+                    if (cursor.moveToFirst()) {
+                        String path = cursor.getString(0);
+                        if (path != null) {
+                            bitmap = BitmapFactory.decodeFile(path);
+                        }
+                    }
+                    cursor.close();
+                }
+                // If you get a bitmap, you might want to scale it manually here for pre-Q
+                if (bitmap != null) {
+                    return Bitmap.createScaledBitmap(bitmap, targetSize.getWidth(), targetSize.getHeight(), false);
+                }
+                return null; // Or return a default placeholder bitmap
+            }
+        } catch (IOException e) {
+           Log.d("Album adapter", "Error loading album art for ID: " + albumId, e);
+            return null; // Or return a default placeholder bitmap
         }
-        return null;
     }
 
     @Override
@@ -123,14 +169,16 @@ public class AlbumAdapter   extends  RecyclerView.Adapter<AlbumAdapter.ViewHolde
         if(mValues.get(position).getId() != null) {
             try {
                 long p = Long.parseLong(mValues.get(position).getId());
-                Bitmap b =  getAlbumArtwork( context.getContentResolver() , p);
-                holder.mIcon.setImageBitmap(Bitmap.createScaledBitmap(b, 60, 60, true));
-//                Drawable d = new BitmapDrawable(Resources.getSystem(), b);
-
-//                Drawable d = Drawable.createFromPath(mValues.get(position).getArt());
-//                holder.mIcon.setImageDrawable(d);
+                Bitmap b =  getAlbumArtworkBitmap( context , p);
+                if(b == null) throw new Exception("No art");
+                holder.mIcon.setImageBitmap(b);
+//                holder.mIcon.setImageBitmap(Bitmap.createScaledBitmap(b, 60, 60, false));
+////                Drawable d = new BitmapDrawable(Resources.getSystem(), b);
+//
+////                Drawable d = Drawable.createFromPath(mValues.get(position).getArt());
+////                holder.mIcon.setImageDrawable(d);
             } catch (Exception e) {
-//                e.printStackTrace();
+                e.printStackTrace();
                 holder.mIcon.setImageBitmap(createAlbumBit(holder.mItem.getAlbum().charAt(0)+""));
             }
 
