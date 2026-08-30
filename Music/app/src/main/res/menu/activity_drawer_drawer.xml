@@ -74,6 +74,10 @@
                 android:icon="@android:drawable/ic_menu_view"
                 android:title="Theme" />
             <item
+                android:id="@+id/nav_remove_ads"
+                android:icon="@android:drawable/ic_menu_delete"
+                android:title="Remove Ads" />
+            <item
                 android:id="@+id/exit"
                 android:icon="@android:drawable/btn_dialog"
                 android:title="Exit" />

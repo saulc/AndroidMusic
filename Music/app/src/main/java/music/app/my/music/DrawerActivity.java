@@ -70,6 +70,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
+import music.app.my.music.helpers.BillingHelper;
 import music.app.my.music.helpers.FabDoubleTapGS;
 import music.app.my.music.helpers.FaderSettingListener;
 import music.app.my.music.helpers.PlaylistFilemaker;
@@ -120,7 +121,8 @@ public class DrawerActivity extends AppCompatActivity
         FaderSettingListener,
         SecretFragment.SecretListener,
         FabDoubleTapGS.DoubleTapListener,
-        Toolbar.OnMenuItemClickListener  {
+        Toolbar.OnMenuItemClickListener,
+        BillingHelper.BillingListener {
 //    Logger.LogCallback , LoggerFragment.LogFragListener
 
     private VisualizerDialogFragment vf = null;
@@ -229,6 +231,7 @@ public class DrawerActivity extends AppCompatActivity
     private MediaSession mediaSession;
 
     private AdView mAdView;
+    private BillingHelper billingHelper;
 
   //  private NotificationHelper noti;
 
@@ -397,6 +400,19 @@ public class DrawerActivity extends AppCompatActivity
         mAdView = findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);
+
+        billingHelper = new BillingHelper(this, this);
+    }
+
+    @Override
+    public void onAdsRemoved() {
+        runOnUiThread(() -> {
+            if (mAdView != null) {
+                mAdView.setVisibility(View.GONE);
+                mAdView.destroy();
+                mAdView = null;
+            }
+        });
     }
 
 
@@ -571,6 +587,12 @@ public void addBattListener(){
         } else if (id == R.id.nav_mix) {
             log("mix clicked.");
             showMixx();
+
+        } else if (id == R.id.nav_remove_ads) {
+            log("Remove ads clicked.");
+            if (billingHelper != null) {
+                billingHelper.launchBillingFlow();
+            }
 
         }
             if(autoCloseDrawer) {
