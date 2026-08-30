@@ -668,6 +668,7 @@ public void addBattListener(){
 
 //        mfab.setButtonStartPos();
         log("Resume activity.");
+        showNow();
 //        showLogs();
         if(playlistExport) {
             if(pname != null)
