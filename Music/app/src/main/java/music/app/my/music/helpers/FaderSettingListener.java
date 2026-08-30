@@ -13,4 +13,5 @@ public interface FaderSettingListener {
 
         void fadeInGapChanged(int i);
 
+        void crossFadeChanged(int i);
 }

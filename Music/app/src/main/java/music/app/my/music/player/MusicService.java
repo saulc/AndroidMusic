@@ -894,6 +894,9 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 	public void setVolStep(boolean active){
 		player.setVolStep(active);
 	}
+	public void setCrossFade(int i){
+		player.setCrossFade(i);
+	}
 }
 
 

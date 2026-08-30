@@ -220,5 +220,20 @@ class MixFragment : Fragment() {
             }
         })
 
+        s4?.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {
+                // Display the current progress of SeekBar
+//                viewModel.fadeOutGap = i
+                mListener?.crossFadeChanged(i)
+                updateData()
+                log("updating Fade Setting...")
+            }
+            override fun onStartTrackingTouch(seekBar: SeekBar) {
+                log("Seekbar started: ")
+            }
+            override fun onStopTrackingTouch(seekBar: SeekBar) {
+                log("Seekbar Stopped: ")
+            }
+        })
     }
 }

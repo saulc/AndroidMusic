@@ -2221,6 +2221,13 @@ public void addBattListener(){
 
     }
 
+    @Override
+    public void crossFadeChanged(int i) {
+        log("cross fade chaned: "+ i);
+        if(mService != null)  mService.setCrossFade(i);
+
+    }
+
 //   override system volume and double the steps.
     @Override
     public int getMaxVol() {

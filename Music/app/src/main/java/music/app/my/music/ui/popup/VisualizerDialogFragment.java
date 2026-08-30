@@ -76,6 +76,7 @@ public  class  VisualizerDialogFragment extends Fragment implements Visualizer.O
         super.onCreate(savedInstanceState);
         log("Visualizer created.");
         if (getArguments() != null) {
+            log("Checking vis arguements");
             aid = getArguments().getInt("Aid");
             log("Visualizer aid: " + aid);
 
