@@ -1,8 +1,7 @@
 apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 34
+    compileSdk 34
 
     defaultConfig {
         applicationId "music.app.my.music"
@@ -18,7 +17,7 @@ android {
     buildTypes {
         release {
             minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
     namespace 'music.app.my.music'
@@ -26,11 +25,9 @@ android {
         targetCompatibility "17"
         sourceCompatibility JavaVersion.VERSION_17
     }
-    buildToolsVersion '35.0.0'
 }
 
 dependencies {
-
     implementation 'androidx.vectordrawable:vectordrawable:1.2.0'
 
     implementation fileTree(include: ['*.jar'], dir: 'libs')
