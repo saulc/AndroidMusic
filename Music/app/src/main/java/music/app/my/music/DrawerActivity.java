@@ -2,6 +2,7 @@ package music.app.my.music;
 
 import static java.lang.Math.round;
 
+import android.Manifest;
 import android.animation.LayoutTransition;
 import android.app.SearchManager;
 import android.content.BroadcastReceiver;
@@ -19,6 +20,7 @@ import android.media.AudioManager;
 import android.media.session.MediaSession;
 import android.net.Uri;
 import android.os.BatteryManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -41,6 +43,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -60,6 +63,8 @@ import com.google.android.material.snackbar.Snackbar;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 import music.app.my.music.helpers.FabDoubleTapGS;
@@ -147,6 +152,51 @@ public class DrawerActivity extends AppCompatActivity
     private boolean battWarn = false;
     private final String TAG = getClass().getSimpleName();
 
+    private final ActivityResultLauncher<String[]> requestPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), isGranted -> {
+                boolean allGranted = true;
+                for (Map.Entry<String, Boolean> entry : isGranted.entrySet()) {
+                    if (!entry.getValue()) {
+                        allGranted = false;
+                        log("Permission denied: " + entry.getKey());
+                    }
+                }
+                if (allGranted) {
+                    log("All permissions granted");
+                } else {
+                    Toast.makeText(this, "Permissions are required for the app to function properly", Toast.LENGTH_LONG).show();
+                }
+            });
+
+    private void checkAndRequestPermissions() {
+        List<String> permissionsNeeded = new ArrayList<>();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+                permissionsNeeded.add(Manifest.permission.READ_MEDIA_AUDIO);
+            }
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                permissionsNeeded.add(Manifest.permission.POST_NOTIFICATIONS);
+            }
+        } else {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                permissionsNeeded.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+            }
+        }
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            permissionsNeeded.add(Manifest.permission.RECORD_AUDIO);
+        }
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            permissionsNeeded.add(Manifest.permission.CAMERA);
+        }
+
+        if (!permissionsNeeded.isEmpty()) {
+            requestPermissionLauncher.launch(permissionsNeeded.toArray(new String[0]));
+        }
+    }
+
     private void log(String s) {
 //        Logger.log(TAG, s);
         Log.i(TAG, s);
@@ -189,6 +239,9 @@ public class DrawerActivity extends AppCompatActivity
 
 
         setContentView(R.layout.activity_drawer);
+
+        checkAndRequestPermissions();
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
