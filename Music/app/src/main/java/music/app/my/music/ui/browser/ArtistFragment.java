@@ -33,7 +33,7 @@ public class ArtistFragment extends baseListFragment implements DrawerActivity.m
         log("scroll by:" + y);
 //        recyclerView.scrollBy(0, (int) y);
     }
-    protected ArrayList<Artist> items;
+    protected ArrayList<Artist> items = new ArrayList<>();
 
     private final String TAG = getClass().getSimpleName();
     private void log(String s){
@@ -61,7 +61,6 @@ public class ArtistFragment extends baseListFragment implements DrawerActivity.m
         super.onCreate(savedInstanceState);
         log("Artist fragment qFragCreated");
      //   iniMsHelper();
-    items = new ArrayList<Artist>();
 
     }
 

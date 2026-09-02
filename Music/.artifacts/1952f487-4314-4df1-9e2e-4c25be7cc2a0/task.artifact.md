@@ -1,0 +1,4 @@
+- [x] Implement `OnBackStackChangedListener` in `DrawerActivity` to toggle toolbar icon
+- [x] Update `onBackPressed` to handle back stack popping
+- [x] Ensure `onSupportNavigateUp` handles back navigation correctly
+- [ ] Verify navigation between Artist -> Album -> Song flows

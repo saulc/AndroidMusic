@@ -54,6 +54,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.gms.ads.AdRequest;
@@ -232,6 +233,7 @@ public class DrawerActivity extends AppCompatActivity
 
     private AdView mAdView;
     private BillingHelper billingHelper;
+    private ActionBarDrawerToggle toggle;
 
   //  private NotificationHelper noti;
 
@@ -348,10 +350,29 @@ public class DrawerActivity extends AppCompatActivity
         fab.setOnTouchListener(gestureListener);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+        toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
+
+        getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
+            @Override
+            public void onBackStackChanged() {
+                if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+                    toggle.setDrawerIndicatorEnabled(false);
+                    toggle.setToolbarNavigationClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            onBackPressed();
+                        }
+                    });
+                } else {
+                    toggle.setDrawerIndicatorEnabled(true);
+                    toggle.setToolbarNavigationClickListener(toggle.getToolbarNavigationClickListener());
+                    toggle.syncState();
+                }
+            }
+        });
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         if(navigationView != null)   navigationView.setNavigationItemSelectedListener(this);
@@ -2376,30 +2397,35 @@ public void addBattListener(){
 //            prevPressed();
 //            am.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, 0);
               volDown();
+            return true;
         }else if ((keyCode == KeyEvent.KEYCODE_VOLUME_UP)){
             //Do something
             log("Volume up button clicked.");
 //            nextPressed();
 //            am.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, 0);
              volUp();
+            return true;
         }else if ((keyCode == KeyEvent.KEYCODE_MEDIA_PREVIOUS)){
             //Do something
             log("Previous Media button clicked.");
             prevPressed();
+            return true;
         }else if ((keyCode == KeyEvent.KEYCODE_MEDIA_NEXT)){
             //Do something
             log("Next Media button clicked.");
             nextPressed();
+            return true;
         }else if ((keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE)){
             //Do something
             log("Play/pause Media button clicked.");
             playPausePressed();
+            return true;
         }
 
         //show the change on the now fragment if its showing.
         if(nowShowing && nf != null) nf.updateVol(getVol());
 
-        return true;
+        return super.onKeyDown(keyCode, event);
     }
 
     /* ---------- not needed? ------------- */

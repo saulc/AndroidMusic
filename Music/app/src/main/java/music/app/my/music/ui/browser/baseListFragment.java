@@ -51,7 +51,7 @@ public  class baseListFragment extends Fragment implements MediaHelperListener {
 
     protected MediaStoreHelper msHelper;
     protected RecyclerView.Adapter mAdapter;
-    protected ArrayList<Playlist> items;
+    protected ArrayList<Playlist> items = new ArrayList<>();
 //    protected RecyclerView recyclerView;
     protected FastScrollRecyclerView recyclerView;
 
@@ -80,9 +80,12 @@ public  class baseListFragment extends Fragment implements MediaHelperListener {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
         }
         log("Base fragment qFragCreated");
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         iniMsHelper();
-
-
     }
 
     @Override
@@ -108,15 +111,17 @@ public  class baseListFragment extends Fragment implements MediaHelperListener {
 
     public void iniMsHelper(){
         log("Setting up MediaStore Helper");
-        msHelper = new MediaStoreHelper(getContext());
-
         FragmentManager fragmentManager = getChildFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        msHelper = (MediaStoreHelper) fragmentManager.findFragmentByTag("MediaStoreHelper");
 
-        fragmentTransaction.add(msHelper, "MediaStoreHelper");
-        fragmentTransaction.commit();
+        if (msHelper == null) {
+            msHelper = new MediaStoreHelper();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.add(msHelper, "MediaStoreHelper");
+            fragmentTransaction.commit();
+        }
+
         msHelper.setListener(this);
-        items = new ArrayList<>();
     }
 
     public void updateAdapter(){

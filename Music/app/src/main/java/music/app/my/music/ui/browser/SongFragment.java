@@ -63,7 +63,7 @@ public class   SongFragment extends baseListFragment implements MediaHelperListe
 
    // private MediaStoreHelper msHelper;
    // private RecyclerView.Adapter mAdapter;
-    private ArrayList<Song> items;
+    private ArrayList<Song> items = new ArrayList<>();
   //  private RecyclerView recyclerView;
 
     private   ImageView bigIcon;
@@ -357,6 +357,8 @@ public class   SongFragment extends baseListFragment implements MediaHelperListe
 
      //   mhandler.removeCallbacks(updatesongbar);
 
+        if(items == null)
+            items = new ArrayList<>();
 
         mAdapter = new SongAdapter(myType == SF_TYPE.PLAYLISTITEMS, pid, pname, items
                 , ( baseListFragment.OnListFragmentInteractionListener) getActivity() );
@@ -366,8 +368,6 @@ public class   SongFragment extends baseListFragment implements MediaHelperListe
         recyclerView.setOnFastScrollStateChangeListener((OnFastScrollStateChangeListener)mAdapter);
         log("Updating song list adapter");
         mAdapter.notifyDataSetChanged();
-        if(items == null)
-            items = new ArrayList<>();
 
         String s = items.size() + " song";
         if(items.size() > 1) s += "s";

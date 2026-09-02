@@ -32,7 +32,7 @@ public class GenreFragment extends baseListFragment implements DrawerActivity.mF
         log("scroll by:" + y);
 //        recyclerView.scrollBy(0, (int) y);
     }
-    protected ArrayList<Genre> items;
+    protected ArrayList<Genre> items = new ArrayList<>();
 
     private final String TAG = getClass().getSimpleName();
     private void log(String s){
@@ -56,7 +56,6 @@ public class GenreFragment extends baseListFragment implements DrawerActivity.mF
         super.onCreate(savedInstanceState);
         log("Genre fragment Created");
         //   iniMsHelper();
-        items = new ArrayList<Genre>();
 
     }
 

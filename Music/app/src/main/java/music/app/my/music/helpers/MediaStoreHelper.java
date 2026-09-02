@@ -57,32 +57,26 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
         super();
     }
 
-	public MediaStoreHelper(Context c){
-		super();
-		mContext = c;
-
-	}
-
-
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        log("Media store helper fragment qFragCreated");
-	if(mListener !=null)
-        mListener.helperReady();
-
+        log("Media store helper fragment created");
+        if (mListener != null) {
+            mListener.helperReady();
+        }
     }
 
 	public void setListener(MediaHelperListener l){
-
 		mListener = l;
+		if (mListener != null && isAdded()) {
+			mListener.helperReady();
+		}
 	}
 
 	public void search(String q){
 		myType = LOADER_TYPE.QUERY;
 		pname = q;
-		LoaderManager.getInstance(this).initLoader(mLOADER, null, this);
+		LoaderManager.getInstance(this).restartLoader(mLOADER, null, this);
 //		getLoaderManager().initLoader(mLOADER, null, this);
 	}
 
@@ -90,7 +84,7 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
 	public void loadSongs(){
 		myType = LOADER_TYPE.SONGS;
 
-		LoaderManager.getInstance(this).initLoader(mLOADER, null, this);
+		LoaderManager.getInstance(this).restartLoader(mLOADER, null, this);
 //		getLoaderManager().initLoader(mLOADER, null, this);
 
 	}
@@ -98,7 +92,7 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
 
         log("Loading Queue...");
 		myType = LOADER_TYPE.QUEUE;
-		LoaderManager.getInstance(this).initLoader(mLOADER, null, this);
+		LoaderManager.getInstance(this).restartLoader(mLOADER, null, this);
 //		getLoaderManager().initLoader(mLOADER, null, this);
 
 
@@ -108,55 +102,55 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
 		myType = LOADER_TYPE.PLAYLIST;
 		var lm = LoaderManager.getInstance(this);
 		log("lm ready...");
-		lm.initLoader(mLOADER, null, this);
+		lm.restartLoader(mLOADER, null, this);
 		log("playlist loader init.");
 //		getSupportLoaderManager().initLoader(mLOADER, null, this);
 		
 	}
 	public void loadGenres() {
 		myType = LOADER_TYPE.GENRE;
-		LoaderManager.getInstance(this).initLoader(mLOADER, null, this);
+		LoaderManager.getInstance(this).restartLoader(mLOADER, null, this);
 //		getLoaderManager().initLoader(mLOADER, null, this);
 
 	}
 	public void loadGenreItems(String id) {
 		myType = LOADER_TYPE.GENREITEMS;
 		pid = id;
-		LoaderManager.getInstance(this).initLoader(mLOADER, null, this);
+		LoaderManager.getInstance(this).restartLoader(mLOADER, null, this);
 //		getLoaderManager().initLoader(mLOADER, null, this);
 
 	}
 
     public void loadArtists() {
         myType = LOADER_TYPE.ARTISTS;
-		LoaderManager.getInstance(this).initLoader(mLOADER, null, this);
+		LoaderManager.getInstance(this).restartLoader(mLOADER, null, this);
 //		getLoaderManager().initLoader(mLOADER, null, this);
 
     }
 	public void loadAlbums() {
 		myType = LOADER_TYPE.ALBUMS;
-		LoaderManager.getInstance(this).initLoader(mLOADER, null, this);
+		LoaderManager.getInstance(this).restartLoader(mLOADER, null, this);
 //		getLoaderManager().initLoader(mLOADER, null, this);
 
 	}
 	public void loadAlbums(String artist) {
 		myType = LOADER_TYPE.ALBUMS;
 		pname = artist;
-		LoaderManager.getInstance(this).initLoader(mLOADER, null, this);
+		LoaderManager.getInstance(this).restartLoader(mLOADER, null, this);
 //		getLoaderManager().initLoader(mLOADER, null, this);
 
 	}
 	public void loadGenreItems(String id, String pname) {
 		myType = LOADER_TYPE.GENREITEMS;
 		pid = id;
-		LoaderManager.getInstance(this).initLoader(mLOADER, null, this);
+		LoaderManager.getInstance(this).restartLoader(mLOADER, null, this);
 //		getLoaderManager().initLoader(mLOADER, null, this);
 
 	}
 	public void loadAlbumItems(String id, String pname) {
 		myType = LOADER_TYPE.ALBUMITEMS;
 		pid = id;
-		LoaderManager.getInstance(this).initLoader(mLOADER, null, this);
+		LoaderManager.getInstance(this).restartLoader(mLOADER, null, this);
 //		getLoaderManager().initLoader(mLOADER, null, this);
 
 	}
@@ -165,7 +159,7 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
 	public void loadArtistItems(String id, String pname) {
 		myType = LOADER_TYPE.ARTISTITEMS;
 		pid = id;
-		LoaderManager.getInstance(this).initLoader(mLOADER, null, this);
+		LoaderManager.getInstance(this).restartLoader(mLOADER, null, this);
 //		getLoaderManager().initLoader(mLOADER, null, this);
 
 	}
@@ -175,7 +169,7 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
         myType = LOADER_TYPE.PLAYLISTITEMS;
 		pid = id;
 		pname = name;
-		LoaderManager.getInstance(this).initLoader(mLOADER, null, this);
+		LoaderManager.getInstance(this).restartLoader(mLOADER, null, this);
 //		getLoaderManager().initLoader(mLOADER, null, this);
 
     }
@@ -184,17 +178,18 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
 		log("Loading Radio directory: " + name);
 		myType = LOADER_TYPE.RADIOITEMS;
 		pname = name;
-		LoaderManager.getInstance(this).initLoader(mLOADER, null, this);
+		LoaderManager.getInstance(this).restartLoader(mLOADER, null, this);
 //		getLoaderManager().initLoader(mLOADER, null, this);
 
 	}
 	@Override
 	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
 
-		log("mshelper loader created.");
+		log("mshelper loader created. type: " + myType);
+        Context context = requireContext();
         if(myType == LOADER_TYPE.PLAYLIST || myType == LOADER_TYPE.QUEUE) {
 			log("mshelper loading playlists/queue...");
-            return new CursorLoader(mContext, playlistUri, playlistProjection, null, null, playlistSortOrder);
+            return new CursorLoader(context, playlistUri, playlistProjection, null, null, playlistSortOrder);
         }
 		else  if(myType == LOADER_TYPE.RADIOITEMS) {
 
@@ -202,7 +197,7 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
 			try {
 
 //				Uri uri =  MediaStore.Audio.Media.getContentUriForPath("Music/"+ pname);
-				return new CursorLoader(mContext, songUri, defaultProjection,  MediaStore.Audio.Media.DATA + " LIKE ? " , new String[]{"%"+pname+"/%"}, defaultSort);
+				return new CursorLoader(context, songUri, defaultProjection,  MediaStore.Audio.Media.DATA + " LIKE ? " , new String[]{"%"+pname+"/%"}, defaultSort);
 			} catch (NumberFormatException e) {
 				e.printStackTrace();
 			}
@@ -213,7 +208,7 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
 			try {
 				long lpid = parseLong(pid);
 				Uri uri =  MediaStore.Audio.Playlists.Members.getContentUri("external", lpid);
-				return new CursorLoader(mContext, uri, playlistMemberProjection, null, null, playlistMemberSort);
+				return new CursorLoader(context, uri, playlistMemberProjection, null, null, playlistMemberSort);
 			} catch (NumberFormatException e) {
 				e.printStackTrace();
 			}
@@ -224,7 +219,7 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
 				long lpid = parseLong(pid);
 				Uri uri =  MediaStore.Audio.Genres.Members.getContentUri("external", lpid);
 
-				return new CursorLoader(mContext, uri, genreMembersProjection, null, null, genreMembersSortOrder);
+				return new CursorLoader(context, uri, genreMembersProjection, null, null, genreMembersSortOrder);
 			} catch (NumberFormatException e) {
 				e.printStackTrace();
 			}
@@ -232,18 +227,18 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
 		}
 		else if(myType == LOADER_TYPE.GENRE)
 		{
-			return new CursorLoader(mContext, genreUri, genreProjection, null, null, null);
+			return new CursorLoader(context, genreUri, genreProjection, null, null, null);
 		}
         else if(myType == LOADER_TYPE.ARTISTS)
         {
-            return new CursorLoader(mContext, artistUri, artistProjection, null, null, artistSortOrder);
+            return new CursorLoader(context, artistUri, artistProjection, null, null, artistSortOrder);
         }
         else if(myType == LOADER_TYPE.ARTISTITEMS)
 		{
 			log("Artist Item loader Created");
 			String arg[] = {pid};
 
-			return new CursorLoader(mContext, songUri, defaultProjection, artistMemberSelection, arg , defaultSort);
+			return new CursorLoader(context, songUri, defaultProjection, artistMemberSelection, arg , defaultSort);
 		}
 
         else if(myType == LOADER_TYPE.ALBUMS)
@@ -251,34 +246,34 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
 			log("Albums loader Created");
 			if(pname != null){		//for artist albums.
 				String arg[] = { pname };
-				return new CursorLoader(mContext, albumUri, albumProjection, albumSelection, arg, albumSort);
+				return new CursorLoader(context, albumUri, albumProjection, albumSelection, arg, albumSort);
 			}
 			//all albums
-            return new CursorLoader(mContext, albumUri, albumProjection, null, null, albumSort);
+            return new CursorLoader(context, albumUri, albumProjection, null, null, albumSort);
         }
 		else if(myType == LOADER_TYPE.ALBUMITEMS)
 		{
 			log("Album Item loader Created");
 			String arg[] = {pid};
 
-			return new CursorLoader(mContext, songUri, albumMemberProjection, albumMemberSelection, arg , albumMemeberSort);
+			return new CursorLoader(context, songUri, albumMemberProjection, albumMemberSelection, arg , albumMemeberSort);
 		}
 
 		else  if(myType == LOADER_TYPE.SONGS) {
 
 			log("Song Item loader Created");
 
-				return new CursorLoader(mContext, songUri, defaultProjection , null, null, defaultSort);
+				return new CursorLoader(context, songUri, defaultProjection , null, null, defaultSort);
 
 		}
 		else  if(myType == LOADER_TYPE.QUERY) {
 
 			log("Query loader Created");
 
-			return new CursorLoader(mContext, songUri, defaultProjection , defaultSelection, null, defaultSort);
+			return new CursorLoader(context, songUri, defaultProjection , defaultSelection, null, defaultSort);
 
 		}
-            return new CursorLoader(mContext, playlistUri, playlistProjection, null, null, playlistSortOrder);
+            return new CursorLoader(context, playlistUri, playlistProjection, null, null, playlistSortOrder);
 
 
 	}

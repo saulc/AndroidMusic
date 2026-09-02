@@ -31,7 +31,7 @@ public class AlbumFragment  extends baseListFragment  implements DrawerActivity.
 //        recyclerView.scrollBy(0, (int) y);
     }
 
-    protected ArrayList<Album> items;
+    protected ArrayList<Album> items = new ArrayList<>();
 
     private final String TAG = getClass().getSimpleName();
     private void log(String s){
@@ -73,7 +73,6 @@ public class AlbumFragment  extends baseListFragment  implements DrawerActivity.
         super.onCreate(savedInstanceState);
         log("Album fragment qFragCreated");
         //   iniMsHelper();
-        items = new ArrayList<Album>();
 
         Bundle b = getArguments();
         if(b != null){
