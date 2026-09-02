@@ -47,9 +47,9 @@ public class AudioFocusHelper implements AudioManager.OnAudioFocusChangeListener
 			Log.i("M6", "lost focus transiently!");
 		} 
 		else if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
-			Intent i = new Intent(mContext, MusicService.class);
-			i.setAction(MusicService.ACTION_PLAY);
-			mContext.startService(i);
+//			Intent i = new Intent(mContext, MusicService.class);
+//			i.setAction(MusicService.ACTION_PLAY);
+//			mContext.startService(i);
 			Log.i("M6", "Got focus!");
 		} 
 		else if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
