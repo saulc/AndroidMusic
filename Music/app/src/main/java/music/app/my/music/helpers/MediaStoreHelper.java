@@ -304,7 +304,11 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
 		ContentValues values = new ContentValues();
 		values.put(MediaStore.Audio.Playlists.NAME, "QUEUE");
 		ContentResolver resolver = mContext.getContentResolver();
-		resolver.insert(uri, values);
+		try {
+			resolver.insert(uri, values);
+		} catch (SecurityException e) {
+			Log.e(TAG, "SecurityException saving queue playlist: " + e.getMessage());
+		}
 
 	}
 

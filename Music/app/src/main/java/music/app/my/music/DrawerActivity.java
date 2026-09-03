@@ -65,11 +65,18 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;
+import android.app.PendingIntent;
+import android.content.ContentUris;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import android.app.Activity;
+import android.app.RecoverableSecurityException;
+import android.content.IntentSender;
+import androidx.activity.result.IntentSenderRequest;
 
 import music.app.my.music.helpers.BillingHelper;
 import music.app.my.music.helpers.FabDoubleTapGS;
@@ -157,6 +164,56 @@ public class DrawerActivity extends AppCompatActivity
     private boolean powerPaused = false;
     private boolean battWarn = false;
     private final String TAG = getClass().getSimpleName();
+    private BroadcastReceiver batteryReceiver;
+    private Runnable pendingRetry;
+
+    private final ActivityResultLauncher<IntentSenderRequest> intentSenderLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartIntentSenderForResult(), result -> {
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    log("Permission granted through recovery flow");
+                    if (pendingRetry != null) {
+                        log("Retrying pending operation");
+                        pendingRetry.run();
+                        pendingRetry = null;
+                    }
+                    // Optionally retry the operation or refresh UI
+                    Fragment f = getSupportFragmentManager().findFragmentById(R.id.frame);
+                    if (f instanceof PlayListFragment) {
+                        ((PlayListFragment) f).helperReady();
+                    } else if (f instanceof SongFragment) {
+                        ((SongFragment) f).helperReady();
+                    }
+                } else {
+                    log("Permission denied through recovery flow");
+                    pendingRetry = null;
+                }
+            });
+
+    private void handleSecurityException(SecurityException e, Long pid, Runnable retryAction) {
+        log("handleSecurityException: " + e.getMessage() + " pid: " + pid);
+        this.pendingRetry = retryAction;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && pid != null && pid > 0) {
+            try {
+                Uri baseUri = MediaStore.Audio.Playlists.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
+                Uri playlistUri = ContentUris.withAppendedId(baseUri, pid);
+                log("Requesting write access for: " + playlistUri);
+                PendingIntent pendingIntent = MediaStore.createWriteRequest(getContentResolver(), Collections.singletonList(playlistUri));
+                intentSenderLauncher.launch(new IntentSenderRequest.Builder(pendingIntent.getIntentSender()).build());
+            } catch (Exception ex) {
+                log("Error creating write request: " + ex.getMessage());
+                Toast.makeText(this, "Security error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                pendingRetry = null;
+            }
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && e instanceof RecoverableSecurityException recoverableException) {
+            log("Handling RecoverableSecurityException");
+            IntentSender intentSender = recoverableException.getUserAction().getActionIntent().getIntentSender();
+            intentSenderLauncher.launch(new IntentSenderRequest.Builder(intentSender).build());
+        } else {
+            log("Unrecoverable SecurityException");
+            Toast.makeText(this, "Security error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            pendingRetry = null;
+        }
+    }
 
     private final ActivityResultLauncher<String[]> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), isGranted -> {
@@ -459,7 +516,7 @@ public class DrawerActivity extends AppCompatActivity
 
 public void addBattListener(){
 
-    BroadcastReceiver receiver = new BroadcastReceiver() {
+    batteryReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
 
             int status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
@@ -469,16 +526,16 @@ public void addBattListener(){
             boolean lowbatt = intent.getBooleanExtra(BatteryManager.EXTRA_BATTERY_LOW, false);
             if(fullbatt) {
                 battWarn = false;
-            }else if ((plugged == BatteryManager.BATTERY_PLUGGED_AC) | (plugged == BatteryManager.BATTERY_PLUGGED_USB)) {
+            }else if ((plugged == BatteryManager.BATTERY_PLUGGED_AC) || (plugged == BatteryManager.BATTERY_PLUGGED_USB)) {
                 // on USB power
-                if(mService == null) return;
-                if(battWarn & powerPaused & !mService.getPlayer().isPlaying()){
+                if(mService == null || mService.getPlayer() == null) return;
+                if(battWarn && powerPaused && !mService.getPlayer().isPlaying()){
                     playPausePressed();
                     powerPaused = false;
                 }
-            } else if(lowbatt & !battWarn){
+            } else if(lowbatt && !battWarn){
                 log("Low battery detected.");
-                if(mService.getPlayer().isPlaying()) {
+                if(mService != null && mService.getPlayer() != null && mService.getPlayer().isPlaying()) {
                     log("Pausing audio.");
                     playPausePressed();
                     powerPaused = true;
@@ -493,7 +550,7 @@ public void addBattListener(){
 
 
     IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-    Intent batteryIntent = registerReceiver(receiver, filter);
+    registerReceiver(batteryReceiver, filter);
 
 }
     public void showLogs(){
@@ -814,6 +871,10 @@ public void addBattListener(){
     protected void onStop() {
         super.onStop();
         log("Stopping Activity");
+        if (batteryReceiver != null) {
+            unregisterReceiver(batteryReceiver);
+            batteryReceiver = null;
+        }
         // am.unregisterMediaButtonEventReceiver(myEventReceiver);
         //	saveQueue();
     }
@@ -1793,18 +1854,21 @@ public void addBattListener(){
     @Override
     public void nameEnted(String name, boolean isQ) {
         Log.d(TAG, "Playlist  name entered: " + name);
-        PlaylistHelper.newPlaylist(getApplicationContext(), name);
-//         PlaylistFilemaker pl = new PlaylistFilemaker();
-//         pl.newPlaylist(getApplicationContext(), name);
-        Toast.makeText(mService, "Created Playlist: " + name, Toast.LENGTH_SHORT).show();
-        if(isQ)  saveQueueAsPlaylist(name);
+        try {
+            PlaylistHelper.newPlaylist(getApplicationContext(), name);
+            Toast.makeText(mService, "Created Playlist: " + name, Toast.LENGTH_SHORT).show();
+            if(isQ)  saveQueueAsPlaylist(name);
+        } catch (SecurityException e) {
+            handleSecurityException(e, null, () -> nameEnted(name, isQ));
+        }
     }
 
     //called back fro nameEnted when playlist has been created.
     //add items and we're done.
     public void saveQueueAsPlaylist(String name){
+        Long ii = 0L;
         try {
-            Long ii =  PlaylistHelper.findPlaylistId(getApplicationContext(), name);
+            ii =  PlaylistHelper.findPlaylistId(getApplicationContext(), name);
             ArrayList<Long> ss = new ArrayList<>();
 
             if(mService != null) {
@@ -1818,6 +1882,8 @@ public void addBattListener(){
 
         } catch (NumberFormatException e) {
             e.printStackTrace();
+        } catch (SecurityException e) {
+            handleSecurityException(e, ii, () -> saveQueueAsPlaylist(name));
         }
     }
 
@@ -1853,9 +1919,12 @@ public void addBattListener(){
                 Toast.makeText(mService, "Cleared Now playing: " + name + " : " + pid, Toast.LENGTH_SHORT).show();
             }
         }else {
-
-            PlaylistHelper.deletePlaylist(getApplicationContext(), pid);
-            Toast.makeText(mService, "Deleted Playlist: " + name + " : " + pid, Toast.LENGTH_SHORT).show();
+            try {
+                PlaylistHelper.deletePlaylist(getApplicationContext(), pid);
+                Toast.makeText(mService, "Deleted Playlist: " + name + " : " + pid, Toast.LENGTH_SHORT).show();
+            } catch (SecurityException e) {
+                handleSecurityException(e, Long.parseLong(pid), () -> deleted(pid, name));
+            }
         }
     }
 
@@ -1917,6 +1986,8 @@ public void addBattListener(){
             PlaylistHelper.addToPlaylist(getApplicationContext(), name, id, lsid, top);
         } catch (NumberFormatException e) {
             e.printStackTrace();
+        } catch (SecurityException e) {
+            handleSecurityException(e, Long.parseLong(pid), () -> addSongToPlaylist(name, sid, pos, pid, top));
         }
     }
 
@@ -1945,7 +2016,11 @@ public void addBattListener(){
             ArrayList<Long> i = new ArrayList<>();
             for(int j = 0; j < items.length; j++) i.add(items[j]);
 
-            PlaylistHelper.addListToPlaylist(getApplicationContext(), Long.parseLong(pid), i, top);
+            try {
+                PlaylistHelper.addListToPlaylist(getApplicationContext(), Long.parseLong(pid), i, top);
+            } catch (SecurityException e) {
+                handleSecurityException(e, Long.parseLong(pid), () -> addPlaylistPicked(items, top, pid));
+            }
 
     }
 
@@ -1961,17 +2036,20 @@ public void addBattListener(){
 
     }
 
-    /* ---------- remove song comfirmed, show snackbar and delete it. ------------- */
     public void deletedSong(String pname, String pid, String sid, int pos) {
         //TODO add an 'undo" to the snackbar.
         View contextView = findViewById(R.id.controlFrame);
         Snackbar.make(contextView, "deleting item: " +sid + " from playlist " + pname, Snackbar.LENGTH_LONG).show();
-        PlaylistHelper.deleteFromPlaylist(getApplicationContext(), Long.parseLong(pid), pname, sid , pos);
+        try {
+            PlaylistHelper.deleteFromPlaylist(getApplicationContext(), Long.parseLong(pid), pname, sid , pos);
 
-        // Refresh the UI
-        Fragment f = getSupportFragmentManager().findFragmentById(R.id.frame);
-        if (f instanceof SongFragment) {
-            ((SongFragment) f).helperReady();
+            // Refresh the UI
+            Fragment f = getSupportFragmentManager().findFragmentById(R.id.frame);
+            if (f instanceof SongFragment) {
+                ((SongFragment) f).helperReady();
+            }
+        } catch (SecurityException e) {
+            handleSecurityException(e, Long.parseLong(pid), () -> deletedSong(pname, pid, sid, pos));
         }
 
     }

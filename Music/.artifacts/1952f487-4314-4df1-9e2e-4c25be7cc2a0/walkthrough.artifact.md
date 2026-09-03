@@ -1,27 +1,26 @@
-# Walkthrough: Back Navigation for Browser Fragments
+# Walkthrough - Fixing SecurityException on Playlist Operations
 
-I have enabled back navigation for the browser fragments in `DrawerActivity`. This allows users to use the system back gesture or the toolbar back button to navigate through their browsing history (e.g., from a Song list back to an Album list).
+I have implemented a recovery flow to handle `SecurityException` when deleting or modifying playlists on Android 10+ (API 29+). This ensures the app doesn't crash when encountering Scoped Storage restrictions.
 
 ## Changes Made
 
-### DrawerActivity Integration
-- Added an `OnBackStackChangedListener` to the `FragmentManager` in `DrawerActivity.onCreate`.
-- Implemented logic to automatically toggle between the navigation drawer's "hamburger" icon and a "back arrow" depending on whether there are fragments in the back stack.
-- Configured the toolbar navigation click listener to trigger `onBackPressed()` when the back arrow is shown.
-- Ensured `onSupportNavigateUp()` also triggers back navigation for accessibility and consistency.
+### MediaStore & Helper Classes
+- **[PlaylistHelper.java](file:///Users/user/Dev/AndroidMusic/Music/app/src/main/java/music/app/my/music/helpers/PlaylistHelper.java)**:
+    - Wrapped `ContentResolver.delete` and `ContentResolver.insert` calls in `try-catch` blocks to catch `SecurityException`.
+    - Modified `deletePlaylist` and `deleteFromPlaylist` to rethrow the exception so the UI layer can handle it, while returning status where applicable.
+- **[MediaStoreHelper.java](file:///Users/user/Dev/AndroidMusic/Music/app/src/main/java/music/app/my/music/helpers/MediaStoreHelper.java)**:
+    - Added a `try-catch` block in `saveQueue()` to prevent crashes when the app tries to create the internal "QUEUE" playlist without sufficient permissions.
 
-### Navigation Flow Improvements
-- The app now correctly tracks fragment transactions in the back stack for all major browser sections (Artists, Albums, Genres, Playlists, etc.).
-- Deep navigation (e.g., Artist -> Album -> Song List) now supports full back navigation.
+### UI & Activity Layer
+- **[DrawerActivity.java](file:///Users/user/Dev/AndroidMusic/Music/app/src/main/java/music/app/my/music/DrawerActivity.java)**:
+    - Implemented `intentSenderLauncher` using `ActivityResultContracts.StartIntentSenderForResult()` to handle permission recovery.
+    - Added `handleSecurityException(SecurityException e)` to detect `RecoverableSecurityException` (Android 10) and initiate the system-mandated confirmation flow.
+    - Updated all playlist-related methods (`deleted`, `deletedSong`, `addPlaylistPicked`, `addSongToPlaylist`, `nameEnted`, `saveQueueAsPlaylist`) to catch `SecurityException` and invoke the recovery flow.
 
 ## Verification Results
 
 ### Automated Tests
-- Ran `:app:assembleDebug` to verify compilation and resource linking.
+- Executed `gradlew app:assembleDebug` - **Passed**.
 
-### Manual Verification Recommended
-- Open the app and navigate to **Artists**.
-- Select an artist to view their **Albums**.
-- Verify that a back arrow appears in the top-left corner.
-- Tap the back arrow or use the system back gesture.
-- Verify that you return to the **Artists** list and the hamburger icon reappears.
+### Manual Verification Required
+- On a device running Android 11+, try deleting a playlist that was not created by the current installation of the app. You should see a system dialog asking for permission instead of a crash.
