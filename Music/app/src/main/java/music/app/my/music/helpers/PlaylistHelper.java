@@ -13,8 +13,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -47,16 +49,15 @@ public class  PlaylistHelper {
 
         //ids already has our new items at the top, just add the old ones to it
         // if adding to the end, just insert the old items. at 0
-        cur.moveToFirst();
         ArrayList<Long> old = new ArrayList<>();
-        while (cur.moveToNext()) {
+        while (cur != null && cur.moveToNext()) {
             long l = Long.parseLong(cur.getString(1));
             old.add(l);
             if (top) ids.add(0, l);
             else ids.add(l);
 
         }
-        cur.close();
+        if (cur != null) cur.close();
         log("songs added to playlist Ids: " + ids.size());
 
         //todo delete old items
@@ -90,15 +91,14 @@ public class  PlaylistHelper {
         Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external", pid);
         Cursor cur = resolver.query(uri, cols, null, null, null);
         int base = 0;
-        if (!top && cur.moveToLast()) {
+        if (cur != null) {
+            if (!top && cur.moveToLast()) {
 
-            base = cur.getInt(0);
-            base += 1;
-            String id = cur.getString(1);
-        } else {
-            cur.moveToFirst();
+                base = cur.getInt(0);
+                base += 1;
+            }
+            cur.close();
         }
-        cur.close();
         log("adding item --->>>>>base: " + base + " to " + pname);
 
         ContentValues values = new ContentValues();
@@ -110,20 +110,70 @@ public class  PlaylistHelper {
     }
 
     //remove 1 song from playlist
-    public static void deleleFromPlaylist(Context context, Long pid, String pname, String sid, int pos) {
-        String[] cols = new String[]{
-                MediaStore.Audio.Playlists.Members.PLAY_ORDER,
-                MediaStore.Audio.Playlists.Members.AUDIO_ID
-        };
+    public static void deleteFromPlaylist(Context context, Long pid, String pname, String sid, int pos) {
+        log("deleteFromPlaylist: pid=" + pid + ", pname=" + pname + ", sid=" + sid + ", pos=" + pos);
+
+
         ContentResolver resolver = context.getContentResolver();
         Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external", pid);
 
-        String[] arg = {sid, pos + ""};
-        String where = MediaStore.Audio.Playlists.Members.AUDIO_ID + "=? AND " +
-                MediaStore.Audio.Playlists.Members.PLAY_ORDER + "=?";
-        resolver.delete(uri, where, arg);
+        String[] projection = {MediaStore.Audio.Playlists.Members._ID, MediaStore.Audio.Playlists.Members.AUDIO_ID};
+        String sortOrder = MediaStore.Audio.Playlists.Members.PLAY_ORDER + " ASC";
 
-        log(sid + " deleted from playlist: " + pname + " pos: " + pos);
+        Cursor cursor = resolver.query(uri, projection, null, null, sortOrder);
+        if (cursor != null) {
+            if (cursor.moveToPosition(pos)) {
+                long memberId = cursor.getLong(0);
+                String foundSid = cursor.getString(1);
+                if (foundSid.equals(sid)) {
+                    int deleted = resolver.delete(uri, MediaStore.Audio.Playlists.Members._ID + "=?", new String[]{String.valueOf(memberId)});
+                    log("Deleted from MediaStore. memberId=" + memberId + ", count=" + deleted);
+                    removeFromM3u(pname, pos);
+                } else {
+                    log("AUDIO_ID mismatch: expected " + sid + " but found " + foundSid + " at pos " + pos);
+                }
+            } else {
+                log("Could not move to pos " + pos + " (total count: " + cursor.getCount() + ")");
+            }
+            cursor.close();
+        } else {
+            log("Cursor was null for playlist " + pid);
+        }
+
+    }
+
+    private static void removeFromM3u(String pname, int pos) {
+        String path = Environment.getExternalStorageDirectory().toString() + "/Music/" + pname + ".m3u";
+        File file = new File(path);
+        if (!file.exists()) {
+            log("m3u file not found: " + path);
+            return;
+        }
+
+        ArrayList<String> lines = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                lines.add(line);
+            }
+        } catch (IOException e) {
+            log("Error reading m3u file: " + e.getMessage());
+            return;
+        }
+
+        if (pos >= 0 && pos < lines.size()) {
+            lines.remove(pos);
+            try (PrintWriter writer = new PrintWriter(new FileOutputStream(file))) {
+                for (String l : lines) {
+                    writer.println(l);
+                }
+            } catch (IOException e) {
+                log("Error writing m3u file: " + e.getMessage());
+            }
+            log("Removed item at pos " + pos + " from m3u file: " + pname);
+        } else {
+            log("Pos " + pos + " out of bounds for m3u file (size: " + lines.size() + ")");
+        }
     }
 
 
@@ -167,12 +217,15 @@ public class  PlaylistHelper {
         Cursor cur = resolver.query(uri, playlistProjection, null, null, null);
 
         long id = 0;
-        while (cur.moveToNext()) {
-            if (cur.getString(0).equals(name)) {
-                id = Long.parseLong(cur.getString(1));
-                Log.d("m6", "queue playlist id: " + id);
-                return id;
+        if (cur != null) {
+            while (cur.moveToNext()) {
+                if (cur.getString(0).equals(name)) {
+                    id = Long.parseLong(cur.getString(1));
+                    Log.d("m6", "queue playlist id: " + id);
+                    break;
+                }
             }
+            cur.close();
         }
         return id;
     }
@@ -199,14 +252,13 @@ public class  PlaylistHelper {
 
         };
         Cursor cursor = resolver.query(songUri, defaultProjection, defaultSelection, null, defaultSort);
-        cursor.moveToFirst();
-        ArrayList<Song> songs = new ArrayList<Song>();
-        while (cursor.moveToNext()) {
+        ArrayList<Song> songs = new ArrayList<>();
+        while (cursor != null && cursor.moveToNext()) {
             songs.add(new Song(cursor.getString(0), cursor.getString(1),
                     cursor.getString(2), cursor.getString(3), cursor.getString(4)
                     , cursor.getString(5), cursor.getString(6), cursor.getString(7)));
         }
-        cursor.close();
+        if (cursor != null) cursor.close();
         int i = ((int) (Math.random() * 50000));
         i = i % songs.size();
 

@@ -419,8 +419,10 @@ public class DrawerActivity extends AppCompatActivity
         });
 
         mAdView = findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mAdView.loadAd(adRequest);
+        if (mAdView != null) {
+            AdRequest adRequest = new AdRequest.Builder().build();
+            mAdView.loadAd(adRequest);
+        }
 
         billingHelper = new BillingHelper(this, this);
     }
@@ -1964,7 +1966,13 @@ public void addBattListener(){
         //TODO add an 'undo" to the snackbar.
         View contextView = findViewById(R.id.controlFrame);
         Snackbar.make(contextView, "deleting item: " +sid + " from playlist " + pname, Snackbar.LENGTH_LONG).show();
-        PlaylistHelper.deleleFromPlaylist(getApplicationContext(), Long.parseLong(pid), pname, sid , pos);
+        PlaylistHelper.deleteFromPlaylist(getApplicationContext(), Long.parseLong(pid), pname, sid , pos);
+
+        // Refresh the UI
+        Fragment f = getSupportFragmentManager().findFragmentById(R.id.frame);
+        if (f instanceof SongFragment) {
+            ((SongFragment) f).helperReady();
+        }
 
     }
 
