@@ -1,6 +1,7 @@
 package music.app.my.music.helpers;
 
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -21,6 +22,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 
 import music.app.my.music.types.Playlist;
 import music.app.my.music.types.Song;
@@ -29,18 +31,54 @@ public class  PlaylistHelper {
 
     private static final String TAG = "PlaylistHelper";
 
+    public static class MemberSecurityException extends SecurityException {
+        private final Uri memberUri;
+        public MemberSecurityException(String message, Uri uri) {
+            super(message);
+            this.memberUri = uri;
+        }
+        public Uri getMemberUri() { return memberUri; }
+    }
+
     private static void log(String s) {
         Log.d(TAG, s);
     }
 
 
-    private static String getVolumeName() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ? MediaStore.VOLUME_EXTERNAL_PRIMARY : "external";
+    private static String getVolumeName(Context context, Long pid) {
+        if (pid == null || pid <= 0) return "external";
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            // Check primary first
+            if (checkVolume(context, pid, MediaStore.VOLUME_EXTERNAL_PRIMARY)) return MediaStore.VOLUME_EXTERNAL_PRIMARY;
+
+            // Check all other volumes
+            Set<String> volumes = MediaStore.getExternalVolumeNames(context);
+            for (String vol : volumes) {
+                if (vol.equals(MediaStore.VOLUME_EXTERNAL_PRIMARY) || vol.equals("external")) continue;
+                if (checkVolume(context, pid, vol)) return vol;
+            }
+        }
+        return "external";
+    }
+
+    private static boolean checkVolume(Context context, long pid, String volume) {
+        Uri uri = MediaStore.Audio.Playlists.getContentUri(volume);
+        try (Cursor cur = context.getContentResolver().query(uri, new String[]{MediaStore.Audio.Playlists._ID},
+                MediaStore.Audio.Playlists._ID + "=?", new String[]{String.valueOf(pid)}, null)) {
+            if (cur != null && cur.getCount() > 0) {
+                log("Found playlist " + pid + " on volume: " + volume);
+                return true;
+            }
+        } catch (Exception e) {
+            log("Error checking volume " + volume + " for playlist " + pid + ": " + e.getMessage());
+        }
+        return false;
     }
 
 
     //add multiple songs to playlist
     public static void addListToPlaylist(Context context, Long pid, ArrayList<Long> ids, boolean top) {
+        if (pid == null || pid <= 0) return;
 
         log("adding songs to playlist Ids: " + ids.size() + " pid: " + pid);
 
@@ -49,7 +87,8 @@ public class  PlaylistHelper {
         };
         ContentValues values = new ContentValues();
         ContentResolver resolver = context.getContentResolver();
-        Uri uri = MediaStore.Audio.Playlists.Members.getContentUri(getVolumeName(), pid);
+        String volume = getVolumeName(context, pid);
+        Uri uri = MediaStore.Audio.Playlists.Members.getContentUri(volume, pid);
 
         log("Querying members for: " + uri);
         Cursor cur = null;
@@ -58,6 +97,9 @@ public class  PlaylistHelper {
         } catch (SecurityException e) {
             log("SecurityException querying playlist members: " + e.getMessage());
             throw e;
+        } catch (Exception e) {
+            log("Error querying playlist members: " + e.getMessage());
+            return;
         }
 
         //ids already has our new items at the top, just add the old ones to it
@@ -97,6 +139,10 @@ public class  PlaylistHelper {
         } catch (SecurityException e) {
             Log.e(TAG, "SecurityException modifying list in playlist: " + e.getMessage());
             throw e;
+        } catch (IllegalArgumentException e) {
+            Log.e(TAG, "IllegalArgumentException modifying list in playlist (possible missing playlist): " + e.getMessage());
+        } catch (Exception e) {
+            Log.e(TAG, "Error modifying playlist members: " + e.getMessage());
         }
 
     }
@@ -110,7 +156,8 @@ public class  PlaylistHelper {
         };
 
         ContentResolver resolver = context.getContentResolver();
-        Uri uri = MediaStore.Audio.Playlists.Members.getContentUri(getVolumeName(), pid);
+        String volume = getVolumeName(context, pid);
+        Uri uri = MediaStore.Audio.Playlists.Members.getContentUri(volume, pid);
         log("Querying for base position: " + uri);
         Cursor cur = null;
         int base = 0;
@@ -140,6 +187,10 @@ public class  PlaylistHelper {
         } catch (SecurityException e) {
             Log.e(TAG, "SecurityException adding to playlist: " + e.getMessage());
             throw e;
+        } catch (IllegalArgumentException e) {
+            Log.e(TAG, "IllegalArgumentException adding to playlist: " + e.getMessage());
+        } catch (Exception e) {
+            Log.e(TAG, "Error adding to playlist: " + e.getMessage());
         }
 
 
@@ -151,35 +202,79 @@ public class  PlaylistHelper {
 
 
         ContentResolver resolver = context.getContentResolver();
-        Uri uri = MediaStore.Audio.Playlists.Members.getContentUri(getVolumeName(), pid);
+        String volume = getVolumeName(context, pid);
+        Uri uri = MediaStore.Audio.Playlists.Members.getContentUri(volume, pid);
+        log("Members URI: " + uri);
 
         String[] projection = {MediaStore.Audio.Playlists.Members._ID, MediaStore.Audio.Playlists.Members.AUDIO_ID};
         String sortOrder = MediaStore.Audio.Playlists.Members.PLAY_ORDER + " ASC";
 
-        Cursor cursor = resolver.query(uri, projection, null, null, sortOrder);
-        if (cursor != null) {
-            if (cursor.moveToPosition(pos)) {
-                long memberId = cursor.getLong(0);
-                String foundSid = cursor.getString(1);
-                if (foundSid.equals(sid)) {
-                    try {
-                        int deleted = resolver.delete(uri, MediaStore.Audio.Playlists.Members._ID + "=?", new String[]{String.valueOf(memberId)});
-                        log("Deleted from MediaStore. memberId=" + memberId + ", count=" + deleted);
-                        removeFromM3u(pname, pos);
-                        return deleted > 0;
-                    } catch (SecurityException e) {
-                        Log.e(TAG, "SecurityException deleting song from playlist: " + e.getMessage());
-                        throw e;
+        Cursor cursor = null;
+        try {
+            cursor = resolver.query(uri, projection, null, null, sortOrder);
+            if (cursor != null) {
+                log("Cursor count: " + cursor.getCount());
+                if (cursor.moveToPosition(pos)) {
+                    long memberId = cursor.getLong(0);
+                    String foundSid = cursor.getString(1);
+                    log("Found memberId=" + memberId + ", foundSid=" + foundSid + " at pos=" + pos);
+                    if (foundSid.equals(sid)) {
+                        try {
+                            Uri deleteUri = ContentUris.withAppendedId(uri, memberId);
+                            log("Deleting from URI: " + deleteUri);
+                            int deleted = resolver.delete(deleteUri, null, null);
+                            log("Deleted from MediaStore (by URI). memberId=" + memberId + ", count=" + deleted);
+                            if (deleted == 0) {
+                                log("Retry delete with selection by _ID on base members URI");
+                                deleted = resolver.delete(uri, MediaStore.Audio.Playlists.Members._ID + "=?", new String[]{String.valueOf(memberId)});
+                                log("Retry delete count=" + deleted);
+                            }
+                            if (deleted == 0) {
+                                log("Final attempt: delete by AUDIO_ID and PLAY_ORDER");
+                                String where = MediaStore.Audio.Playlists.Members.AUDIO_ID + "=? AND " + MediaStore.Audio.Playlists.Members.PLAY_ORDER + "=?";
+                                String[] args = {sid, String.valueOf(pos)};
+                                deleted = resolver.delete(uri, where, args);
+                                log("Final attempt count=" + deleted);
+                            }
+                            if (deleted == 0 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                                log("All delete attempts failed. Throwing MemberSecurityException to trigger recovery flow if needed.");
+                                throw new MemberSecurityException("Unable to delete member. Possible permission issue.", deleteUri);
+                            }
+                            removeFromM3u(pname, pos);
+                            return deleted > 0;
+                        } catch (SecurityException e) {
+                            Log.e(TAG, "SecurityException deleting song from playlist: " + e.getMessage());
+                            throw e;
+                        } catch (IllegalArgumentException e) {
+                            Log.e(TAG, "IllegalArgumentException deleting from playlist: " + e.getMessage());
+                        } catch (Exception e) {
+                            Log.e(TAG, "Error deleting from playlist: " + e.getMessage());
+                        }
+                    } else {
+                        log("AUDIO_ID mismatch: expected " + sid + " but found " + foundSid + " at pos " + pos);
+                        // Try to find by sid if pos is wrong
+                        cursor.moveToPosition(-1);
+                        while (cursor.moveToNext()) {
+                            if (cursor.getString(1).equals(sid)) {
+                                long mId = cursor.getLong(0);
+                                log("Found sid match at different position. memberId=" + mId);
+                                int deleted = resolver.delete(uri, MediaStore.Audio.Playlists.Members._ID + "=?", new String[]{String.valueOf(mId)});
+                                log("Deleted match from MediaStore. count=" + deleted);
+                                return deleted > 0;
+                            }
+                        }
                     }
                 } else {
-                    log("AUDIO_ID mismatch: expected " + sid + " but found " + foundSid + " at pos " + pos);
+                    log("Could not move to pos " + pos + " (total count: " + cursor.getCount() + ")");
                 }
             } else {
-                log("Could not move to pos " + pos + " (total count: " + cursor.getCount() + ")");
+                log("Cursor was null for playlist " + pid);
             }
-            cursor.close();
-        } else {
-            log("Cursor was null for playlist " + pid);
+        } catch (SecurityException e) {
+            log("SecurityException querying playlist members: " + e.getMessage());
+            throw e;
+        } finally {
+            if (cursor != null) cursor.close();
         }
         return false;
     }
@@ -231,7 +326,10 @@ public class  PlaylistHelper {
         } catch (SecurityException e) {
             Log.e(TAG, "SecurityException deleting playlist: " + e.getMessage());
             throw e;
+        } catch (Exception e) {
+            Log.e(TAG, "Error deleting playlist: " + e.getMessage());
         }
+        return false;
     }
 
 
@@ -246,14 +344,13 @@ public class  PlaylistHelper {
         } catch (SecurityException e) {
             Log.e(TAG, "SecurityException creating new playlist: " + e.getMessage());
             throw e;
+        } catch (Exception e) {
+            Log.e(TAG, "Error creating new playlist: " + e.getMessage());
         }
         long id = findPlaylistId(context, name);
         if (id > 0) {
             Log.i("m6", name + " Playlist saved sucessful id: " + id);
-
-
         }
-
     }
 
 

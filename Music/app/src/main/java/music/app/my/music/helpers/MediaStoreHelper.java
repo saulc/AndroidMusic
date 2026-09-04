@@ -227,7 +227,7 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
 		}
 		else if(myType == LOADER_TYPE.GENRE)
 		{
-			return new CursorLoader(context, genreUri, genreProjection, null, null, null);
+			return new CursorLoader(context, genreUri, genreProjection, null, null, genreSortOrder);
 		}
         else if(myType == LOADER_TYPE.ARTISTS)
         {

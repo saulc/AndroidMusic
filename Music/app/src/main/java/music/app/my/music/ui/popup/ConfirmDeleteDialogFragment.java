@@ -7,6 +7,8 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
+import android.util.Log;
+
 import androidx.fragment.app.DialogFragment;
 
 import music.app.my.music.DrawerActivity;
@@ -66,6 +68,7 @@ public  class ConfirmDeleteDialogFragment extends DialogFragment {
         builder.setMessage("Playlist : " + n)
                 .setPositiveButton("Delete!", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
+                        Log.d("ConfirmDelete", "Positive button clicked. t=" + t + " name=" + n + " pid=" + pid + " sid=" + sid + " pos=" + pos);
                         if(t == 0)  ((DrawerActivity)  getActivity()).deleted(getTag().toString(), n);
                         else if(t == 1)   ((DrawerActivity)  getActivity()).deletedSong(n, pid, sid, pos);
 

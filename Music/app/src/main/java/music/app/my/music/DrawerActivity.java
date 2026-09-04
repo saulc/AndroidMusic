@@ -166,6 +166,7 @@ public class DrawerActivity extends AppCompatActivity
     private final String TAG = getClass().getSimpleName();
     private BroadcastReceiver batteryReceiver;
     private Runnable pendingRetry;
+    private int securityRetryCount = 0;
 
     private final ActivityResultLauncher<IntentSenderRequest> intentSenderLauncher =
             registerForActivityResult(new ActivityResultContracts.StartIntentSenderForResult(), result -> {
@@ -173,10 +174,11 @@ public class DrawerActivity extends AppCompatActivity
                     log("Permission granted through recovery flow");
                     if (pendingRetry != null) {
                         log("Retrying pending operation");
+                        // Don't reset securityRetryCount here, it will be reset if successful or if another error happens
                         pendingRetry.run();
                         pendingRetry = null;
                     }
-                    // Optionally retry the operation or refresh UI
+                    // Optionally refresh UI
                     Fragment f = getSupportFragmentManager().findFragmentById(R.id.frame);
                     if (f instanceof PlayListFragment) {
                         ((PlayListFragment) f).helperReady();
@@ -186,23 +188,52 @@ public class DrawerActivity extends AppCompatActivity
                 } else {
                     log("Permission denied through recovery flow");
                     pendingRetry = null;
+                    securityRetryCount = 0;
                 }
             });
 
     private void handleSecurityException(SecurityException e, Long pid, Runnable retryAction) {
-        log("handleSecurityException: " + e.getMessage() + " pid: " + pid);
+        handleSecurityException(e, pid, null, retryAction);
+    }
+
+    private void handleSecurityException(SecurityException e, Long pid, Uri specificUri, Runnable retryAction) {
+        log("handleSecurityException: " + e.getMessage() + " pid: " + pid + " uri: " + specificUri + " retryCount: " + securityRetryCount);
+
+        if (securityRetryCount > 0) {
+            log("Security retry loop detected. Stopping.");
+            Toast.makeText(this, "Operation failed even after granting permission.", Toast.LENGTH_SHORT).show();
+            securityRetryCount = 0;
+            pendingRetry = null;
+            return;
+        }
+
         this.pendingRetry = retryAction;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && pid != null && pid > 0) {
+        securityRetryCount++;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             try {
-                Uri baseUri = MediaStore.Audio.Playlists.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
-                Uri playlistUri = ContentUris.withAppendedId(baseUri, pid);
-                log("Requesting write access for: " + playlistUri);
-                PendingIntent pendingIntent = MediaStore.createWriteRequest(getContentResolver(), Collections.singletonList(playlistUri));
-                intentSenderLauncher.launch(new IntentSenderRequest.Builder(pendingIntent.getIntentSender()).build());
+                List<Uri> uris = new ArrayList<>();
+                if (specificUri != null) {
+                    uris.add(specificUri);
+                } else if (pid != null && pid > 0) {
+                    uris.add(ContentUris.withAppendedId(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI, pid));
+                }
+
+                if (!uris.isEmpty()) {
+                    log("Requesting access for: " + uris);
+                    // Use createWriteRequest for modifications
+                    PendingIntent pendingIntent = MediaStore.createWriteRequest(getContentResolver(), uris);
+                    intentSenderLauncher.launch(new IntentSenderRequest.Builder(pendingIntent.getIntentSender()).build());
+                } else {
+                    log("No URIs to request access for.");
+                    securityRetryCount = 0;
+                    pendingRetry = null;
+                }
             } catch (Exception ex) {
                 log("Error creating write request: " + ex.getMessage());
                 Toast.makeText(this, "Security error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 pendingRetry = null;
+                securityRetryCount = 0;
             }
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && e instanceof RecoverableSecurityException recoverableException) {
             log("Handling RecoverableSecurityException");
@@ -212,6 +243,7 @@ public class DrawerActivity extends AppCompatActivity
             log("Unrecoverable SecurityException");
             Toast.makeText(this, "Security error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             pendingRetry = null;
+            securityRetryCount = 0;
         }
     }
 
@@ -1984,6 +2016,7 @@ public void addBattListener(){
             long lsid = Long.parseLong(sid);
 
             PlaylistHelper.addToPlaylist(getApplicationContext(), name, id, lsid, top);
+            securityRetryCount = 0; // Reset on success
         } catch (NumberFormatException e) {
             e.printStackTrace();
         } catch (SecurityException e) {
@@ -2041,13 +2074,17 @@ public void addBattListener(){
         View contextView = findViewById(R.id.controlFrame);
         Snackbar.make(contextView, "deleting item: " +sid + " from playlist " + pname, Snackbar.LENGTH_LONG).show();
         try {
-            PlaylistHelper.deleteFromPlaylist(getApplicationContext(), Long.parseLong(pid), pname, sid , pos);
-
+            boolean success = PlaylistHelper.deleteFromPlaylist(getApplicationContext(), Long.parseLong(pid), pname, sid , pos);
+            if (success) {
+                securityRetryCount = 0; // Reset on success
+            }
             // Refresh the UI
             Fragment f = getSupportFragmentManager().findFragmentById(R.id.frame);
             if (f instanceof SongFragment) {
                 ((SongFragment) f).helperReady();
             }
+        } catch (PlaylistHelper.MemberSecurityException e) {
+            handleSecurityException(e, Long.parseLong(pid), e.getMemberUri(), () -> deletedSong(pname, pid, sid, pos));
         } catch (SecurityException e) {
             handleSecurityException(e, Long.parseLong(pid), () -> deletedSong(pname, pid, sid, pos));
         }
