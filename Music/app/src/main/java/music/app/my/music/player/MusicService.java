@@ -25,6 +25,7 @@ import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v4.media.MediaMetadataCompat;
@@ -126,23 +127,38 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 
 //         am.registerMediaButtonEventReceiver(myEventReceiver);
 
-	    mediaSession = new MediaSessionCompat(getApplicationContext(), "remote");
+	   mediaSession = new MediaSessionCompat(getApplicationContext(), "remote");
 //		mediaSession.setMediaButtonReceiver();
 	   mediaSession.setFlags(
 			   MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
 					   MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
 	   // Set an initial PlaybackState with ACTION_PLAY, so media buttons can start the player
 	   stateBuilder = new PlaybackStateCompat.Builder()
-			   .setActions(PlaybackStateCompat.ACTION_PLAY |
+			   .setActions(PlaybackStateCompat.ACTION_PLAY | PlaybackStateCompat.ACTION_PAUSE |
+					   PlaybackStateCompat.ACTION_STOP | PlaybackStateCompat.ACTION_SEEK_TO |
 					   PlaybackStateCompat.ACTION_SKIP_TO_NEXT| PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS);
 	   mediaSession.setPlaybackState(stateBuilder.build());
 
 	   mediaSession.setCallback(new MediaSessionCompat.Callback() {
 		   @Override
 		   public void onPlay() {
-//			   super.onPause();
-			   log("play/pause caught!");
-			   togglePlaybackRequest();
+			   log("play caught!");
+			   playRequest();
+		   }
+		   @Override
+		   public void onPause() {
+			   log("pause caught!");
+			   pauseRequest();
+		   }
+		   @Override
+		   public void onStop() {
+			   log("stop caught!");
+			   stopRequest();
+		   }
+		   @Override
+		   public void onSeekTo(long pos) {
+			   log("seek caught! " + pos);
+			   player.seekTo((int) (pos / 1000));
 		   }
 		   @Override
 		   public void onSkipToNext() {
@@ -422,10 +438,10 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 	   if(ab == null) ab = BitmapFactory.decodeResource(getResources(), R.drawable.android_icon32);
 	   nb = noti.getNotification1(s.getTitle() + " (" + text + ") ",
 			   s.getArtist() + " - " + s.getAlbum(),
-			   ab);
+			   ab, s.getDuration(), (int) (player.getCurrentPosition() / 1000));
 
 	   MediaMetadataCompat.Builder mediaMetaData_builder = new MediaMetadataCompat.Builder();
-	   mediaMetaData_builder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, s.getDuration() )
+	   mediaMetaData_builder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, s.getLongDuration() )
 			   .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, s.getArtist())
 			   .putString(MediaMetadataCompat.METADATA_KEY_TITLE, s.getTitle())
 			   .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, ab)
@@ -617,6 +633,18 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 
    }
 
+	private void updatePlaybackState() {
+		int state = PlaybackStateCompat.STATE_STOPPED;
+		if (player != null) {
+			if (player.isPlaying()) state = PlaybackStateCompat.STATE_PLAYING;
+			else if (player.getmPlayers().get(player.getCurrentPlayer()).isPaused()) state = PlaybackStateCompat.STATE_PAUSED;
+			else if (!player.getmPlayers().get(player.getCurrentPlayer()).isPrepared()) state = PlaybackStateCompat.STATE_BUFFERING;
+		}
+
+		stateBuilder.setState(state, player.getCurrentPosition(), 1.0f, SystemClock.elapsedRealtime());
+		mediaSession.setPlaybackState(stateBuilder.build());
+	}
+
 
 	public Runnable updateUi = new Runnable(){
 		@Override
@@ -653,6 +681,12 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 				getPlayer().getmPlayers().get(getPlayer().getCurrentPlayer()).setEndspace((int)endSpace);
 				mListener.sendProgress(getUiInfo());		//send call to begin updating UI
 			}
+
+			updatePlaybackState();
+			if (player.isPlaying()) {
+				setUpAsForeground("Playing");
+			}
+
 			 mHandler.postDelayed(updateUi, 1000);
 
 		}
@@ -766,6 +800,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 			updateDream(); //send now playing info to daydream..screensaver...
 
 			setUpAsForeground("Playing");;
+			updatePlaybackState();
 			// Tell any remote controls that our playback state is 'paused'.
 	        if (mRemoteControlClientCompat != null) {
 	            mRemoteControlClientCompat
@@ -777,6 +812,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 			mListener.setPlayPause(false);
 			mHandler.removeCallbacks(updateUi);
 			 // Tell any remote controls that our playback state is 'paused'.
+			updatePlaybackState();
 	        if (mRemoteControlClientCompat != null) {
 	            mRemoteControlClientCompat
 	                    .setPlaybackState(RemoteControlClient.PLAYSTATE_PAUSED);
@@ -785,6 +821,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 		case STOPPED :
 			//mHandler.post(updateUi);
 			 // Tell any remote controls that our playback state is 'paused'.
+			updatePlaybackState();
 	        if (mRemoteControlClientCompat != null) {
 	            mRemoteControlClientCompat
 	                    .setPlaybackState(RemoteControlClient.PLAYSTATE_STOPPED);
@@ -792,6 +829,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 		case PREPARED :
 		case PREPARING :  // Tell any remote controls that our playback state is 'paused'.
 			//mHandler.post(updateUi);
+			updatePlaybackState();
 	        if (mRemoteControlClientCompat != null) {
 	            mRemoteControlClientCompat
 	                    .setPlaybackState(RemoteControlClient.PLAYSTATE_BUFFERING);

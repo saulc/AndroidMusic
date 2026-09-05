@@ -80,7 +80,7 @@ public class NotificationHelper extends ContextWrapper {
      * @param body the body text for the notification
      * @return the builder as it keeps a reference to the notification (since API 24)
     */
-    public NotificationCompat.Builder getNotification1(String title, String body, Bitmap albumart) {
+    public NotificationCompat.Builder getNotification1(String title, String body, Bitmap albumart, int duration, int progress) {
         Intent resultIntent = new Intent(this, DrawerActivity.class);
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
         stackBuilder.addNextIntentWithParentStack(resultIntent);
@@ -113,6 +113,7 @@ public class NotificationHelper extends ContextWrapper {
                 .setContentTitle(title)
                 .setColor(Color.GREEN)
                 .setLargeIcon(albumart)
+                .setProgress(duration, progress, false)
                 .setSmallIcon(getSmallIcon()).setContentIntent(resultPendingIntent).setOngoing(true)
                 .setContentText(body).addAction(previous).addAction(pp).addAction(next)
                 .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
