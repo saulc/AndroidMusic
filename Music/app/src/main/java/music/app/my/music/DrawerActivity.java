@@ -2083,8 +2083,6 @@ public void addBattListener(){
             if (f instanceof SongFragment) {
                 ((SongFragment) f).helperReady();
             }
-        } catch (PlaylistHelper.MemberSecurityException e) {
-            handleSecurityException(e, Long.parseLong(pid), e.getMemberUri(), () -> deletedSong(pname, pid, sid, pos));
         } catch (SecurityException e) {
             handleSecurityException(e, Long.parseLong(pid), () -> deletedSong(pname, pid, sid, pos));
         }
