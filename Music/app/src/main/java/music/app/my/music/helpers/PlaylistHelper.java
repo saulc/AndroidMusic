@@ -34,79 +34,84 @@ public class  PlaylistHelper {
     //add multiple songs to playlist
     public static void addListToPlaylist(Context context, Long pid, ArrayList<Long> ids, boolean top) {
 
-        log("adding songs to playlist Ids: " + ids.size());
+        log("adding songs to playlist pid: " + pid + " ids: " + ids.size());
 
-        String[] cols = new String[]{
-                MediaStore.Audio.Playlists.Members.PLAY_ORDER, MediaStore.Audio.Playlists.Members.AUDIO_ID
-        };
-        ContentValues values = new ContentValues();
         ContentResolver resolver = context.getContentResolver();
         Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external", pid);
 
-        Cursor cur = resolver.query(uri, cols, null, null, null);
-
-        //ids already has our new items at the top, just add the old ones to it
-        // if adding to the end, just insert the old items. at 0
-        cur.moveToFirst();
-        ArrayList<Long> old = new ArrayList<>();
-        while (cur.moveToNext()) {
-            long l = Long.parseLong(cur.getString(1));
-            old.add(l);
-            if (top) ids.add(0, l);
-            else ids.add(l);
-
+        // 1. Get current items in order
+        ArrayList<Long> currentIds = new ArrayList<>();
+        Cursor cur = resolver.query(uri, new String[]{MediaStore.Audio.Playlists.Members.AUDIO_ID}, 
+                null, null, MediaStore.Audio.Playlists.Members.PLAY_ORDER + " ASC");
+        if (cur != null) {
+            while (cur.moveToNext()) {
+                currentIds.add(cur.getLong(0));
+            }
+            cur.close();
         }
-        cur.close();
-        log("songs added to playlist Ids: " + ids.size());
 
-        //todo delete old items
-//        int p=0;
-        for (long l : old) {
-            String[] arg = {l + ""};//, p++ + ""};
-            String where = MediaStore.Audio.Playlists.Members.AUDIO_ID + "=? ";//AND " +
-//                    MediaStore.Audio.Playlists.Members.PLAY_ORDER + "=?";
-            resolver.delete(uri, where, arg);
+        // 2. Clear the playlist
+        // Try multiple ways to clear, as behavior varies by Android version/device
+        int deletedCount = resolver.delete(uri, null, null);
+        if (deletedCount == 0) {
+            // Try with a selection that should match everything
+            deletedCount = resolver.delete(uri, "1=1", null);
         }
-        //add the all the items in the new order
+        if (deletedCount == 0) {
+            // Try the general members URI with a selection on playlist ID
+            try {
+                Uri allMembersUri = Uri.parse("content://media/external/audio/playlists/members");
+                deletedCount = resolver.delete(allMembersUri, "playlist_id=?", new String[]{String.valueOf(pid)});
+            } catch (Exception e) {
+                log("Failed to delete from general members URI: " + e.getMessage());
+            }
+        }
+        log("Clear playlist pid " + pid + " result: " + deletedCount);
 
-        for (int i = 0; i < ids.size(); i++) {
-            values = new ContentValues();
-            // Log.d("Music service", i +" saving song: " + t.getTitle() + songid);
+        // 3. Build the new full list of IDs
+        ArrayList<Long> fullList = new ArrayList<>();
+        if (top) {
+            fullList.addAll(ids);
+            fullList.addAll(currentIds);
+        } else {
+            fullList.addAll(currentIds);
+            fullList.addAll(ids);
+        }
+
+        // 4. Re-insert everything in the correct order
+
+        for (int i = 0; i < fullList.size(); i++) {
+            ContentValues values = new ContentValues();
             values.put(MediaStore.Audio.Playlists.Members.PLAY_ORDER, i);
-            values.put(MediaStore.Audio.Playlists.Members.AUDIO_ID, ids.get(i));
+            values.put(MediaStore.Audio.Playlists.Members.AUDIO_ID, fullList.get(i));
             resolver.insert(uri, values);
         }
-
+        log("Songs added. Total songs now: " + fullList.size());
     }
 
     //add 1 song to playlist
     public static void addToPlaylist(Context context, String pname, Long pid, Long sid, boolean top) {
-        String[] cols = new String[]{
-                MediaStore.Audio.Playlists.Members.PLAY_ORDER,
-                MediaStore.Audio.Playlists.Members.AUDIO_ID
-        };
-
-        ContentResolver resolver = context.getContentResolver();
-        Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external", pid);
-        Cursor cur = resolver.query(uri, cols, null, null, null);
-        int base = 0;
-        if (!top && cur.moveToLast()) {
-
-            base = cur.getInt(0);
-            base += 1;
-            String id = cur.getString(1);
+        log("addToPlaylist: " + pname + " pid:" + pid + " sid:" + sid + " top:" + top);
+        if (!top) {
+            // Simple append to bottom
+            Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external", pid);
+            String[] cols = new String[]{ MediaStore.Audio.Playlists.Members.PLAY_ORDER };
+            Cursor cur = context.getContentResolver().query(uri, cols, null, null, MediaStore.Audio.Playlists.Members.PLAY_ORDER + " DESC");
+            int base = 0;
+            if (cur != null && cur.moveToFirst()) {
+                base = cur.getInt(0) + 1;
+                cur.close();
+            }
+            ContentValues values = new ContentValues();
+            values.put(MediaStore.Audio.Playlists.Members.PLAY_ORDER, base);
+            values.put(MediaStore.Audio.Playlists.Members.AUDIO_ID, sid);
+            context.getContentResolver().insert(uri, values);
+            log("Added to bottom at pos: " + base);
         } else {
-            cur.moveToFirst();
+            ArrayList<Long> ids = new ArrayList<>();
+            ids.add(sid);
+            addListToPlaylist(context, pid, ids, top);
         }
-        cur.close();
-        log("adding item --->>>>>base: " + base + " to " + pname);
-
-        ContentValues values = new ContentValues();
-        values.put(MediaStore.Audio.Playlists.Members.PLAY_ORDER, base);
-        values.put(MediaStore.Audio.Playlists.Members.AUDIO_ID, sid);
-        resolver.insert(uri, values);
-
-
     }
 
     //remove 1 song from playlist
