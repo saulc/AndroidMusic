@@ -435,9 +435,7 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
 			log("Albums loaded");
 			ArrayList<Album> ar = new ArrayList<>();
 			while(cursor.moveToNext()){
-				//ar.add( new Album( cursor.getString(4), cursor.getString(1) ) );
-				ar.add( new Album( cursor.getString(0), cursor.getString(1) , cursor.getString(2), cursor.getString(3 ), cursor.getString(4)    ));
-				// adapter.add(cursor.getString(0) + "||" + cursor.getString(1) + "||" +   cursor.getString(2) + "||" +   cursor.getString(3) + "||" +  cursor.getString(4) + "||" +  cursor.getString(5));
+				ar.add( new Album( cursor.getString(0), cursor.getString(1) , null, cursor.getString(2), cursor.getString(3) ));
 			}
 			log("found " + ar.size() + " Album(s)");
 			mListener.albumLoaderFinished(ar);
@@ -524,11 +522,10 @@ public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderC
 	   private String[] albumProjection = {
 	            MediaStore.Audio.Albums.ALBUM,
 	            MediaStore.Audio.Albums.ARTIST,
-	            MediaStore.Audio.Albums.ALBUM_ART,
 	            MediaStore.Audio.Albums.NUMBER_OF_SONGS,
 	            MediaStore.Audio.Albums._ID
 	    };
-	   private Uri albumUri = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI;
+	   private Uri albumUri = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI; // test edit
 	   private String albumSort = MediaStore.Audio.Albums.ALBUM + "  COLLATE NOCASE ASC";
 
 	   //for artist albums

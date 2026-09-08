@@ -51,6 +51,9 @@ dependencies {
     implementation 'com.google.android.gms:play-services-ads:23.3.0'
     implementation 'com.android.billingclient:billing:9.1.0'
 
+    implementation 'com.github.bumptech.glide:glide:4.16.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.16.0'
+
     androidTestImplementation 'androidx.test.ext:junit:1.2.1'
     androidTestImplementation 'androidx.test:runner:1.6.2'
     androidTestImplementation 'androidx.test:rules:1.6.1'

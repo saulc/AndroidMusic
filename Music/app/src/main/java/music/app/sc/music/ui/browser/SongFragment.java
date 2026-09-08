@@ -174,17 +174,29 @@ public class   SongFragment extends baseListFragment implements MediaHelperListe
         if(myType == SF_TYPE.QUERY)  mListener.onSearchDestroyed();
         super.onDestroy();
     }
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    private Bitmap getAlbumArtwork(ContentResolver resolver, long albumId) throws IOException {
-        Uri contentUri = ContentUris.withAppendedId(
-                MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
-                albumId
-        );
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            return resolver.loadThumbnail(contentUri, new Size(640, 480), null);
+    private Bitmap getAlbumArtwork(ContentResolver resolver, long albumId) throws IOException {
+
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                Uri contentUri = ContentUris.withAppendedId(
+                        MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
+                                                albumId
+                                                );
+                return resolver.loadThumbnail(contentUri, new Size(640, 480), null);
+            }
+            Uri legacyUri = ContentUris.withAppendedId(
+                    Uri.parse("content://media/external/audio/albumart"),
+                    albumId
+                    );
+                    return MediaStore.Images.Media.getBitmap(resolver, legacyUri);
+
+        } catch (Exception e) {
+//                        Log.e(TAG, "Failed to load album artwork", e);
+//                        return null;
+            // Gracefully handle missing art
+            return null;
         }
-        return null;
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

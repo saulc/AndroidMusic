@@ -404,17 +404,30 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 
 	}
 
-	@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-	private Bitmap getAlbumArtwork(ContentResolver resolver, long albumId) throws IOException {
-		Uri contentUri = ContentUris.withAppendedId(
-				MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
-				albumId
-		);
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-			return resolver.loadThumbnail(contentUri, new Size(640, 480), null);
+	private Bitmap getAlbumArtwork(ContentResolver resolver, long albumId) throws IOException {
+
+
+		try {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+//				return resolver.loadThumbnail(contentUri, new Size(640, 480), null);
+				Uri contentUri = ContentUris.withAppendedId(
+												MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
+												albumId
+												);
+				return resolver.loadThumbnail(contentUri, new Size(640, 480), null);
+			}
+//				return MediaStore.Images.Media.getBitmap(resolver, contentUri);
+			Uri legacyUri = ContentUris.withAppendedId(
+										Uri.parse("content://media/external/audio/albumart"),
+										albumId
+									);
+			return MediaStore.Images.Media.getBitmap(resolver, legacyUri);
+
+		} catch (Exception e) {
+	//			log("Error loading album artwork: " + e.getMessage());
+			return null;
 		}
-		return null;
 	}
 	   /**
     * Configures service as a foreground service. A foreground service is a service that's doing
@@ -430,10 +443,12 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 
        Bitmap ab = null;
        try {
-           ab = getAlbumArtwork(getContentResolver(), Long.parseLong(s.getAlbumId()) );
 
-	   } catch (IOException e) {
-		   log(e.toString());
+		   if (s.getAlbumId() != null && !s.getAlbumId().isEmpty()) {
+			   ab = getAlbumArtwork(getContentResolver(), Long.parseLong(s.getAlbumId()));
+		   }
+	   } catch (Exception e) {
+		   log("Failed to load album art for notification: " + e.toString());
 	   }
 	   if(ab == null) ab = BitmapFactory.decodeResource(getResources(), R.drawable.android_icon32);
 	   nb = noti.getNotification1(s.getTitle() + " (" + text + ") ",
