@@ -8,7 +8,7 @@ android {
     defaultConfig {
         applicationId "music.app.sc.music"
         minSdkVersion 23
-        targetSdkVersion 34
+        targetSdkVersion 36
         versionCode 1
         versionName "0.1"
         vectorDrawables.useSupportLibrary = true

@@ -684,6 +684,7 @@ public void addBattListener(){
 //            Fragment f = SongFragment.newInstance();
 //            showFragment(R.id.frame, f, true);
             log("Songs clicked. loading Query page.");
+            searchActive = false;
             doMySearch("");
 
 
@@ -929,7 +930,11 @@ public void addBattListener(){
     public boolean onShuffleClicked(){
         log("Suffle clicked");
         int b = mService.shuffleSongs();
-        Toast.makeText(mService, "Shuffle: " + b, Toast.LENGTH_SHORT).show();
+        String s = "";
+        if(b == 0) s = "off";
+        else if(b == 1) s = "Infinite";
+        else if(b == 2) s = "on";
+        Toast.makeText(mService, "Shuffle: " + s, Toast.LENGTH_SHORT).show();
         updateQueueFrag(mService.getQueue());
 
         return b > 0;
@@ -1085,7 +1090,12 @@ public void addBattListener(){
     //load all songs ready for search keyword. in title, artist, album.
     private void doMySearch(String q) {
         log("Searching for: " + q);
-
+//        if(searchActive){
+//            if(sf == null){
+//                log("Song fragment null. resetting search.");
+//                searchActive = false;
+//            }
+//        }
         if (!searchActive) {
             sf = (SongFragment) SongFragment.newInstance();
 

@@ -369,7 +369,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
            intent.setComponent(myEventReceiver);
            mRemoteControlClientCompat = new RemoteControlClientCompat(
                    PendingIntent.getBroadcast(this /*context*/,
-                           0 /*requestCode, ignored*/, intent /*intent*/, 0 /*flags*/));
+                           0 /*requestCode, ignored*/, intent /*intent*/, PendingIntent.FLAG_IMMUTABLE /*flags*/));
            RemoteControlHelper.registerRemoteControlClient(am,
                    mRemoteControlClientCompat);
        }
