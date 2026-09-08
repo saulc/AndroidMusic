@@ -3,7 +3,7 @@
     <capability android:name="actions.media.action.MEDIA_PLAY_FROM_SEARCH">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetClass="music.app.my.music.DrawerActivity"
+            android:targetClass="music.app.sc.music.DrawerActivity"
             android:targetPackage="music">
             <parameter
                 android:name="exercise.name"
@@ -13,7 +13,7 @@
         </intent>
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetClass="music.app.my.music.DrawerActivity">
+            android:targetClass="music.app.sc.music.DrawerActivity">
         </intent>
     </capability>
 </shortcuts>

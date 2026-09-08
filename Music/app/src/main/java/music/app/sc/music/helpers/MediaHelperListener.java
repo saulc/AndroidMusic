@@ -1,0 +1,32 @@
+package music.app.sc.music.helpers;
+
+import java.util.ArrayList;
+
+import music.app.sc.music.types.Album;
+import music.app.sc.music.types.Artist;
+import music.app.sc.music.types.Genre;
+import music.app.sc.music.types.Playlist;
+import music.app.sc.music.types.Song;
+
+/**
+ * Created by saul on 7/26/16.
+ */
+public interface MediaHelperListener {
+
+
+    void playlistLoaderFinished(ArrayList<Playlist> p);
+    void artistLoaderFinished(ArrayList<Artist> a);
+    void genreLoaderFinished(ArrayList<Genre> a);
+
+    void playlistItemLoaderFinished(ArrayList<Song> s);
+    void artistItemLoaderFinished(ArrayList<Song> s);
+    void albumItemLoaderFinished(ArrayList<Song> s);
+    void genreItemLoaderFinished(ArrayList<Song> s);
+    void helperReady();
+
+    void songLoadedFinished(ArrayList<Song> songs);
+    void queueitemLoaderFinished(ArrayList<Song> songs);
+    void albumLoaderFinished(ArrayList<Album> ar);
+    void queryLoaderFinished(ArrayList<Song> songs);
+    void radioLoaderFinished(ArrayList<Song> songs);
+}

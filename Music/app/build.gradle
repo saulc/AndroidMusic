@@ -6,7 +6,7 @@ android {
     compileSdk 35
 
     defaultConfig {
-        applicationId "music.app.my.music"
+        applicationId "music.app.sc.music"
         minSdkVersion 23
         targetSdkVersion 34
         versionCode 1
@@ -22,7 +22,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-    namespace 'music.app.my.music'
+    namespace 'music.app.sc.music'
     compileOptions {
         targetCompatibility "17"
         sourceCompatibility JavaVersion.VERSION_17

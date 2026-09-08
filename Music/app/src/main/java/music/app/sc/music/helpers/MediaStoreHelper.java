@@ -1,0 +1,614 @@
+package music.app.sc.music.helpers;
+
+
+import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Bundle;
+import android.provider.MediaStore;
+
+import android.util.Log;
+
+
+import java.util.ArrayList;
+
+import music.app.sc.music.types.Album;
+import music.app.sc.music.types.Artist;
+import music.app.sc.music.types.Genre;
+import music.app.sc.music.types.Playlist;
+import music.app.sc.music.types.Song;
+
+import static java.lang.Long.parseLong;
+
+import androidx.annotation.NonNull;
+import androidx.cursoradapter.widget.CursorAdapter;
+import androidx.fragment.app.Fragment;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.CursorLoader;
+import androidx.loader.content.Loader;
+
+/*
+	Media store helper handles query and loader response to android mediastore db.
+ */
+
+public class  MediaStoreHelper extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+	private static final int mLOADER = 12;
+
+
+
+//	public  enum Media { songs, artists, playlists};
+
+	private MediaHelperListener mListener;
+	private enum LOADER_TYPE {QUEUE,  PLAYLIST, PLAYLISTITEMS, SONGS, ALBUMS,ALBUMITEMS, ARTISTS,ARTISTITEMS, GENRE, GENREITEMS, QUERY, RADIO, RADIOITEMS };
+	private LOADER_TYPE myType = LOADER_TYPE.SONGS;
+	private Context mContext;
+	private String pid = null;
+	private String pname = null;
+	private String qid = "";
+
+    private final String TAG = getClass().getSimpleName();
+    private void log(String s){
+        Log.d(TAG, s);
+    }
+    public MediaStoreHelper() {
+        super();
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        log("Media store helper fragment created");
+        if (mListener != null) {
+            mListener.helperReady();
+        }
+    }
+
+	public void setListener(MediaHelperListener l){
+		mListener = l;
+		if (mListener != null && isAdded()) {
+			mListener.helperReady();
+		}
+	}
+
+	public void search(String q){
+		myType = LOADER_TYPE.QUERY;
+		pname = q;
+		LoaderManager.getInstance(this).restartLoader(mLOADER, null, this);
+//		getLoaderManager().initLoader(mLOADER, null, this);
+	}
+
+
+	public void loadSongs(){
+		myType = LOADER_TYPE.SONGS;
+
+		LoaderManager.getInstance(this).restartLoader(mLOADER, null, this);
+//		getLoaderManager().initLoader(mLOADER, null, this);
+
+	}
+	public void loadQueue(){
+
+        log("Loading Queue...");
+		myType = LOADER_TYPE.QUEUE;
+		LoaderManager.getInstance(this).restartLoader(mLOADER, null, this);
+//		getLoaderManager().initLoader(mLOADER, null, this);
+
+
+	}
+	public void loadPlaylists(){
+
+		myType = LOADER_TYPE.PLAYLIST;
+		var lm = LoaderManager.getInstance(this);
+		log("lm ready...");
+		lm.restartLoader(mLOADER, null, this);
+		log("playlist loader init.");
+//		getSupportLoaderManager().initLoader(mLOADER, null, this);
+		
+	}
+	public void loadGenres() {
+		myType = LOADER_TYPE.GENRE;
+		LoaderManager.getInstance(this).restartLoader(mLOADER, null, this);
+//		getLoaderManager().initLoader(mLOADER, null, this);
+
+	}
+	public void loadGenreItems(String id) {
+		myType = LOADER_TYPE.GENREITEMS;
+		pid = id;
+		LoaderManager.getInstance(this).restartLoader(mLOADER, null, this);
+//		getLoaderManager().initLoader(mLOADER, null, this);
+
+	}
+
+    public void loadArtists() {
+        myType = LOADER_TYPE.ARTISTS;
+		LoaderManager.getInstance(this).restartLoader(mLOADER, null, this);
+//		getLoaderManager().initLoader(mLOADER, null, this);
+
+    }
+	public void loadAlbums() {
+		myType = LOADER_TYPE.ALBUMS;
+		LoaderManager.getInstance(this).restartLoader(mLOADER, null, this);
+//		getLoaderManager().initLoader(mLOADER, null, this);
+
+	}
+	public void loadAlbums(String artist) {
+		myType = LOADER_TYPE.ALBUMS;
+		pname = artist;
+		LoaderManager.getInstance(this).restartLoader(mLOADER, null, this);
+//		getLoaderManager().initLoader(mLOADER, null, this);
+
+	}
+	public void loadGenreItems(String id, String pname) {
+		myType = LOADER_TYPE.GENREITEMS;
+		pid = id;
+		LoaderManager.getInstance(this).restartLoader(mLOADER, null, this);
+//		getLoaderManager().initLoader(mLOADER, null, this);
+
+	}
+	public void loadAlbumItems(String id, String pname) {
+		myType = LOADER_TYPE.ALBUMITEMS;
+		pid = id;
+		LoaderManager.getInstance(this).restartLoader(mLOADER, null, this);
+//		getLoaderManager().initLoader(mLOADER, null, this);
+
+	}
+
+
+	public void loadArtistItems(String id, String pname) {
+		myType = LOADER_TYPE.ARTISTITEMS;
+		pid = id;
+		LoaderManager.getInstance(this).restartLoader(mLOADER, null, this);
+//		getLoaderManager().initLoader(mLOADER, null, this);
+
+	}
+
+    public void loadPlaylistItems(String id, String name){
+        log("Loading playlist: " + name);
+        myType = LOADER_TYPE.PLAYLISTITEMS;
+		pid = id;
+		pname = name;
+		LoaderManager.getInstance(this).restartLoader(mLOADER, null, this);
+//		getLoaderManager().initLoader(mLOADER, null, this);
+
+    }
+
+	public void loadRadioItems(String id, String name){
+		log("Loading Radio directory: " + name);
+		myType = LOADER_TYPE.RADIOITEMS;
+		pname = name;
+		LoaderManager.getInstance(this).restartLoader(mLOADER, null, this);
+//		getLoaderManager().initLoader(mLOADER, null, this);
+
+	}
+	@Override
+	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
+
+		log("mshelper loader created. type: " + myType);
+        Context context = requireContext();
+        if(myType == LOADER_TYPE.PLAYLIST || myType == LOADER_TYPE.QUEUE) {
+			log("mshelper loading playlists/queue...");
+            return new CursorLoader(context, playlistUri, playlistProjection, null, null, playlistSortOrder);
+        }
+		else  if(myType == LOADER_TYPE.RADIOITEMS) {
+
+			log("Radio Item loader Created");
+			try {
+
+//				Uri uri =  MediaStore.Audio.Media.getContentUriForPath("Music/"+ pname);
+				return new CursorLoader(context, songUri, defaultProjection,  MediaStore.Audio.Media.DATA + " LIKE ? " , new String[]{"%"+pname+"/%"}, defaultSort);
+			} catch (NumberFormatException e) {
+				e.printStackTrace();
+			}
+		}
+        else  if(myType == LOADER_TYPE.PLAYLISTITEMS) {
+
+            log("Playlist Item loader Created");
+			try {
+				long lpid = parseLong(pid);
+				Uri uri =  MediaStore.Audio.Playlists.Members.getContentUri("external", lpid);
+				return new CursorLoader(context, uri, playlistMemberProjection, null, null, playlistMemberSort);
+			} catch (NumberFormatException e) {
+				e.printStackTrace();
+			}
+		}
+		else if(myType == LOADER_TYPE.GENREITEMS)
+		{
+			try {
+				long lpid = parseLong(pid);
+				Uri uri =  MediaStore.Audio.Genres.Members.getContentUri("external", lpid);
+
+				return new CursorLoader(context, uri, genreMembersProjection, null, null, genreMembersSortOrder);
+			} catch (NumberFormatException e) {
+				e.printStackTrace();
+			}
+
+		}
+		else if(myType == LOADER_TYPE.GENRE)
+		{
+			return new CursorLoader(context, genreUri, genreProjection, null, null, genreSortOrder);
+		}
+        else if(myType == LOADER_TYPE.ARTISTS)
+        {
+            return new CursorLoader(context, artistUri, artistProjection, null, null, artistSortOrder);
+        }
+        else if(myType == LOADER_TYPE.ARTISTITEMS)
+		{
+			log("Artist Item loader Created");
+			String arg[] = {pid};
+
+			return new CursorLoader(context, songUri, defaultProjection, artistMemberSelection, arg , defaultSort);
+		}
+
+        else if(myType == LOADER_TYPE.ALBUMS)
+        {
+			log("Albums loader Created");
+			if(pname != null){		//for artist albums.
+				String arg[] = { pname };
+				return new CursorLoader(context, albumUri, albumProjection, albumSelection, arg, albumSort);
+			}
+			//all albums
+            return new CursorLoader(context, albumUri, albumProjection, null, null, albumSort);
+        }
+		else if(myType == LOADER_TYPE.ALBUMITEMS)
+		{
+			log("Album Item loader Created");
+			String arg[] = {pid};
+
+			return new CursorLoader(context, songUri, albumMemberProjection, albumMemberSelection, arg , albumMemeberSort);
+		}
+
+		else  if(myType == LOADER_TYPE.SONGS) {
+
+			log("Song Item loader Created");
+
+				return new CursorLoader(context, songUri, defaultProjection , null, null, defaultSort);
+
+		}
+		else  if(myType == LOADER_TYPE.QUERY) {
+
+			log("Query loader Created");
+
+			return new CursorLoader(context, songUri, defaultProjection , defaultSelection, null, defaultSort);
+
+		}
+            return new CursorLoader(context, playlistUri, playlistProjection, null, null, playlistSortOrder);
+
+
+	}
+
+
+
+	public boolean findQueuePlaylist(){
+		Log.d("M6", "Looking for queue playlist");
+		ContentResolver resolver = mContext.getContentResolver();
+		String[] playlistProjection = { MediaStore.Audio.Playlists.NAME,
+				MediaStore.Audio.Playlists._ID};
+		Uri uri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
+		Cursor cur = resolver.query(uri, playlistProjection, null, null, null);
+
+		while(cur.moveToNext()){
+			if(cur.getString(0).equals("QUEUE")){
+				qid = cur.getString(1);
+				Log.d("m6", "queue playlist id: " + cur.getString(1));
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public void saveQueue(){
+		Log.i("m6", "Saving Queue");
+		Uri uri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
+		ContentValues values = new ContentValues();
+		values.put(MediaStore.Audio.Playlists.NAME, "QUEUE");
+		ContentResolver resolver = mContext.getContentResolver();
+		try {
+			resolver.insert(uri, values);
+		} catch (SecurityException e) {
+			Log.e(TAG, "SecurityException saving queue playlist: " + e.getMessage());
+		}
+
+	}
+
+
+	@Override
+	public void onLoadFinished(@NonNull Loader<Cursor> arg0, Cursor cursor) {
+
+		if(myType == LOADER_TYPE.QUEUE){
+			if(qid.compareTo("") == 0)
+				if(!findQueuePlaylist())
+					saveQueue();
+
+			log("Searching for Queue id " + qid);
+
+			while(cursor.moveToNext()){
+				if( cursor.getString(1).compareTo(qid) == 0) {
+                    log("Found Queue Playlist Id.");
+					//qid = cursor.getString(1);
+                    loadPlaylistItems(qid, "QUEUE");
+					return;
+				}
+			}
+
+		}
+		else if(myType == LOADER_TYPE.PLAYLIST)
+		{
+			log("playlists loaded.");
+			ArrayList<Playlist> pl = new ArrayList<Playlist>();
+		  while(cursor.moveToNext()){
+	    	  pl.add( new Playlist( cursor.getString(0), cursor.getString(1) ) );
+		       // adapter.add(cursor.getString(0) + "||" + cursor.getString(1) + "||" +   cursor.getString(2) + "||" +   cursor.getString(3) + "||" +  cursor.getString(4) + "||" +  cursor.getString(5));
+			}
+
+			mListener.playlistLoaderFinished(pl);
+			return;
+		}
+		else  if(myType == LOADER_TYPE.PLAYLISTITEMS) {
+			log("Playlist Items loaded");
+			ArrayList<Song> songs = new ArrayList<Song>();
+			while(cursor.moveToNext()) {
+				songs.add(new Song(cursor.getString(0), cursor.getString(1),
+						cursor.getString(2), cursor.getString(3), cursor.getString(4)
+						, cursor.getString(5), cursor.getString(6), cursor.getString(7), cursor.getString(8)));
+			}
+			log("Returning Playlist with "+ songs.size() + " Items to activity");
+			if(pid.compareTo(qid) == 0) mListener.queueitemLoaderFinished(songs);
+			else mListener.playlistItemLoaderFinished(songs);
+
+			return;
+		}
+		else if(myType == LOADER_TYPE.GENRE)
+		{
+
+			ArrayList<Genre> pl = new ArrayList<Genre>();
+			while(cursor.moveToNext()){
+				pl.add( new Genre( cursor.getString(0), cursor.getString(1) ) );
+				// adapter.add(cursor.getString(0) + "||" + cursor.getString(1) + "||" +   cursor.getString(2) + "||" +   cursor.getString(3) + "||" +  cursor.getString(4) + "||" +  cursor.getString(5));
+			}
+
+			mListener.genreLoaderFinished(pl);
+			return;
+		}
+
+		else  if(myType == LOADER_TYPE.GENREITEMS) {
+			log("Genre Items loaded");
+			ArrayList<Song> songs = new ArrayList<Song>();
+			while(cursor.moveToNext()) {
+				songs.add(new Song(cursor.getString(0), cursor.getString(1) ,
+								cursor.getString(2), cursor.getString(3),
+								cursor.getString(4) , cursor.getString(5),
+								cursor.getString(6) , cursor.getString(7),
+						cursor.getString(8), cursor.getString(9) ) );
+			}
+			log("Returning Genre with "+ songs.size() + " Items to activity");
+			 mListener.genreItemLoaderFinished(songs);
+
+			return;
+		}
+
+
+		else  if(myType == LOADER_TYPE.ALBUMITEMS) {
+			log("Album Items loaded");
+			ArrayList<Song> songs = new ArrayList<Song>();
+			while(cursor.moveToNext()) {
+				songs.add(new Song(cursor.getString(0), cursor.getString(1),
+						cursor.getString(2), cursor.getString(3), cursor.getString(4)
+						, cursor.getString(5), cursor.getString(6) , cursor.getString(7) ));
+			}
+			log("Returning Album with "+ songs.size() + " Items to activity");
+			 mListener.albumItemLoaderFinished(songs);
+
+			return;
+		}
+
+
+		else  if(myType == LOADER_TYPE.ARTISTITEMS) {
+			log("Artist Items loaded");
+			ArrayList<Song> songs = new ArrayList<Song>();
+			while(cursor.moveToNext()) {
+				songs.add(new Song(cursor.getString(0), cursor.getString(1),
+						cursor.getString(2), cursor.getString(3), cursor.getString(4)
+						, cursor.getString(5), cursor.getString(6), cursor.getString(7) ));
+			}
+			log("Returning Artist with "+ songs.size() + " Items to activity");
+			mListener.artistItemLoaderFinished(songs);
+
+			return;
+		}
+
+        else if(myType == LOADER_TYPE.ARTISTS)
+        {
+			log("Artists  loaded");
+            ArrayList<Artist> ar = new ArrayList<>();
+            while(cursor.moveToNext()){
+               // ar.add( new Artist( cursor.getString(0), cursor.getString(1) ) );
+				ar.add( new Artist( cursor.getString(0), cursor.getString(1 ), cursor.getString(2), cursor.getString(3) ));
+                // adapter.add(cursor.getString(0) + "||" + cursor.getString(1) + "||" +   cursor.getString(2) + "||" +   cursor.getString(3) + "||" +  cursor.getString(4) + "||" +  cursor.getString(5));
+            }
+			log("found " + ar.size() + " Artist(s)");
+            mListener.artistLoaderFinished(ar);
+            return;
+        }
+		else if(myType == LOADER_TYPE.ALBUMS)
+		{
+			log("Albums loaded");
+			ArrayList<Album> ar = new ArrayList<>();
+			while(cursor.moveToNext()){
+				//ar.add( new Album( cursor.getString(4), cursor.getString(1) ) );
+				ar.add( new Album( cursor.getString(0), cursor.getString(1) , cursor.getString(2), cursor.getString(3 ), cursor.getString(4)    ));
+				// adapter.add(cursor.getString(0) + "||" + cursor.getString(1) + "||" +   cursor.getString(2) + "||" +   cursor.getString(3) + "||" +  cursor.getString(4) + "||" +  cursor.getString(5));
+			}
+			log("found " + ar.size() + " Album(s)");
+			mListener.albumLoaderFinished(ar);
+			return;
+		}
+		else  if(myType == LOADER_TYPE.RADIOITEMS) {
+			log("Radio Items loaded");
+			ArrayList<Song> songs = new ArrayList<Song>();
+			while(cursor.moveToNext()) {
+				songs.add(new Song(cursor.getString(0), cursor.getString(1),
+						cursor.getString(2), cursor.getString(3), cursor.getString(4)
+						, cursor.getString(5), cursor.getString(6), cursor.getString(7 )));
+			}
+			log("Returning Radio songs to activity: " + songs.size());
+			mListener.radioLoaderFinished(songs);
+			return;
+		}
+
+		else  if(myType == LOADER_TYPE.SONGS) {
+			log("SONG Items loaded");
+			ArrayList<Song> songs = new ArrayList<Song>();
+			while(cursor.moveToNext()) {
+				songs.add(new Song(cursor.getString(0), cursor.getString(1),
+						cursor.getString(2), cursor.getString(3), cursor.getString(4)
+						, cursor.getString(5), cursor.getString(6), cursor.getString(7 )));
+			}
+			log("Returning SONGs  to activity");
+			mListener.songLoadedFinished(songs);
+			return;
+		}
+
+
+		else  if(myType == LOADER_TYPE.QUERY) {
+			log("SONG Items loaded");
+			ArrayList<Song> songs = new ArrayList<Song>();
+			while(cursor.moveToNext()) {
+				songs.add(new Song(cursor.getString(0), cursor.getString(1),
+						cursor.getString(2), cursor.getString(3), cursor.getString(4)
+						, cursor.getString(5), cursor.getString(6), cursor.getString(7 )));
+			}
+			log("Querying " + songs.size() + " songs for: " + pname);
+
+			mListener.queryLoaderFinished(songs);
+			return;
+		}
+
+		
+	}
+	
+	 
+	@Override
+	public void onLoaderReset(Loader<Cursor> arg0) {
+
+		log("Loader Reset");
+	}
+	
+//	public void 
+	
+	public Cursor getMedia(String type, String where, CursorAdapter adapter){
+	//	if(type.equals("albums")){
+		//	getLoaderManager().initLoader(0, null, adapter);
+			//initLoader(0, null, adapter);
+	//	}
+		return null;
+	}
+
+	private Uri songUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+	private String defaultSort =  MediaStore.Audio.Media.TITLE + " COLLATE NOCASE ASC";
+	private String allAlbumSort =  MediaStore.Audio.Media.ALBUM + " COLLATE NOCASE ASC";
+	private String allArtistSort =  MediaStore.Audio.Media.ARTIST + " COLLATE NOCASE ASC";
+	private String defaultSelection = MediaStore.Audio.Media.IS_MUSIC + " != 0";
+	private String[] defaultProjection = {
+            MediaStore.Audio.Media.TITLE,
+            MediaStore.Audio.Media.DATA,
+            MediaStore.Audio.Media.ARTIST,
+            MediaStore.Audio.Media.ALBUM,
+            MediaStore.Audio.Media.DURATION,
+            MediaStore.Audio.Media._ID,
+            MediaStore.Audio.Media.ALBUM_ID,
+			MediaStore.Audio.Media.ARTIST_ID
+
+	};
+
+	   private String[] albumProjection = {
+	            MediaStore.Audio.Albums.ALBUM,
+	            MediaStore.Audio.Albums.ARTIST,
+	            MediaStore.Audio.Albums.ALBUM_ART,
+	            MediaStore.Audio.Albums.NUMBER_OF_SONGS,
+	            MediaStore.Audio.Albums._ID
+	    };
+	   private Uri albumUri = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI;
+	   private String albumSort = MediaStore.Audio.Albums.ALBUM + "  COLLATE NOCASE ASC";
+
+	   //for artist albums
+	private String albumSelection =  MediaStore.Audio.Albums.ARTIST + "=?";
+
+
+	private String[] albumMemberProjection = {
+				MediaStore.Audio.Media.TITLE,
+				MediaStore.Audio.Media.DATA,
+				MediaStore.Audio.Media.ARTIST,
+				MediaStore.Audio.Media.ALBUM,
+				MediaStore.Audio.Media.DURATION,
+				MediaStore.Audio.Media._ID,
+				MediaStore.Audio.Media.ALBUM_ID,
+				MediaStore.Audio.Media.TRACK,
+			    MediaStore.Audio.Media.ARTIST_ID
+
+	   };
+	   private String albumMemeberSort =  MediaStore.Audio.Media.TRACK + "  COLLATE NOCASE ASC";
+	   private String albumMemberSelection =  MediaStore.Audio.Media.ALBUM_ID + "=?";
+
+
+	   private String artistMemberSelection =  MediaStore.Audio.Media.ARTIST_ID + "=?";
+
+	   private Uri artistUri = MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI;
+	   private String artistSortOrder = MediaStore.Audio.Artists.ARTIST   + "  COLLATE NOCASE ASC";
+	   private String[] artistProjection = {
+				MediaStore.Audio.Artists._ID,
+				MediaStore.Audio.Artists.ARTIST,
+				MediaStore.Audio.Artists.NUMBER_OF_ALBUMS,
+				MediaStore.Audio.Artists.NUMBER_OF_TRACKS,
+				};
+
+	private String[] playlistMemberProjection = {
+			MediaStore.Audio.Playlists.Members.TITLE,
+			MediaStore.Audio.Playlists.Members.DATA,
+			MediaStore.Audio.Playlists.Members.ARTIST,
+			MediaStore.Audio.Playlists.Members.ALBUM,
+			MediaStore.Audio.Playlists.Members.DURATION,
+			MediaStore.Audio.Playlists.Members.AUDIO_ID,
+			MediaStore.Audio.Playlists.Members.ALBUM_ID,
+			MediaStore.Audio.Playlists.Members.PLAY_ORDER,
+			MediaStore.Audio.Playlists.Members.ARTIST_ID
+
+
+	};
+
+	private String playlistMemberSort =  MediaStore.Audio.Playlists.Members.PLAY_ORDER + " ASC";
+
+
+	private  String[] playlistProjection = { MediaStore.Audio.Playlists.NAME,
+			MediaStore.Audio.Playlists._ID,
+	};
+	private Uri playlistUri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
+	private String playlistSortOrder = MediaStore.Audio.Playlists.NAME   + "  COLLATE NOCASE ASC";
+
+	private Uri genreUri = MediaStore.Audio.Genres.EXTERNAL_CONTENT_URI;
+	private String genreSortOrder = MediaStore.Audio.Genres.NAME   + "  COLLATE NOCASE ASC";
+	private String[] genreProjection = {
+			MediaStore.Audio.Genres.NAME,
+			MediaStore.Audio.Genres._ID
+
+	};
+
+
+	private String genreMembersSortOrder = MediaStore.Audio.Genres.Members.ARTIST   + "  COLLATE NOCASE ASC";
+	private String[] genreMembersProjection = {
+			MediaStore.Audio.Genres.Members.TITLE,
+			MediaStore.Audio.Genres.Members.GENRE_ID,
+			MediaStore.Audio.Genres.Members.AUDIO_ID,
+			MediaStore.Audio.Genres.Members.DURATION,
+			MediaStore.Audio.Genres.Members.DATA,
+			MediaStore.Audio.Genres.Members.ARTIST,
+			MediaStore.Audio.Genres.Members.ARTIST_ID,
+			MediaStore.Audio.Genres.Members.ALBUM,
+			MediaStore.Audio.Genres.Members.ALBUM_ID,
+			MediaStore.Audio.Genres.Members.YEAR
+
+	};
+
+}
+
+

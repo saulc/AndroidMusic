@@ -26,7 +26,7 @@
     app:fastScrollThumbColor="?colorAccent"
     app:fastScrollThumbEnabled="true"
     app:layoutManager="LinearLayoutManager"
-    tools:context="music.app.my.music.ui.QueueFragment"
+    tools:context="music.app.sc.music.ui.QueueFragment"
     tools:listitem="@layout/fragment_queueitem" />
 
 </LinearLayout>

@@ -27,7 +27,7 @@
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         android:background="@android:color/transparent"
-        tools:context="music.app.my.music.ui.QueueFragment"
+        tools:context="music.app.sc.music.ui.QueueFragment"
         tools:listitem="@layout/fragment_queueitem" />
 
 
