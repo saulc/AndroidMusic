@@ -665,20 +665,20 @@ public void addBattListener(){
         }
         if (id == R.id.nav_playlists || id == R.id.new_playlist) {
             Fragment f = PlayListFragment.newInstance();
-            showFragment(R.id.frame, f, true);
+            showFragment(R.id.frame, f, false);
 
 
         } else if (id == R.id.nav_artists) {
             Fragment f = ArtistFragment.newInstance();
-            showFragment(R.id.frame, f, true);
+            showFragment(R.id.frame, f, false);
 
         } else if (id == R.id.nav_albums) {
             Fragment f = AlbumFragment.newInstance();
-            showFragment(R.id.frame, f, true);
+            showFragment(R.id.frame, f, false);
 
         } else if (id == R.id.nav_genres) {
             Fragment f = GenreFragment.newInstance();
-            showFragment(R.id.frame, f, true);
+            showFragment(R.id.frame, f, false);
 
         } else if (id == R.id.nav_songs) {
 //            Fragment f = SongFragment.newInstance();
@@ -1578,6 +1578,9 @@ public void addBattListener(){
     private void showFragment(int r, Fragment f, boolean addTobs) {
 
         if (r == R.id.frame) {
+            if (!addTobs) {
+                getSupportFragmentManager().popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            }
             //its the main frame.
             //if its the now fragment, minimize the queue, hide the controls
             //any other fragment set the queue to half.
@@ -1780,7 +1783,7 @@ public void addBattListener(){
         if(nf != null && nf.isVisible() ) return;
 
         nf =  NowFragment.newInstance(false);
-        showFragment(R.id.frame, nf, true);
+        showFragment(R.id.frame, nf, false);
     }
 
     /* ---------- Show mixxer fragment ------------- */
