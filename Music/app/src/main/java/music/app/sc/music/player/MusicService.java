@@ -274,7 +274,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 		public void setPlayPause(Boolean isPlaying);
 
 		public void setCurrentInfo(Song s);
-
+		public void updateQ();
    	}
    @Override
 	public IBinder onBind(Intent arg0) {
@@ -763,7 +763,7 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 
 			};
 			Uri memebersUri =  MediaStore.Audio.Playlists.Members.getContentUri("external", queuePlaylistId);
-			String sort =  MediaStore.Audio.Playlists.Members.PLAY_ORDER + " COLLATE LOCALIZED ASC";
+			String sort =  MediaStore.Audio.Playlists.Members.PLAY_ORDER + " COLLATE NOCASE ASC";
 			Cursor cursor = resolver.query(memebersUri, memberProjection, null, null, sort);
 			//  ArrayList<Song> songs = new ArrayList<Song>();
 			while(cursor.moveToNext()){
@@ -773,6 +773,9 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
 						, cursor.getString(5), cursor.getString(6), cursor.getString(7), cursor.getString(8)));
 			}
 			cursor.close();
+			//update queue
+			if(mListener != null)
+			 mListener.updateQ();
 
 			//Uri uri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
 			//this.getApplicationContext().getContentResolver().delete(uri, MediaStore.Audio.Playlists._ID +" = "+queuePlaylistId, null);

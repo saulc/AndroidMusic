@@ -755,6 +755,12 @@ public void addBattListener(){
                     updateCurrentInfo(s);
                 }
 
+                @Override
+                public void updateQ() {
+//                    qf.updateAdapter();
+
+                }
+
             });
         }
 
@@ -765,7 +771,13 @@ public void addBattListener(){
         }
     };
 
-
+public void updateQueue(){
+    log("updating queue.");
+    if (qf == null) {
+        qf = QueueFragment.newInstance();
+        showFragment(R.id.qframe, qf, false);
+    }
+}
 
     /* -----------------------------------  start    ----------------------------------- */
     public void handleSearchIntents() {
@@ -1518,6 +1530,8 @@ public void addBattListener(){
 
         return showq;
     }
+
+
 
     public int showQ() {
         log("Show Q:" + ++showq);
