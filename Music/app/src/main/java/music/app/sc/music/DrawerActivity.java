@@ -158,7 +158,7 @@ public class DrawerActivity extends AppCompatActivity
 
     private boolean autoCloseDrawer = true;
     private boolean showfmenu = false; //show/hide floating control buttons.
-    private int showq = 0; //0 == hidden, 1 = miniplayer q, 2 = half, 3 = full screen, todo 4 edit plist
+    private int showq = 3; //0 == hidden, 1 = miniplayer q, 2 = half, 3 = full screen, todo 4 edit plist
     private int showlog = 1;
     private boolean powerPaused = false;
     private boolean battWarn = false;
@@ -493,7 +493,6 @@ public class DrawerActivity extends AppCompatActivity
 //        if(controlsVisible)
 //            showControls();
 
-        showNow(); //update queue when its loaded
 
         // showBubbles();
 
@@ -513,6 +512,9 @@ public class DrawerActivity extends AppCompatActivity
         }
 
         billingHelper = new BillingHelper(this, this);
+
+
+//        showNow(); //update queue when its loaded
     }
 
     @Override
@@ -923,15 +925,15 @@ public void updateQueue(){
         //	saveQueue();
     }
 
-    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }
+//    @Override
+//    public void onBackPressed() {
+//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+//        if (drawer.isDrawerOpen(GravityCompat.START)) {
+//            drawer.closeDrawer(GravityCompat.START);
+//        } else {
+//            super.onBackPressed();
+//        }
+//    }
 
     /* -----------------------------------   onCreateOptions   -----------------------------------
      *
@@ -1746,9 +1748,13 @@ public void updateQueue(){
     /* ---------- set up an Update to now fragment ------------- */
     @Override
     public void onNowViewCreated() {
-        log("Now Fragment created");
+        log("Now Fragment created callback!");
 
-        if (nf == null) showNow();
+        if (nf == null) {
+            log("updating queue frag!");
+            showq = 3;
+            showQ();
+        }
 
         nowShowing = true;
         getSupportActionBar().hide();
@@ -1760,18 +1766,24 @@ public void updateQueue(){
         h.postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (mService != null)
-                    if (nf.isVisible() || cf.isVisible())
-                        if (mService.getQueue().getSize() > 0) {
-                            updateQueueFrag( mService.getQueue() );
+                if (mService != null) {
+
+                    if (mService.getQueue().getSize() > 0) {
+                        log("Now fragment updating queue.!");
+                        updateQueueFrag(mService.getQueue());
+
+                        if (nf.isVisible() || cf.isVisible()) {
                             updateCurrentInfo(mService.getCurrentSong());
                             updateNowButtons(mService.getQueue());
                             nf.setupVolbar(getMaxVol(), getVol());
                         }
+                    }
+                    }
+
                 Log.d(TAG, "Now updating..");
                 h.removeCallbacks(this);
             }
-        }, 400);
+        }, 900);
 
 
     }
@@ -1794,10 +1806,13 @@ public void updateQueue(){
         if (orientation == Configuration.ORIENTATION_PORTRAIT)
             hideControls(false);
 
+
         if(nf != null && nf.isVisible() ) return;
 
         nf =  NowFragment.newInstance(false);
         showFragment(R.id.frame, nf, false);
+
+
     }
 
     /* ---------- Show mixxer fragment ------------- */
