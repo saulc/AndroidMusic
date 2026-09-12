@@ -39,7 +39,7 @@ class MixFragment : Fragment() {
         mixSwitch = v.findViewById(R.id.mixmodeSwitch)
 
         mixSwitch?.setOnCheckedChangeListener( object : CompoundButton.OnCheckedChangeListener{
-            override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
+            override fun onCheckedChanged(p0: CompoundButton, isChecked: Boolean) {
                 log("mix Switch clicked: " + isChecked)
                 setMixMode(isChecked)
             }

@@ -304,7 +304,7 @@ public class DrawerActivity extends AppCompatActivity
     private ImageView navIcon;
 
     private String actionSetTheme = "ACTION_SET_THEME";
-    private int currentTheme = R.style.DarkSide;    //R.style.AppTheme_NoActionBar;
+    private int currentTheme = R.style.AppTheme;    //R.style.AppTheme_NoActionBar;
 
     private boolean controlsVisible = false;
     //private TextureView bgTexture;

@@ -33,6 +33,7 @@ import android.widget.ViewSwitcher;
 import androidx.annotation.RequiresApi;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import music.app.sc.music.R;
 import music.app.sc.music.player.MusicPlayer;
@@ -418,7 +419,7 @@ public class NowFragment extends ControlFragment {
                 String aa= s.getAlbumId();
                 log("Now fragment updating albumart: " + aa);
                 long p = Long.parseLong(aa);
-                Bitmap b =  getAlbumArtwork( getContext().getContentResolver() , p);
+                Bitmap b =  getAlbumArtwork( requireContext().getContentResolver() , p);
 
 //                Drawable d = new BitmapDrawable(getResources(), b);
                 if(isMini) icon.setImageBitmap(b);
