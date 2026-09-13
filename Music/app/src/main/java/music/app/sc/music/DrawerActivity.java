@@ -1006,6 +1006,10 @@ public void updateQueue(){
         else if (id == R.id.mix) {
             log("Mix clicked");
             Song s = PlaylistHelper.getRandomSong(getApplicationContext());
+            if(s == null) {
+                Toast.makeText(mService, "No songs!", Toast.LENGTH_SHORT).show();
+                return true;
+            }
             String b = "Mix: " + s.getTitle() + " by " + s.getArtist() + " added to Queue.";
             Toast.makeText(mService, b, Toast.LENGTH_SHORT).show();
 
@@ -2077,6 +2081,8 @@ public void updateQueue(){
     @Override
     public void addSongsToPlaylist(ArrayList<Song> items, boolean top) {
         Log.d(TAG, "Group Option long clicked, add to playlist");
+        if(items == null || items.isEmpty()) return;
+
         long[] ids = new long[items.size()];
         for(int a = 0; a <items.size(); a++) ids[a] = Long.parseLong( items.get(a).getId() );
 

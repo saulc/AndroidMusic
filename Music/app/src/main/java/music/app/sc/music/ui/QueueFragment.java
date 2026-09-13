@@ -212,6 +212,8 @@ public class QueueFragment extends baseListFragment {
 
 
     private  void updateHeader(){
+        if(items == null) return;
+
         int s = items.size();
         String m = "Now playing: " + s + " song" + ( (s >1) ? "s": "");
 

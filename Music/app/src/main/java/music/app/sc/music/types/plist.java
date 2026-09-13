@@ -179,6 +179,8 @@ public class plist extends Qbase{
 	    	return null;
 	    }
 	    public Song getCurrentSong(){
+			if(songs == null || songs.isEmpty()) return null;
+
 	    	if(songIndex < songs.size())
 	    	return songs.get(songIndex);
 

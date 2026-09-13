@@ -11,8 +11,8 @@ android {
         applicationId "music.app.sc.music"
         minSdkVersion 23
         targetSdkVersion 37
-        versionCode 3
-        versionName "0.3"
+        versionCode 5
+        versionName "0.5"
         vectorDrawables.useSupportLibrary = true
     }
     buildFeatures {

@@ -212,12 +212,16 @@ public class  PlaylistHelper {
                     , cursor.getString(5), cursor.getString(6), cursor.getString(7)));
         }
         cursor.close();
-        int i = ((int) (Math.random() * 50000));
-        i = i % songs.size();
+        if(!songs.isEmpty()) {
+            int i = ((int) (Math.random() * 50000));
+            i = i % songs.size();
 
-        Log.d("M6", " 'random' song: " + i);
+            Log.d("M6", " 'random' song: " + i);
+
 
         return songs.get(i);
+        }
+        return null;
 
     }
 
