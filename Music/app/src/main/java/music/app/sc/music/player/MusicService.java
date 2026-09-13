@@ -63,18 +63,18 @@ public class MusicService extends Service implements OnSharedPreferenceChangeLis
   // private RemoteControlReceiver mRemoteControlReceiver;
 
    //intents
-   public static final String ACTION_TOGGLE_PLAYBACK = "com.app.m6.action.TOGGLE_PLAYBACK";
-   public static final String ACTION_PLAY = "com.app.m6.action.PLAY";
-   public static final String ACTION_PAUSE = "com.app.m6.action.PAUSE";
-   public static final String ACTION_STOP = "com.app.m6.action.STOP";
-   public static final String ACTION_NEXT = "com.app.m6.action.NEXT";
-   public static final String ACTION_PREVIOUS = "com.app.m6.action.PREVIOUS";
-   public static final String ACTION_BLANK = "com.app.m6.action.ACTION_BLANK";
-	public static final String ACTION_DUCK = "com.app.m6.action.ACTION_DUCK";
-	public static final String ACTION_GOOSE = "com.app.m6.action.ACTION_GOOSE";
+   public static final String ACTION_TOGGLE_PLAYBACK = "music.app.sc.music.action.TOGGLE_PLAYBACK";
+   public static final String ACTION_PLAY = "music.app.sc.music.action.PLAY";
+   public static final String ACTION_PAUSE = "music.app.sc.music.action.PAUSE";
+   public static final String ACTION_STOP = "music.app.sc.music.action.STOP";
+   public static final String ACTION_NEXT = "music.app.sc.music.action.NEXT";
+   public static final String ACTION_PREVIOUS = "music.app.sc.music.action.PREVIOUS";
+   public static final String ACTION_BLANK = "music.app.sc.music.action.ACTION_BLANK";
+	public static final String ACTION_DUCK = "music.app.sc.music.action.ACTION_DUCK";
+	public static final String ACTION_GOOSE = "music.app.sc.music.action.ACTION_GOOSE";
 	//dream intent to get now playing., snooze start, wake end dream
-	public static final String ACTION_SNOOZE = "com.app.m6.action.ACTION_SNOOZE";
-	public static final String ACTION_WAKE = "com.app.m6.action.ACTION_WAKE";
+	public static final String ACTION_SNOOZE = "music.app.sc.music.action.ACTION_SNOOZE";
+	public static final String ACTION_WAKE = "music.app.sc.music.action.ACTION_WAKE";
 	private boolean dreaming = false;
 
 	private RemoteControlClientCompat mRemoteControlClientCompat;

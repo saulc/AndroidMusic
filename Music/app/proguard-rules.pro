@@ -15,3 +15,15 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+
+# Prevent WorkManager classes from being stripped or obfuscated
+-keep class androidx.work.** { *; }
+-dontwarn androidx.work.**
+
+# Prevent Room database components from being stripped
+-keep class androidx.room.** { *; }
+-dontwarn androidx.room.**
+
+# Keep SQLite and database support classes
+-keep class androidx.sqlite.** { *; }
+-dontwarn androidx.sqlite.**
