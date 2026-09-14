@@ -2360,6 +2360,10 @@ public void updateQueue(){
         log(position + " Q item swiped " + mItem.getTitle());
       //  Toast.makeText(mService, "removed: " + mItem.getTitle() + " from queue.", Toast.LENGTH_SHORT).show();
 
+        if(position == mService.getQueue().getIndex()) //remove the song thats playing
+        {
+            nextPressed();
+        }
         log(position + " Removing " + mItem.getTitle() + " from queue.");
         mService.removeSong(position);
 

@@ -91,6 +91,16 @@ public class SecretFragment extends Fragment implements TextureView.SurfaceTextu
         return view;
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (mCamera != null) {
+            mCamera.stopPreview();
+            mCamera.release();
+            mCamera = null;
+        }
+    }
+
         @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -151,8 +161,10 @@ public class SecretFragment extends Fragment implements TextureView.SurfaceTextu
 
     @Override
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surfaceTexture) {
-        mCamera.stopPreview();
-       mCamera.release();
+        if(mCamera != null) {
+            mCamera.stopPreview();
+            mCamera.release();
+        }
         return true;
     }
 
