@@ -20,6 +20,7 @@ import music.app.sc.music.DrawerActivity;
 import music.app.sc.music.R;
 import music.app.sc.music.adapters.AlbumAdapter;
 import music.app.sc.music.types.Album;
+import music.app.sc.music.types.Artist;
 
 public class AlbumFragment  extends baseListFragment  implements DrawerActivity.mFabListener {
 
@@ -86,7 +87,7 @@ public class AlbumFragment  extends baseListFragment  implements DrawerActivity.
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_baselist, container, false);
 
-        View header =  view.findViewById(R.id.header);
+        header =  view.findViewById(R.id.header);
         TextView t = (TextView) header.findViewById(R.id.content);
         infoText = (TextView) header.findViewById(R.id.line2);
         infoText.setText("...");
@@ -125,12 +126,22 @@ public class AlbumFragment  extends baseListFragment  implements DrawerActivity.
 
     }
 
+    private View header;
     private  TextView infoText;
 
     private void updateHeader( ){
         if(infoText == null) return;
         String s = items.size() + " Albums" +  ( (items.size()==1) ? "" : "s");
         infoText.setText(s);
+
+        header.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                log("album header clicked");
+                mListener.onArtistLongClicked(new Artist(id, name));
+                //open all songs by artists
+            }
+        });
     }
 
     @Override
