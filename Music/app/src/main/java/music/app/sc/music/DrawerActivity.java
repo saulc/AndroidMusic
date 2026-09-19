@@ -1547,7 +1547,15 @@ public void updateQueue(){
             //expandSidebar();
             showControls();
             // return showq;
+
+
+            if (qf == null) {
+                log("updating queue.");
+                qf = QueueFragment.newInstance();
+                showFragment(R.id.qframe, qf, false);
+            }
         }
+
         if (showq > 3) {
             log("Hiding browser.");
             showq = 0;
@@ -1561,11 +1569,7 @@ public void updateQueue(){
             return showq;
         }
 
-        log("updating queue.");
-        if (qf == null) {
-            qf = QueueFragment.newInstance();
-            showFragment(R.id.qframe, qf, false);
-        }
+
         expandSidebar();
         return showq;
     }
@@ -2302,6 +2306,8 @@ public void updateQueue(){
         log("Q frag created");
         if(mService != null  )
             updateQueueFrag(mService.getQueue());
+
+//        if(qf != null) qf.updateAdapter();
     }
 
     @Override

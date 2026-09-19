@@ -404,7 +404,11 @@ public class NowFragment extends ControlFragment {
     public void updateSongInfo(Song s) {
         log("Now fragment updating song info.");
         //avoid doing this every second, it doesn't change
-
+        if (!isAdded() || getContext() == null) {
+            // The fragment is detached; abort any UI or resource-dependent updates
+            log("No context, returning before we hit an error.");
+            return;
+        }
         log("Now Playing: "+ s.getTitle() + " : " + s.getArtist());
 
 
