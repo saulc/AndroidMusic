@@ -1547,13 +1547,11 @@ public void updateQueue(){
             //expandSidebar();
             showControls();
             // return showq;
-
-
-            if (qf == null) {
-                log("updating queue.");
-                qf = QueueFragment.newInstance();
-                showFragment(R.id.qframe, qf, false);
-            }
+//            if (qf == null) {
+//                log("updating queue.");
+//                qf = QueueFragment.newInstance();
+//                showFragment(R.id.qframe, qf, false);
+//            }
         }
 
         if (showq > 3) {
@@ -1569,7 +1567,13 @@ public void updateQueue(){
             return showq;
         }
 
-
+        if (qf != null && mService != null) {
+            log("updating queue.");
+            updateQueueFrag(mService.getQueue());
+        } else if(qf == null){
+            qf = QueueFragment.newInstance();
+            showFragment(R.id.qframe, qf, false);
+        }
         expandSidebar();
         return showq;
     }
