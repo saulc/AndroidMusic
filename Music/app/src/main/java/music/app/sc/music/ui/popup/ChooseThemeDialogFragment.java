@@ -43,7 +43,7 @@ public  class ChooseThemeDialogFragment extends DialogFragment {
         a = R.style.AppThemeJarvis;
         items.add(a);
 
-        CharSequence[] i = { "Light", "Darkside", "Lake", "Nior", "Colors", "Jarvis"};
+        CharSequence[] i = { "Light", "Darkside", "Blue", "Nior", "Colors", "Jarvis"};
 
         return i;
     }
